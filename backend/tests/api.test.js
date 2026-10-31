@@ -1,0 +1,103 @@
+/**
+ * Integration tests for REST API endpoints
+ * Uses supertest — MongoDB connection is mocked
+ */
+
+const request = require('supertest');
+
+// Mock mongoose so tests don't need a real DB
+jest.mock('mongoose', () => ({
+  connect: jest.fn().mockResolvedValue({}),
+  connection: { on: jest.fn(), host: 'mock' },
+  Schema: class {
+    constructor() { this.index = jest.fn(); this.pre = jest.fn(); this.methods = {}; }
+    static Types = { ObjectId: String, Mixed: Object };
+  },
+  model: jest.fn().mockReturnValue({
+    findOne: jest.fn().mockResolvedValue(null),
+    find: jest.fn().mockResolvedValue([]),
+    create: jest.fn().mockResolvedValue({ _id: 'mock_id' }),
+    countDocuments: jest.fn().mockResolvedValue(0)
+  })
+}));
+
+// Mock models
+jest.mock('../src/models/User',     () => ({
+  findOne: jest.fn(),
+  create:  jest.fn(),
+  findById: jest.fn()
+}));
+jest.mock('../src/models/Trip',     () => ({ findOne: jest.fn(), find: jest.fn(), countDocuments: jest.fn() }));
+jest.mock('../src/models/Log',      () => ({ create: jest.fn() }));
+
+const app = require('../server');
+
+// ── Health check ──────────────────────────────────────────────────────────────
+
+describe('GET /health', () => {
+  it('returns 200 with status healthy', async () => {
+    const res = await request(app).get('/health');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('healthy');
+    expect(res.body).toHaveProperty('uptime');
+  });
+});
+
+// ── Auth routes ───────────────────────────────────────────────────────────────
+
+describe('POST /api/auth/login', () => {
+  it('returns 400 when email/password missing', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: '' });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('returns 400 for invalid email format', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'not-an-email', password: 'pass123' });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+// ── 404 handler ───────────────────────────────────────────────────────────────
+
+describe('Unknown routes', () => {
+  it('returns 404 for undefined routes', async () => {
+    const res = await request(app).get('/api/does-not-exist');
+    expect(res.statusCode).toBe(404);
+    expect(res.body.success).toBe(false);
+  });
+});
+
+// ── Protected routes ──────────────────────────────────────────────────────────
+
+describe('Protected routes without token', () => {
+  it('GET /api/trip/my returns 401', async () => {
+    const res = await request(app).get('/api/trip/my');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('GET /api/finance/report returns 401', async () => {
+    const res = await request(app).get('/api/finance/report');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('GET /api/admin/dashboard returns 401', async () => {
+    const res = await request(app).get('/api/admin/dashboard');
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+// ── Trip request validation ───────────────────────────────────────────────────
+
+describe('POST /api/trip/request validation', () => {
+  it('returns 401 without auth token', async () => {
+    const res = await request(app)
+      .post('/api/trip/request')
+      .send({ fromCity: 'Delhi', toCity: 'Mumbai' });
+    expect(res.statusCode).toBe(401);
+  });
+});
