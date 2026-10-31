@@ -21,11 +21,39 @@ const app = express();
 connectDB();
 
 // ── Security headers
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 
 // ── CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173'
+];
+
+if (process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL.split(',').forEach(url => {
+    const trimmed = url.trim().replace(/\/+$/, '');
+    if (trimmed) allowedOrigins.push(trimmed);
+  });
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g. curl, server-to-server, postman)
+    if (!origin) return callback(null, true);
+
+    const isExplicitlyAllowed = allowedOrigins.includes(origin) || allowedOrigins.includes('*');
+    const isVercel = origin.endsWith('.vercel.app');
+    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+
+    if (isExplicitlyAllowed || isVercel || isLocalhost || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']

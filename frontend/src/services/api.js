@@ -1,8 +1,22 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+const getBaseURL = () => {
+  // If explicitly configured via Vite env var (e.g. in Vercel settings or .env)
+  if (import.meta.env.VITE_API_URL) {
+    const url = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+    return url.endsWith('/api') ? url : `${url}/api`;
+  }
+  // In production builds (deployed to Vercel), default to the deployed Render backend
+  if (import.meta.env.PROD) {
+    return 'https://corporate-travel-management.onrender.com/api';
+  }
+  // In local development, fallback to '/api' (handled by Vite dev proxy)
+  return '/api';
+};
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: getBaseURL(),
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' }
 });
