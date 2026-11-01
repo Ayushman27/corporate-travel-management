@@ -80,7 +80,7 @@ export default function TripSummary({ trip, onBack }) {
             </div>
             <div style={{ textAlign: 'right' }}>
               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', color: 'var(--atmos-dark)' }}>
-                ₹{travelCost.toLocaleString('en-IN')}
+                ₹{(Number(travelCost) || 0).toLocaleString('en-IN')}
               </span>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function TripSummary({ trip, onBack }) {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', color: 'var(--atmos-dark)' }}>
-                  ₹{hotelCost.toLocaleString('en-IN')}
+                  ₹{(Number(hotelCost) || 0).toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
@@ -123,7 +123,7 @@ export default function TripSummary({ trip, onBack }) {
             </div>
             <div style={{ textAlign: 'right' }}>
               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', color: '#C4A25D', fontWeight: 600 }}>
-                ₹{trip.estimatedBudget.toLocaleString('en-IN')}
+                ₹{(Number(trip.estimatedBudget) || 0).toLocaleString('en-IN')}
               </span>
             </div>
           </div>

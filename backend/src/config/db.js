@@ -1,7 +1,10 @@
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
+
+// Parse PostgreSQL NUMERIC/DECIMAL (OID 1700) as JavaScript numbers
+types.setTypeParser(1700, (val) => (val === null ? null : parseFloat(val)));
 
 const connectionString =
   process.env.DATABASE_URL ||

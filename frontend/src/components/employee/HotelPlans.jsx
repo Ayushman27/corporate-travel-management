@@ -201,7 +201,21 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
         )}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+        <motion.button
+          onClick={() => onHotelSelected?.()}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          style={{
+            padding: '0.85rem 1.5rem', borderRadius: '0.75rem',
+            background: 'transparent',
+            border: '1px solid rgba(196,162,93,0.3)',
+            color: 'var(--atmos-dark)', fontFamily: 'Montserrat', fontSize: '0.82rem', fontWeight: 500,
+            cursor: 'pointer'
+          }}
+        >
+          Skip Hotel (Travel Only) →
+        </motion.button>
         <motion.button
           onClick={handleConfirm}
           disabled={!selectedHotelData || isSubmitting}

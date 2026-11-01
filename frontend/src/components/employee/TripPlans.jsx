@@ -18,16 +18,17 @@ const PLAN_META = {
 const MODE_EMOJI = { flight: '✈️', train: '🚆', bus: '🚌', metro: '🚇', cab: '🚕', walk: '🚶' };
 
 function ScoreBar({ label, value, color }) {
+  const num = typeof value === 'number' ? value : parseFloat(value) || 0;
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
         <span style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>{label}</span>
-        <span style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{value?.toFixed(1)}/10</span>
+        <span style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{num.toFixed(1)}/10</span>
       </div>
       <div style={{ height: '4px', borderRadius: '999px', background: 'rgba(196,162,93,0.1)', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${(value / 10) * 100}%` }}
+          animate={{ width: `${Math.min(100, Math.max(0, (num / 10) * 100))}%` }}
           transition={{ duration: 1.1, ease: [0.25, 1, 0.5, 1] }}
           style={{ height: '100%', borderRadius: '999px', background: color }}
         />
@@ -99,7 +100,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <div>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 500, color: 'var(--atmos-dark)', lineHeight: 1 }}>
-              ₹{plan.totalCost?.toLocaleString('en-IN')}
+              ₹{(Number(plan.totalCost) || 0).toLocaleString('en-IN')}
             </p>
             <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
               {hrs}h {mins}m total travel
@@ -180,7 +181,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{seg.from} → {seg.to}</p>
                     <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>
-                      {seg.operator} · {seg.departureTime}–{seg.arrivalTime} · ₹{seg.cost?.toLocaleString('en-IN')}
+                      {seg.operator} · {seg.departureTime}–{seg.arrivalTime} · ₹{(Number(seg.cost) || 0).toLocaleString('en-IN')}
                     </p>
                   </div>
                 </div>
@@ -194,7 +195,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
       <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid rgba(196,162,93,0.1)', display: 'flex', gap: '0.65rem' }}>
         {!selected ? (
           <motion.button
-            onClick={() => onSelect(plan._id)}
+            onClick={() => onSelect(plan._id || plan.id)}
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
             style={{
               flex: 1, padding: '0.6rem', borderRadius: '0.7rem',
@@ -210,7 +211,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
           </motion.button>
         ) : tripStatus === 'draft' ? (
           <motion.button
-            onClick={() => onBook(plan._id)}
+            onClick={() => onBook(plan._id || plan.id)}
             disabled={booking}
             whileHover={!booking ? { scale: 1.02, boxShadow: '0 8px 20px rgba(196,162,93,0.3)' } : {}}
             whileTap={!booking ? { scale: 0.97 } : {}}
@@ -228,7 +229,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
           </motion.button>
         ) : (
           <motion.button
-            onClick={() => onBook(plan._id)}
+            onClick={() => onBook(plan._id || plan.id)}
             disabled={booking}
             whileHover={!booking ? { scale: 1.02, boxShadow: `0 8px 20px ${meta.glow}` } : {}}
             whileTap={!booking ? { scale: 0.97 } : {}}
@@ -258,15 +259,15 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
 
   const handleSelect = async (planId) => {
     try {
-      if (trip.status !== 'draft' && trip.status !== 'pending_manager') {
+      if (trip?.status !== 'draft' && trip?.status !== 'pending_manager') {
         setSelectedPlanId(planId);
         toast.success('Plan selected for booking.');
         return;
       }
-      await tripAPI.selectPlan(trip.tripId, planId);
+      await tripAPI.selectPlan(trip?.tripId, planId);
       setSelectedPlanId(planId);
       onPlanSelected?.();
-      if (trip.status === 'draft') {
+      if (trip?.status === 'draft') {
         toast.success('Plan selected! Click "Continue to Hotels" to proceed.');
       } else {
         toast.success('Plan selected! Budget updated.');
@@ -278,18 +279,18 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
   };
 
   const handleBook = async (planId) => {
-    if (trip.status === 'draft') {
+    if (trip?.status === 'draft') {
       // Just move to the next step, don't send to manager yet
       onPlanSelected?.();
       return;
     }
-    if (trip.status !== 'approved') {
+    if (trip?.status !== 'approved') {
       toast.error('Trip must be approved before booking');
       return;
     }
     setBooking(true);
     try {
-      const bk = await bookSelectedPlan(trip.tripId, planId);
+      const bk = await bookSelectedPlan(trip?.tripId, planId);
       onBooked?.(bk);
     } finally { setBooking(false); }
   };
@@ -315,7 +316,7 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
               AI-Generated Plans
             </h2>
             <p style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
-              {trip.fromCity} → {trip.toCity} · 3 optimised options
+              {trip?.fromCity} → {trip?.toCity} · 3 optimised options
             </p>
           </div>
           {onBack && (
@@ -337,7 +338,7 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
       )}
 
       {/* Status notices */}
-      {trip.status !== 'approved' && trip.status !== 'draft' && (
+      {trip?.status !== 'approved' && trip?.status !== 'draft' && (
         <motion.div
           initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           style={{
@@ -346,11 +347,11 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
             fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#8B6914',
           }}
         >
-          ⏳ Trip status: <strong>{trip.status?.replace(/_/g, ' ')}</strong> — booking available after all approvals
+          ⏳ Trip status: <strong>{trip?.status?.replace(/_/g, ' ')}</strong> — booking available after all approvals
         </motion.div>
       )}
 
-      {trip.status === 'draft' && (
+      {trip?.status === 'draft' && (
         <motion.div
           initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           style={{
@@ -364,20 +365,20 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
       )}
 
       {/* Map visualization */}
-      {!compact && trip.fromCity && trip.toCity && (
-        <TripMap startCity={trip.fromCity} endCity={trip.toCity} />
+      {!compact && trip?.fromCity && trip?.toCity && (
+        <TripMap startCity={trip?.fromCity} endCity={trip?.toCity} />
       )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
         {plans.map((plan, i) => (
           <PlanCard
-            key={plan._id}
+            key={plan._id || plan.id || i}
             plan={plan}
-            selected={selectedPlanId === plan._id}
+            selected={selectedPlanId === (plan._id || plan.id)}
             onSelect={handleSelect}
             onBook={handleBook}
             booking={booking}
-            tripStatus={trip.status}
+            tripStatus={trip?.status}
             index={i}
           />
         ))}

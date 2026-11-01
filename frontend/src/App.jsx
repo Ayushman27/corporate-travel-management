@@ -16,6 +16,7 @@ import FinanceReimbursements from './pages/FinanceReimbursements';
 import AdminTelemetry from './pages/AdminTelemetry';
 import LoadingSpinner     from './components/common/ShimmerLoader';
 import AnimatedBackground from './components/common/AnimatedBackground';
+import ErrorBoundary      from './components/common/ErrorBoundary';
 
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
@@ -75,7 +76,9 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <TripProvider>
-          <AppRoutes />
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
         </TripProvider>
       </AuthProvider>
     </ThemeProvider>
