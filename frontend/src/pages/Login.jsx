@@ -503,18 +503,53 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
 
 // ── Admin Login ────────────────────────────────────────────────────────────────
 function AdminLoginForm({ onBack, loginFn, navigate }) {
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [showPwd,  setShowPwd]  = useState(false);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState('');
+  const [mode,           setMode]           = useState('password'); // 'password' | 'otp'
+  const [email,          setEmail]          = useState('');
+  const [password,       setPassword]       = useState('');
+  const [showPwd,        setShowPwd]        = useState(false);
+  const [loading,        setLoading]        = useState(false);
+  const [error,          setError]          = useState('');
   const [deactivatedData, setDeactivatedData] = useState(null);
+  const [requiresOTP,    setRequiresOTP]    = useState(false);
+  const [otp,            setOtp]            = useState('');
+  const [debugOtp,       setDebugOtp]       = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setError(''); setDeactivatedData(null); setLoading(true);
+    e.preventDefault(); setError(''); setDeactivatedData(null);
+    if (!email) { setError('Email is required'); return; }
+
+    if (mode === 'otp') {
+      if (requiresOTP && (!otp || otp.length < 4)) {
+        setError('Please enter the 4-digit OTP');
+        return;
+      }
+    } else {
+      if (!password) {
+        setError('Password is required');
+        return;
+      }
+    }
+
+    setLoading(true);
     try {
-      await loginFn(email, password);
-      navigate('/dashboard');
+      if (mode === 'otp') {
+        const res = await loginFn(email, undefined, requiresOTP ? otp : undefined);
+        if (res?.requiresOTP) {
+          setRequiresOTP(true);
+          if (res.debugOtp) {
+            setOtp(res.debugOtp);
+            setDebugOtp(res.debugOtp);
+            toast.success(`Admin OTP: ${res.debugOtp}`);
+          } else {
+            toast.success(res.message || 'OTP sent to your email');
+          }
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        await loginFn(email, password);
+        navigate('/dashboard');
+      }
     } catch (err) {
       if (err.response?.data?.deactivated) setDeactivatedData(err.response.data);
       setError(err.response?.data?.message || 'Login failed — please try again');
@@ -535,7 +570,7 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
         <ArrowLeft style={{ width: '13px', height: '13px' }} /> Back
       </OutlineButton>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
         <div style={{
           width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -545,8 +580,40 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
         </div>
         <div>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Company Admin</h2>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>Login with your admin credentials</p>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>Login with password or one-time code</p>
         </div>
+      </div>
+
+      {/* Mode Switcher */}
+      <div style={{ display: 'flex', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '3px', marginBottom: '1.25rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <button
+          type="button"
+          onClick={() => { setMode('password'); setError(''); setRequiresOTP(false); }}
+          style={{
+            flex: 1, padding: '0.45rem', borderRadius: '6px',
+            fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 600,
+            cursor: 'pointer', transition: 'all 0.2s',
+            background: mode === 'password' ? 'rgba(196,162,93,0.2)' : 'transparent',
+            color: mode === 'password' ? '#C4A25D' : 'var(--atmos-muted)',
+            border: mode === 'password' ? '1px solid rgba(196,162,93,0.4)' : '1px solid transparent'
+          }}
+        >
+          Password
+        </button>
+        <button
+          type="button"
+          onClick={() => { setMode('otp'); setError(''); }}
+          style={{
+            flex: 1, padding: '0.45rem', borderRadius: '6px',
+            fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 600,
+            cursor: 'pointer', transition: 'all 0.2s',
+            background: mode === 'otp' ? 'rgba(196,162,93,0.2)' : 'transparent',
+            color: mode === 'otp' ? '#C4A25D' : 'var(--atmos-muted)',
+            border: mode === 'otp' ? '1px solid rgba(196,162,93,0.4)' : '1px solid transparent'
+          }}
+        >
+          Email OTP
+        </button>
       </div>
 
       {error && (
@@ -563,24 +630,60 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div>
-          <label style={labelStyle}>Email Address</label>
+          <label style={labelStyle}>Admin Email Address</label>
           <input type="email" style={inputStyle} placeholder="admin@company.com" value={email} onChange={e => setEmail(e.target.value)} required autoFocus />
         </div>
-        <div>
-          <label style={labelStyle}>Password</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPwd ? 'text' : 'password'} style={{ ...inputStyle, paddingRight: '2.75rem' }}
-              placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required
-            />
-            <button type="button" onClick={() => setShowPwd(s => !s)}
-              style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#A8A4A0', padding: 0 }}>
-              {showPwd ? <EyeOff style={{ width: '15px', height: '15px' }} /> : <Eye style={{ width: '15px', height: '15px' }} />}
-            </button>
+
+        {mode === 'password' ? (
+          <div>
+            <label style={labelStyle}>Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPwd ? 'text' : 'password'} style={{ ...inputStyle, paddingRight: '2.75rem' }}
+                placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required
+              />
+              <button type="button" onClick={() => setShowPwd(s => !s)}
+                style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#A8A4A0', padding: 0 }}>
+                {showPwd ? <EyeOff style={{ width: '15px', height: '15px' }} /> : <Eye style={{ width: '15px', height: '15px' }} />}
+              </button>
+            </div>
           </div>
-        </div>
-        <GoldButton type="submit" disabled={loading}>
-          {loading ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Signing in…</> : 'Sign In'}
+        ) : (
+          requiresOTP && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ overflow: 'hidden' }}>
+              <label style={labelStyle}>Enter 4-Digit Admin OTP</label>
+              <input
+                type="text" style={{ ...inputStyle, textAlign: 'center', letterSpacing: '0.25em', fontSize: '1.2rem', fontWeight: 700 }}
+                placeholder="••••"
+                maxLength={4}
+                value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                required
+              />
+              {debugOtp ? (
+                <div style={{ marginTop: '0.6rem', padding: '0.6rem 0.8rem', background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '8px', textAlign: 'center' }}>
+                  <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#E8D5B5', margin: 0 }}>
+                    ⚡ Auto-filled OTP: <strong style={{ color: '#C4A25D', fontSize: '0.95rem', letterSpacing: '2px' }}>{debugOtp}</strong>
+                  </p>
+                </div>
+              ) : (
+                <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
+                  Admin OTP sent to {email}. Please check your inbox.
+                </p>
+              )}
+            </motion.div>
+          )
+        )}
+
+        <GoldButton type="submit" disabled={loading || (mode === 'otp' && requiresOTP && otp.length < 4)}>
+          {loading ? (
+            <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Processing…</>
+          ) : mode === 'password' ? (
+            'Sign In'
+          ) : requiresOTP ? (
+            'Verify & Sign In'
+          ) : (
+            'Send Admin OTP'
+          )}
         </GoldButton>
       </form>
     </GlassCard>

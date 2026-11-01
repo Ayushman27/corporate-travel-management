@@ -41,15 +41,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Admin login (email + password)
-  const adminLogin = useCallback(async (email, password) => {
-    const { data } = await authAPI.adminLogin({ email, password });
+  const adminLogin = useCallback(async (email, password, otp) => {
+    const { data } = await authAPI.adminLogin({ email, password, otp });
+    if (data.requiresOTP) {
+      return data;
+    }
     localStorage.setItem('ctm_token', data.token);
     localStorage.setItem('ctm_user',  JSON.stringify(data.user));
     if (data.company) localStorage.setItem('ctm_company', JSON.stringify(data.company));
     setUser(data.user);
     setCompany(data.company || null);
     toast.success(`Welcome back, ${data.user.name}!`);
-    return data.user;
+    return data;
   }, []);
 
   // Register company

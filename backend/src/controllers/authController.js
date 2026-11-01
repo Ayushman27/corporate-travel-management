@@ -353,39 +353,74 @@ const employeeLogin = async (req, res, next) => {
 };
 
 // ── POST /api/auth/admin-login ───────────────────────────────────────────────
-// Company head logs in with email + password.
+// Company head logs in with password OR OTP.
 const adminLogin = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    const { email, password, otp } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
-    console.log(`[AdminLogin] Attempting login for: ${email}`);
+    const cleanEmail = email.toLowerCase().trim();
+    console.log(`[AdminLogin] Attempting login for: ${cleanEmail} (mode: ${otp ? 'OTP_VERIFY' : password ? 'PASSWORD' : 'OTP_REQUEST'})`);
 
-    // Try to find the company by head email
-    const company = await Company.findOne({ headEmail: email.toLowerCase().trim() });
+    // Try to find the company by head email or admin user email
+    let company = await Company.findOne({ headEmail: cleanEmail });
     if (!company) {
-      console.log(`[AdminLogin] No company found for email: ${email}`);
+      const adminUser = await User.findOne({ email: cleanEmail, role: 'admin' });
+      if (adminUser) {
+        company = await Company.findOne({ companyId: adminUser.companyId });
+      }
+    }
+
+    if (!company) {
+      console.log(`[AdminLogin] No company found for email: ${cleanEmail}`);
       return res.status(404).json({ success: false, message: 'No company registered with this email' });
     }
     console.log(`[AdminLogin] Found company: ${company.companyId} (${company.companyName})`);
 
-    const passwordValid = await company.comparePassword(password);
-    console.log(`[AdminLogin] Password valid: ${passwordValid}`);
-    if (!passwordValid) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    const emailKey = `ADMIN:${cleanEmail}`;
+
+    if (otp) {
+      // Verify OTP
+      const stored = otpStore.get(emailKey);
+      if (!stored || stored.otp !== otp || Date.now() > stored.expiresAt) {
+        return res.status(401).json({ success: false, message: 'Invalid or expired OTP' });
+      }
+      otpStore.delete(emailKey);
+    } else if (!password) {
+      // User is requesting an OTP for Admin login
+      const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+      otpStore.set(emailKey, { otp: generatedOtp, expiresAt: Date.now() + 5 * 60 * 1000 });
+
+      const emailResult = await sendOTPEmail(generatedOtp, cleanEmail);
+
+      return res.json({
+        success: true,
+        message: emailResult?.sent ? `Admin OTP sent to ${cleanEmail}` : `OTP generated: ${generatedOtp}`,
+        requiresOTP: true,
+        debugOtp: emailResult?.sent ? undefined : generatedOtp,
+        emailDelivery: emailResult
+      });
+    } else {
+      // Validate Password
+      const passwordValid = await company.comparePassword(password);
+      console.log(`[AdminLogin] Password valid: ${passwordValid}`);
+      if (!passwordValid) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
     }
 
-    // Find the admin user — try by email first, then by employeeId
-    let user = await User.findOne({ companyId: company.companyId, email: email.toLowerCase().trim() });
+    // Find the admin user
+    let user = await User.findOne({ companyId: company.companyId, email: cleanEmail });
     if (!user) {
-      // Maybe the user exists with employeeId ADMIN-001 but email differs slightly
       user = await User.findOne({ companyId: company.companyId, employeeId: 'ADMIN-001' });
     }
-    console.log(`[AdminLogin] Admin user found: ${!!user}`);
     if (!user) {
-      // Auto-create admin user (recovery from DB wipe)
+      user = await User.findOne({ companyId: company.companyId, role: 'admin' });
+    }
+
+    if (!user) {
       console.log(`[AdminLogin] Auto-creating admin user for ${company.companyId}`);
       user = await User.findOneAndUpdate(
         { companyId: company.companyId, employeeId: 'ADMIN-001' },
@@ -394,7 +429,7 @@ const adminLogin = async (req, res, next) => {
           employeeId: 'ADMIN-001',
           name: company.headName,
           email: company.headEmail,
-          password: password,
+          password: password || 'Admin@123',
           department: 'Management',
           role: 'admin',
           loginType: 'password',
@@ -402,13 +437,6 @@ const adminLogin = async (req, res, next) => {
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
-      console.log(`[AdminLogin] Admin user auto-created: ${user._id}`);
-    }
-
-    // Ensure email matches the company head email
-    if (user.email !== company.headEmail) {
-      user.email = company.headEmail;
-      await user.save({ validateBeforeSave: false });
     }
 
     if (!user.isActive) {
@@ -419,9 +447,9 @@ const adminLogin = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     const token = signToken(user._id);
-    await audit('LOGIN', { actor: user, details: { email, loginType: 'password' }, req });
+    await audit('LOGIN', { actor: user, details: { email: cleanEmail, loginType: otp ? 'admin_otp' : 'password' }, req });
 
-    console.log(`[AdminLogin] Login successful for ${email}`);
+    console.log(`[AdminLogin] Login successful for ${cleanEmail}`);
     res.json({ success: true, token, user, company: { companyId: company.companyId, companyName: company.companyName } });
   } catch (err) {
     next(err);
