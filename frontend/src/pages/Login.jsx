@@ -340,6 +340,7 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
   const [deactivatedData, setDeactivatedData] = useState(null);
   const [requiresOTP, setRequiresOTP] = useState(false);
   const [otp, setOtp] = useState('');
+  const [debugOtp, setDebugOtp] = useState('');
 
   useEffect(() => {
     authAPI.listCompanies()
@@ -359,7 +360,13 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
       const res = await loginFn(email, companyId, requiresOTP ? otp : undefined);
       if (res?.requiresOTP) {
         setRequiresOTP(true);
-        toast.success(res.message || 'OTP sent to your email');
+        if (res.debugOtp) {
+          setOtp(res.debugOtp);
+          setDebugOtp(res.debugOtp);
+          toast.success(`OTP generated: ${res.debugOtp}`);
+        } else {
+          toast.success(res.message || 'OTP sent to your email');
+        }
       } else {
         navigate('/dashboard');
       }
@@ -469,9 +476,20 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
               value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
               required
             />
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
-              OTP sent to {email}. Check terminal console.
-            </p>
+            {debugOtp ? (
+              <div style={{ marginTop: '0.6rem', padding: '0.6rem 0.8rem', background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#E8D5B5', margin: 0 }}>
+                  ⚡ Auto-filled OTP: <strong style={{ color: '#C4A25D', fontSize: '0.95rem', letterSpacing: '2px' }}>{debugOtp}</strong>
+                </p>
+                <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: '#A8A4A0', marginTop: '0.25rem', marginBottom: 0 }}>
+                  (SMTP not configured on Render — auto-filled for instant login)
+                </p>
+              </div>
+            ) : (
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
+                OTP sent to {email}. Please check your inbox.
+              </p>
+            )}
           </motion.div>
         )}
 

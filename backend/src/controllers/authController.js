@@ -15,7 +15,7 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
       console.log(`[OTP SYSTEM] Warning: SMTP credentials missing in .env. Falling back to console logging.`);
       console.log(`[OTP] To: ${actualUserEmail}`);
       console.log(`[OTP] Code: ${otp}`);
-      return;
+      return { sent: false, reason: 'SMTP credentials missing' };
     }
 
     const transporter = nodemailer.createTransport({
@@ -27,7 +27,7 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
     });
 
     await transporter.sendMail({
-      from: '"AeroSync CTM" <ayushpatro000@gmail.com>',
+      from: `"AeroSync CTM" <${process.env.SMTP_EMAIL}>`,
       to: actualUserEmail, // Sending to the actual employee who is logging in
       subject: "Your AeroSync CTM Login OTP",
       text: `Hello,\n\nSomeone (email: ${actualUserEmail}) is attempting to login to CTM.\n\nYour CTM Login OTP is: ${otp}\n\nIt will expire in 5 minutes.\n\nRegards,\nAeroSync Team`,
@@ -39,8 +39,10 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
             </div>`
     });
     console.log(`[OTP SYSTEM] Real Email successfully sent to ${actualUserEmail}`);
+    return { sent: true };
   } catch (error) {
     console.error("[OTP SYSTEM] Error sending real email:", error.message);
+    return { sent: false, reason: error.message };
   }
 };
 
@@ -225,9 +227,14 @@ const employeeLogin = async (req, res, next) => {
           otpStore.set(emailKey, { otp: generatedOtp, expiresAt: Date.now() + 5 * 60 * 1000 });
 
           // Send the OTP via email
-          await sendOTPEmail(generatedOtp, email);
+          const emailResult = await sendOTPEmail(generatedOtp, email);
 
-          return res.json({ success: true, message: `OTP sent to ${email}`, requiresOTP: true });
+          return res.json({
+            success: true,
+            message: emailResult?.sent ? `OTP sent to ${email}` : `OTP generated: ${generatedOtp}`,
+            requiresOTP: true,
+            debugOtp: emailResult?.sent ? undefined : generatedOtp
+          });
         }
 
         existingUser.lastLogin = new Date();
@@ -247,9 +254,14 @@ const employeeLogin = async (req, res, next) => {
       otpStore.set(emailKey, { otp: generatedOtp, expiresAt: Date.now() + 5 * 60 * 1000 });
 
       // Send the OTP via email
-      await sendOTPEmail(generatedOtp, email);
+          const emailResult = await sendOTPEmail(generatedOtp, email);
 
-      return res.json({ success: true, message: `OTP sent to ${email}`, requiresOTP: true });
+          return res.json({
+            success: true,
+            message: emailResult?.sent ? `OTP sent to ${email}` : `OTP generated: ${generatedOtp}`,
+            requiresOTP: true,
+            debugOtp: emailResult?.sent ? undefined : generatedOtp
+          });
     }
 
     console.log(`[EmployeeLogin] HRMS employee found: ${hrmsEmployee.EmployeeID} (${hrmsEmployee.Name})`);
