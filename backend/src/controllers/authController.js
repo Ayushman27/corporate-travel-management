@@ -14,7 +14,7 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
   // 1. Try Brevo (formerly Sendinblue) Transactional Email API
   if (process.env.BREVO_API_KEY) {
     try {
-      const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_EMAIL || 'ayushmanpatro2003@gmail.com';
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_EMAIL || 'htrackcom@gmail.com';
       const senderName = process.env.BREVO_SENDER_NAME || 'AeroSync CTM';
 
       const response = await axios.post(
@@ -71,7 +71,7 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
         }
       });
 
-      const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM || process.env.SMTP_EMAIL || 'ayushmanpatro2003@gmail.com';
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM || process.env.SMTP_EMAIL || 'htrackcom@gmail.com';
 
       await transporter.sendMail({
         from: `"AeroSync CTM" <${senderEmail}>`,
@@ -589,7 +589,7 @@ const requestReactivation = async (req, res, next) => {
 
 // ── GET /api/auth/email-diagnostic ──────────────────────────────────────────
 const emailDiagnostic = async (req, res) => {
-  const result = await sendOTPEmail('9999', req.query.email || 'ayushmanpatro2003@gmail.com');
+  const result = await sendOTPEmail('9999', req.query.email || 'htrackcom@gmail.com');
   res.json({
     env: {
       hasBrevoApiKey: !!process.env.BREVO_API_KEY,
