@@ -6,44 +6,89 @@ const { syncCompanySheets, getEmployeeByEmail, getAllEmployees } = require('../s
 const { audit } = require('../services/auditService');
 const logger = require('../utils/logger');
 const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 const otpStore = new Map(); // Simple in-memory store for OTPs
 
 const sendOTPEmail = async (otp, actualUserEmail) => {
-  try {
-    if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
-      console.log(`[OTP SYSTEM] Warning: SMTP credentials missing in .env. Falling back to console logging.`);
-      console.log(`[OTP] To: ${actualUserEmail}`);
-      console.log(`[OTP] Code: ${otp}`);
-      return { sent: false, reason: 'SMTP credentials missing' };
+  // 1. Try Brevo (formerly Sendinblue) Transactional Email API
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_EMAIL || 'ayushmanpatro2003@gmail.com';
+      const senderName = process.env.BREVO_SENDER_NAME || 'AeroSync CTM';
+
+      const response = await axios.post(
+        'https://api.brevo.com/v3/smtp/email',
+        {
+          sender: { name: senderName, email: senderEmail },
+          to: [{ email: actualUserEmail }],
+          subject: 'Your AeroSync CTM Login OTP',
+          htmlContent: `<div style="font-family: sans-serif; padding: 24px; background: #0c0a09; color: #fff; border-radius: 12px; max-width: 500px; margin: 0 auto; border: 1px solid rgba(196,162,93,0.3);">
+            <h2 style="color: #C4A25D; margin-top: 0; font-family: serif;">AeroSync CTM</h2>
+            <p style="font-size: 14px; color: #d4d4d4;">Hello,</p>
+            <p style="font-size: 14px; color: #d4d4d4;">Someone with email <b>${actualUserEmail}</b> requested to log in to the Corporate Travel Management system.</p>
+            <p style="font-size: 14px; color: #d4d4d4;">Your one-time login OTP is:</p>
+            <div style="background: rgba(196,162,93,0.12); border: 1px solid rgba(196,162,93,0.35); padding: 14px 28px; border-radius: 8px; display: inline-block; font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #C4A25D; margin: 12px 0;">
+              ${otp}
+            </div>
+            <p style="color: #888; font-size: 12px; margin-top: 16px;">This OTP will expire in 5 minutes. If you did not initiate this request, you can safely ignore this email.</p>
+          </div>`,
+          textContent: `Hello,\n\nYour AeroSync CTM Login OTP is: ${otp}\n\nIt will expire in 5 minutes.\n\nRegards,\nAeroSync Team`
+        },
+        {
+          headers: {
+            'accept': 'application/json',
+            'api-key': process.env.BREVO_API_KEY,
+            'content-type': 'application/json'
+          },
+          timeout: 10000
+        }
+      );
+
+      console.log(`[BREVO OTP] Email successfully sent to ${actualUserEmail}. Message ID:`, response.data?.messageId);
+      return { sent: true, provider: 'brevo', messageId: response.data?.messageId };
+    } catch (err) {
+      console.error(`[BREVO OTP] Failed to send via Brevo API:`, err.response?.data || err.message);
+      // Fall through to SMTP if configured or console fallback
     }
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD
-      }
-    });
-
-    await transporter.sendMail({
-      from: `"AeroSync CTM" <${process.env.SMTP_EMAIL}>`,
-      to: actualUserEmail, // Sending to the actual employee who is logging in
-      subject: "Your AeroSync CTM Login OTP",
-      text: `Hello,\n\nSomeone (email: ${actualUserEmail}) is attempting to login to CTM.\n\nYour CTM Login OTP is: ${otp}\n\nIt will expire in 5 minutes.\n\nRegards,\nAeroSync Team`,
-      html: `<div style="font-family: sans-serif; padding: 20px;">
-              <h2 style="color: #C4A25D;">AeroSync CTM Login</h2>
-              <p>Someone (<b>${actualUserEmail}</b>) is attempting to log in.</p>
-              <p>Your OTP is: <strong style="font-size: 24px; letter-spacing: 2px;">${otp}</strong></p>
-              <p style="color: #777; font-size: 12px;">This code expires in 5 minutes.</p>
-            </div>`
-    });
-    console.log(`[OTP SYSTEM] Real Email successfully sent to ${actualUserEmail}`);
-    return { sent: true };
-  } catch (error) {
-    console.error("[OTP SYSTEM] Error sending real email:", error.message);
-    return { sent: false, reason: error.message };
   }
+
+  // 2. Try SMTP (e.g. Gmail App Password)
+  if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.SMTP_EMAIL,
+          pass: process.env.SMTP_PASSWORD
+        }
+      });
+
+      await transporter.sendMail({
+        from: `"AeroSync CTM" <${process.env.SMTP_EMAIL}>`,
+        to: actualUserEmail,
+        subject: "Your AeroSync CTM Login OTP",
+        text: `Hello,\n\nSomeone (email: ${actualUserEmail}) is attempting to login to CTM.\n\nYour CTM Login OTP is: ${otp}\n\nIt will expire in 5 minutes.\n\nRegards,\nAeroSync Team`,
+        html: `<div style="font-family: sans-serif; padding: 20px;">
+                <h2 style="color: #C4A25D;">AeroSync CTM Login</h2>
+                <p>Someone (<b>${actualUserEmail}</b>) is attempting to log in.</p>
+                <p>Your OTP is: <strong style="font-size: 24px; letter-spacing: 2px;">${otp}</strong></p>
+                <p style="color: #777; font-size: 12px;">This code expires in 5 minutes.</p>
+              </div>`
+      });
+
+      console.log(`[SMTP OTP] Real Email successfully sent to ${actualUserEmail}`);
+      return { sent: true, provider: 'smtp' };
+    } catch (error) {
+      console.error("[SMTP OTP] Error sending real email:", error.message);
+    }
+  }
+
+  // 3. Fallback when neither service is active or working
+  console.log(`[OTP SYSTEM] Notice: No active email service succeeded. Falling back to local/debug display.`);
+  console.log(`[OTP] To: ${actualUserEmail}`);
+  console.log(`[OTP] Code: ${otp}`);
+  return { sent: false, reason: 'No email service succeeded' };
 };
 
 const signToken = (id) =>
