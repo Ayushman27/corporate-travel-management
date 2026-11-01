@@ -332,6 +332,9 @@ class BaseModel {
   }
 
   findById(id) {
+    if (!id) {
+      return new Query(this, { id: '00000000-0000-0000-0000-000000000000' }, true);
+    }
     return new Query(this, { id }, true);
   }
 
