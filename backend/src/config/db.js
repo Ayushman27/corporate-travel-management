@@ -1,49 +1,49 @@
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 const logger = require('../utils/logger');
 
+const connectionString =
+  process.env.DATABASE_URL ||
+  process.env.NEON_DATABASE_URL ||
+  'postgresql://neondb_owner:npg_8FxyTVjeo3Dt@ep-steep-moon-b55zp83t-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+
+const pool = new Pool({
+  connectionString,
+  ssl: { rejectUnauthorized: false },
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000
+});
+
+pool.on('error', (err) => {
+  logger.error(`[Neon] Unexpected client error: ${err.message}`);
+});
+
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/ctm_db';
+  if (process.env.NODE_ENV === 'test') return;
 
   try {
-    const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    });
-    logger.info(`MongoDB connected: ${conn.connection.host}`);
+    const client = await pool.connect();
+    const res = await client.query('SELECT NOW()');
+    client.release();
+    logger.info(`✅ Neon PostgreSQL connected successfully! Server time: ${res.rows[0].now}`);
 
-    // Clean up stale single-field unique indexes that conflict with compound indexes
-    try {
-      const usersCollection = conn.connection.db.collection('users');
-      const indexes = await usersCollection.indexes();
-      const staleIndexes = indexes.filter(idx => {
-        const keys = Object.keys(idx.key);
-        // Drop single-field unique indexes on employeeId or email
-        // (these should only be unique as part of compound indexes with companyId)
-        return idx.unique && keys.length === 1 && ['employeeId', 'email'].includes(keys[0]);
-      });
-      for (const idx of staleIndexes) {
-        logger.info(`[DB] Dropping stale unique index: ${idx.name}`);
-        await usersCollection.dropIndex(idx.name);
-      }
-      if (staleIndexes.length > 0) {
-        logger.info(`[DB] Dropped ${staleIndexes.length} stale index(es). Rebuilding correct indexes...`);
-        await mongoose.model('User').syncIndexes();
-      }
-    } catch (indexErr) {
-      // Collection may not exist yet on first run — that's fine
-      if (indexErr.codeName !== 'NamespaceNotFound') {
-        logger.warn(`[DB] Index cleanup warning: ${indexErr.message}`);
-      }
+    // Ensure database tables exist
+    const schemaPath = path.join(__dirname, 'schema.sql');
+    if (fs.existsSync(schemaPath)) {
+      const sql = fs.readFileSync(schemaPath, 'utf-8');
+      await pool.query(sql);
+      logger.info('✅ Neon database schema verified');
     }
   } catch (err) {
-    logger.error(`MongoDB connection error: ${err.message}`);
-    // Retry after 5 s instead of crashing immediately
+    logger.error(`❌ Neon PostgreSQL connection error: ${err.message}`);
     setTimeout(connectDB, 5000);
   }
 };
 
-mongoose.connection.on('disconnected', () =>
-  logger.warn('MongoDB disconnected — attempting reconnect...')
-);
+connectDB.connectDB = connectDB;
+connectDB.pool = pool;
+connectDB.query = (text, params) => pool.query(text, params);
 
 module.exports = connectDB;

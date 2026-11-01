@@ -3,16 +3,16 @@ const logger = require('../utils/logger');
 const errorHandler = (err, req, res, _next) => {
   logger.error(`${err.name}: ${err.message}`, { stack: err.stack, url: req.originalUrl });
 
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const messages = Object.values(err.errors).map(e => e.message);
-    return res.status(400).json({ success: false, message: 'Validation error', errors: messages });
+  // PostgreSQL / Mongoose duplicate key
+  if (err.code === '23505' || err.code === 11000) {
+    const detail = err.detail || '';
+    return res.status(409).json({ success: false, message: detail ? `Duplicate record: ${detail}` : 'Duplicate key error' });
   }
 
-  // Mongoose duplicate key
-  if (err.code === 11000) {
-    const field = Object.keys(err.keyValue || {})[0] || 'field';
-    return res.status(409).json({ success: false, message: `Duplicate value for ${field}` });
+  // Validation error
+  if (err.name === 'ValidationError') {
+    const messages = err.errors ? Object.values(err.errors).map(e => e.message) : [err.message];
+    return res.status(400).json({ success: false, message: 'Validation error', errors: messages });
   }
 
   // JWT

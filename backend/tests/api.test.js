@@ -1,28 +1,20 @@
 /**
  * Integration tests for REST API endpoints
- * Uses supertest — MongoDB connection is mocked
+ * Uses supertest — Neon DB connection is mocked
  */
 
 const request = require('supertest');
 
-// Mock mongoose so tests don't need a real DB
-jest.mock('mongoose', () => {
-  const m = {
-    connect: jest.fn().mockResolvedValue({ connection: { host: 'mock' } }),
-    connection: { on: jest.fn(), host: 'mock' },
-    Schema: class {
-      constructor() { this.index = jest.fn(); this.pre = jest.fn(); this.methods = {}; }
-      static Types = { ObjectId: String, Mixed: Object };
-    },
-    model: jest.fn().mockReturnValue({
-      findOne: jest.fn().mockResolvedValue(null),
-      find: jest.fn().mockResolvedValue([]),
-      create: jest.fn().mockResolvedValue({ _id: 'mock_id' }),
-      countDocuments: jest.fn().mockResolvedValue(0)
-    })
-  };
-  return m;
-});
+// Mock pg pool so tests don't need network
+jest.mock('../src/config/db', () => ({
+  pool: {
+    query: jest.fn().mockResolvedValue({ rows: [] }),
+    connect: jest.fn().mockResolvedValue({ query: jest.fn(), release: jest.fn() }),
+    on: jest.fn()
+  },
+  query: jest.fn().mockResolvedValue({ rows: [] }),
+  connectDB: jest.fn().mockResolvedValue(true)
+}));
 
 // Mock models
 jest.mock('../src/models/User',     () => ({

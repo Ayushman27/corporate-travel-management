@@ -1,16 +1,12 @@
 /**
- * Seeds the MongoDB database with a sample company and users.
+ * Seeds the Neon database with a sample company and users.
  * Run: node src/utils/seedDB.js
- *
- * NOTE: In the new multi-tenant flow, companies register through the UI
- * and employees are auto-imported from the HRMS Google Sheet.
- * This seed script creates a sample company for local development.
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
-const mongoose = require('mongoose');
 const fs       = require('fs');
 const path     = require('path');
+const { pool, connectDB } = require('../config/db');
 const User     = require('../models/User');
 const Company  = require('../models/Company');
 
@@ -72,45 +68,47 @@ const users = [
 ];
 
 (async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/ctm_db';
-  await mongoose.connect(uri);
+  try {
+    await connectDB();
 
-  // Upsert sample company (won't wipe other registered companies)
-  await Company.findOneAndUpdate(
-    { companyId: COMPANY_ID },
-    sampleCompany,
-    { upsert: true, new: true, setDefaultsOnInsert: true }
-  );
-  console.log(`✅ Upserted sample company: ${sampleCompany.companyName}`);
-
-  // Upsert sample users (won't wipe other registered users)
-  for (const u of users) {
-    await User.findOneAndUpdate(
-      { companyId: u.companyId, employeeId: u.employeeId },
-      u,
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+    // Upsert sample company
+    await Company.findOneAndUpdate(
+      { companyId: COMPANY_ID },
+      sampleCompany,
+      { upsert: true, new: true }
     );
-  }
-  console.log(`✅ Upserted ${users.length} sample users`);
+    console.log(`✅ Upserted sample company: ${sampleCompany.companyName}`);
 
-  // Copy Excel files into the per-company data directory
-  if (!fs.existsSync(COMPANY_DIR)) fs.mkdirSync(COMPANY_DIR, { recursive: true });
-
-  const filesToCopy = ['hrms.xlsx', 'finance.xlsx'];
-  for (const file of filesToCopy) {
-    const src  = path.join(DATA_DIR, file);
-    const dest = path.join(COMPANY_DIR, file);
-    if (fs.existsSync(src)) {
-      fs.copyFileSync(src, dest);
-      console.log(`✅ Copied ${file} → data/${COMPANY_ID}/${file}`);
-    } else {
-      console.warn(`⚠️  ${file} not found at data/ root — employee login may fail`);
+    // Upsert sample users
+    for (const u of users) {
+      await User.findOneAndUpdate(
+        { companyId: u.companyId, employeeId: u.employeeId },
+        u,
+        { upsert: true, new: true }
+      );
     }
+    console.log(`✅ Upserted ${users.length} sample users into Neon DB`);
+
+    // Copy Excel files into per-company directory
+    if (!fs.existsSync(COMPANY_DIR)) fs.mkdirSync(COMPANY_DIR, { recursive: true });
+
+    const filesToCopy = ['hrms.xlsx', 'finance.xlsx'];
+    for (const file of filesToCopy) {
+      const src  = path.join(DATA_DIR, file);
+      const dest = path.join(COMPANY_DIR, file);
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest);
+        console.log(`✅ Copied ${file} → data/${COMPANY_ID}/${file}`);
+      }
+    }
+
+    console.log('\n📋 Login credentials:');
+    console.log('  Employee login: arjun@company.com (Company ID: COMP-DEV00001)');
+    console.log('  Admin login:    suresh@company.com / password123');
+
+    await pool.end();
+  } catch (err) {
+    console.error('Seed error:', err);
+    process.exit(1);
   }
-
-  console.log('\n📋 Login options:');
-  console.log('  Employee login: Use any email (e.g. arjun@company.com) — no password needed');
-  console.log('  Admin login:    suresh@company.com / password123');
-
-  await mongoose.disconnect();
 })();
