@@ -65,6 +65,9 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
         host: smtpHost,
         port: smtpPort,
         secure: smtpPort === 465,
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
         auth: {
           user: smtpUser,
           pass: smtpPass
@@ -588,6 +591,20 @@ const requestReactivation = async (req, res, next) => {
 
 
 // ── GET /api/auth/email-diagnostic ──────────────────────────────────────────
+
+// ── GET /api/auth/email-env ──────────────────────────────────────────────────
+const emailEnv = (req, res) => {
+  res.json({
+    hasBrevoApiKey: !!process.env.BREVO_API_KEY,
+    hasSmtpHost: !!process.env.SMTP_HOST,
+    smtpHost: process.env.SMTP_HOST || null,
+    hasSmtpUser: !!process.env.SMTP_USER,
+    smtpUser: process.env.SMTP_USER || null,
+    hasSmtpPassword: !!process.env.SMTP_PASSWORD,
+    brevoSenderEmail: process.env.BREVO_SENDER_EMAIL || null
+  });
+};
+
 const emailDiagnostic = async (req, res) => {
   const result = await sendOTPEmail('9999', req.query.email || 'htrackcom@gmail.com');
   res.json({
@@ -606,6 +623,7 @@ const emailDiagnostic = async (req, res) => {
 
 module.exports = {
   emailDiagnostic,
+  emailEnv,
   registerCompany, employeeLogin, adminLogin,
   listCompanies, syncSheets,
   getMe, updateMe, reactivateAdmin, requestReactivation
