@@ -6,26 +6,33 @@
 const request = require('supertest');
 
 // Mock mongoose so tests don't need a real DB
-jest.mock('mongoose', () => ({
-  connect: jest.fn().mockResolvedValue({}),
-  connection: { on: jest.fn(), host: 'mock' },
-  Schema: class {
-    constructor() { this.index = jest.fn(); this.pre = jest.fn(); this.methods = {}; }
-    static Types = { ObjectId: String, Mixed: Object };
-  },
-  model: jest.fn().mockReturnValue({
-    findOne: jest.fn().mockResolvedValue(null),
-    find: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockResolvedValue({ _id: 'mock_id' }),
-    countDocuments: jest.fn().mockResolvedValue(0)
-  })
-}));
+jest.mock('mongoose', () => {
+  const m = {
+    connect: jest.fn().mockResolvedValue({ connection: { host: 'mock' } }),
+    connection: { on: jest.fn(), host: 'mock' },
+    Schema: class {
+      constructor() { this.index = jest.fn(); this.pre = jest.fn(); this.methods = {}; }
+      static Types = { ObjectId: String, Mixed: Object };
+    },
+    model: jest.fn().mockReturnValue({
+      findOne: jest.fn().mockResolvedValue(null),
+      find: jest.fn().mockResolvedValue([]),
+      create: jest.fn().mockResolvedValue({ _id: 'mock_id' }),
+      countDocuments: jest.fn().mockResolvedValue(0)
+    })
+  };
+  return m;
+});
 
 // Mock models
 jest.mock('../src/models/User',     () => ({
   findOne: jest.fn(),
   create:  jest.fn(),
   findById: jest.fn()
+}));
+jest.mock('../src/models/Company',  () => ({
+  findOne: jest.fn(),
+  create:  jest.fn()
 }));
 jest.mock('../src/models/Trip',     () => ({ findOne: jest.fn(), find: jest.fn(), countDocuments: jest.fn() }));
 jest.mock('../src/models/Log',      () => ({ create: jest.fn() }));
@@ -45,20 +52,23 @@ describe('GET /health', () => {
 
 // ── Auth routes ───────────────────────────────────────────────────────────────
 
-describe('POST /api/auth/login', () => {
-  it('returns 400 when email/password missing', async () => {
+describe('POST /api/auth/employee-login', () => {
+  it('returns 400 when email or companyId missing', async () => {
     const res = await request(app)
-      .post('/api/auth/login')
+      .post('/api/auth/employee-login')
       .send({ email: '' });
     expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
   });
+});
 
-  it('returns 400 for invalid email format', async () => {
+describe('POST /api/auth/admin-login', () => {
+  it('returns 400 when email or password missing', async () => {
     const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'not-an-email', password: 'pass123' });
+      .post('/api/auth/admin-login')
+      .send({ email: '' });
     expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
   });
 });
 

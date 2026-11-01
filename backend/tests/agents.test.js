@@ -44,32 +44,32 @@ describe('PolicyService — checkPolicy', () => {
   const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   const trip = { travelDate: futureDate, travelMode: 'mixed' };
 
-  test('employee within budget passes', () => {
-    const result = checkPolicy(trip, 'employee', 20000);
+  test('employee within budget passes', async () => {
+    const result = await checkPolicy(trip, 'employee', 20000);
     expect(result.passed).toBe(true);
     expect(result.violations).toHaveLength(0);
   });
 
-  test('employee over budget fails', () => {
-    const result = checkPolicy(trip, 'employee', 60000);
+  test('employee over budget fails', async () => {
+    const result = await checkPolicy(trip, 'employee', 60000);
     expect(result.passed).toBe(false);
     expect(result.violations.length).toBeGreaterThan(0);
   });
 
-  test('manager has higher budget limit', () => {
-    const result = checkPolicy(trip, 'manager', 100000);
+  test('manager has higher budget limit', async () => {
+    const result = await checkPolicy(trip, 'manager', 100000);
     expect(result.passed).toBe(true);
   });
 
-  test('same-day travel fails advance notice check', () => {
+  test('same-day travel fails advance notice check', async () => {
     const today = new Date().toISOString();
-    const result = checkPolicy({ ...trip, travelDate: today }, 'employee', 10000);
+    const result = await checkPolicy({ ...trip, travelDate: today }, 'employee', 10000);
     expect(result.passed).toBe(false);
     expect(result.violations.some(v => v.includes('days from today'))).toBe(true);
   });
 
-  test('budget warning at 80%', () => {
-    const result = checkPolicy(trip, 'employee', 42000); // 84% of 50000
+  test('budget warning at 80%', async () => {
+    const result = await checkPolicy(trip, 'employee', 42000); // 84% of 50000
     expect(result.warnings.length).toBeGreaterThan(0);
   });
 });

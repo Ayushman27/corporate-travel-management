@@ -17,8 +17,10 @@ const hotelRoutes = require('./src/routes/hotelRoutes');
 
 const app = express();
 
-// Connect MongoDB
-connectDB();
+// Connect MongoDB (skip in automated tests)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // ── Security headers
 app.use(helmet({
@@ -100,15 +102,17 @@ app.use((_req, res) =>
 // ── Centralised error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () =>
-  logger.info(`🚀 CTM Backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`)
-);
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () =>
+    logger.info(`🚀 CTM Backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`)
+  );
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received — shutting down gracefully');
-  server.close(() => process.exit(0));
-});
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    logger.info('SIGTERM received — shutting down gracefully');
+    server.close(() => process.exit(0));
+  });
+}
 
 module.exports = app; // for tests
