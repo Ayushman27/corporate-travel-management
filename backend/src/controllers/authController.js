@@ -318,7 +318,8 @@ const employeeLogin = async (req, res, next) => {
             success: true,
             message: emailResult?.sent ? `OTP sent to ${email}` : `OTP generated: ${generatedOtp}`,
             requiresOTP: true,
-            debugOtp: emailResult?.sent ? undefined : generatedOtp
+            debugOtp: emailResult?.sent ? undefined : generatedOtp,
+            emailDelivery: emailResult
           });
         }
 
@@ -345,7 +346,8 @@ const employeeLogin = async (req, res, next) => {
             success: true,
             message: emailResult?.sent ? `OTP sent to ${email}` : `OTP generated: ${generatedOtp}`,
             requiresOTP: true,
-            debugOtp: emailResult?.sent ? undefined : generatedOtp
+            debugOtp: emailResult?.sent ? undefined : generatedOtp,
+            emailDelivery: emailResult
           });
     }
 
@@ -584,7 +586,26 @@ const requestReactivation = async (req, res, next) => {
   }
 };
 
+
+// ── GET /api/auth/email-diagnostic ──────────────────────────────────────────
+const emailDiagnostic = async (req, res) => {
+  const result = await sendOTPEmail('9999', req.query.email || 'ayushmanpatro2003@gmail.com');
+  res.json({
+    env: {
+      hasBrevoApiKey: !!process.env.BREVO_API_KEY,
+      hasSmtpHost: !!process.env.SMTP_HOST,
+      smtpHost: process.env.SMTP_HOST || null,
+      hasSmtpUser: !!process.env.SMTP_USER,
+      smtpUser: process.env.SMTP_USER || null,
+      hasSmtpPassword: !!process.env.SMTP_PASSWORD,
+      brevoSenderEmail: process.env.BREVO_SENDER_EMAIL || null
+    },
+    sendResult: result
+  });
+};
+
 module.exports = {
+  emailDiagnostic,
   registerCompany, employeeLogin, adminLogin,
   listCompanies, syncSheets,
   getMe, updateMe, reactivateAdmin, requestReactivation
