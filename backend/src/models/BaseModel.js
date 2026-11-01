@@ -67,6 +67,56 @@ class Query {
   }
 }
 
+class UpdateQuery {
+  constructor(modelClass, filter, update, options) {
+    this.modelClass = modelClass;
+    this.filter = filter;
+    this.update = update;
+    this.options = options || {};
+    this._selectFields = null;
+    this._populates = [];
+    this._isLean = false;
+  }
+
+  select(fields) {
+    this._selectFields = fields;
+    return this;
+  }
+
+  populate(field, selectFields) {
+    this._populates.push({ field, selectFields });
+    return this;
+  }
+
+  lean() {
+    this._isLean = true;
+    return this;
+  }
+
+  async exec() {
+    const doc = await this.modelClass._executeUpdate(this.filter, this.update, this.options);
+    if (!doc) return null;
+
+    if (typeof this._selectFields === 'string') {
+      const parts = this._selectFields.trim().split(/\s+/);
+      for (const p of parts) {
+        if (p.startsWith('-')) {
+          delete doc[toCamelCase(p.substring(1))];
+        }
+      }
+    }
+    return this._isLean ? (doc.toObject ? doc.toObject() : doc) : doc;
+  }
+
+  then(resolve, reject) {
+    return this.exec().then(resolve, reject);
+  }
+
+  catch(reject) {
+    return this.exec().catch(reject);
+  }
+}
+
 class BaseModel {
   constructor(tableName, jsonFields = []) {
     this.tableName = tableName;
@@ -147,8 +197,13 @@ class BaseModel {
       if (val === undefined) continue;
 
       if (key === '_id' || key === 'id') {
-        clauses.push(`id = $${idx++}`);
+        if (this.tableName === 'users') {
+          clauses.push(`(id = $${idx} OR employee_id = $${idx})`);
+        } else {
+          clauses.push(`id = $${idx}`);
+        }
         params.push(val);
+        idx++;
         continue;
       }
 
@@ -243,15 +298,28 @@ class BaseModel {
       }
     }
 
+    const processDoc = (doc) => {
+      if (!doc) return null;
+      if (typeof queryObj._selectFields === 'string') {
+        const parts = queryObj._selectFields.trim().split(/\s+/);
+        for (const p of parts) {
+          if (p.startsWith('-')) {
+            delete doc[toCamelCase(p.substring(1))];
+          }
+        }
+      }
+      return queryObj._isLean ? (doc.toObject ? doc.toObject() : doc) : doc;
+    };
+
     if (queryObj.isSingle) {
       if (rows.length === 0) return null;
       const doc = this._rowToDoc(rows[0]);
-      return queryObj._isLean ? doc.toObject() : doc;
+      return processDoc(doc);
     }
 
     return rows.map((r) => {
       const doc = this._rowToDoc(r);
-      return queryObj._isLean ? doc.toObject() : doc;
+      return processDoc(doc);
     });
   }
 
@@ -317,7 +385,15 @@ class BaseModel {
     return parseInt(rows[0].count, 10);
   }
 
-  async findOneAndUpdate(filter, update, options = {}) {
+  findOneAndUpdate(filter, update, options = {}) {
+    return new UpdateQuery(this, filter, update, options);
+  }
+
+  findByIdAndUpdate(id, update, options = {}) {
+    return new UpdateQuery(this, { id }, update, options);
+  }
+
+  async _executeUpdate(filter, update, options = {}) {
     let existing = await this.findOne(filter);
     const updatePayload = update.$set ? { ...update.$set } : { ...update };
     delete updatePayload.$set;
@@ -337,12 +413,8 @@ class BaseModel {
     return existing;
   }
 
-  async findByIdAndUpdate(id, update, options = {}) {
-    return await this.findOneAndUpdate({ id }, update, options);
-  }
-
   async updateOne(filter, update) {
-    const doc = await this.findOneAndUpdate(filter, update);
+    const doc = await this._executeUpdate(filter, update);
     return { modifiedCount: doc ? 1 : 0 };
   }
 
