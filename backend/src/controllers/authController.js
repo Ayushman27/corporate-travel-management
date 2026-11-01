@@ -53,7 +53,47 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
     }
   }
 
-  // 2. Try SMTP (e.g. Gmail App Password)
+    // 2. Try Custom SMTP (e.g. Brevo SMTP relay or standard SMTP)
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+  const smtpUser = process.env.SMTP_USER || process.env.SMTP_EMAIL;
+  const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+
+  if (smtpHost && smtpUser && smtpPass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM || process.env.SMTP_EMAIL || 'ayushmanpatro2003@gmail.com';
+
+      await transporter.sendMail({
+        from: `"AeroSync CTM" <${senderEmail}>`,
+        to: actualUserEmail,
+        subject: "Your AeroSync CTM Login OTP",
+        text: `Hello,\n\nSomeone (email: ${actualUserEmail}) is attempting to login to CTM.\n\nYour CTM Login OTP is: ${otp}\n\nIt will expire in 5 minutes.\n\nRegards,\nAeroSync Team`,
+        html: `<div style="font-family: sans-serif; padding: 20px;">
+                <h2 style="color: #C4A25D;">AeroSync CTM Login</h2>
+                <p>Someone (<b>${actualUserEmail}</b>) is attempting to log in.</p>
+                <p>Your OTP is: <strong style="font-size: 24px; letter-spacing: 2px;">${otp}</strong></p>
+                <p style="color: #777; font-size: 12px;">This code expires in 5 minutes.</p>
+              </div>`
+      });
+
+      console.log(`[CUSTOM SMTP OTP] Real Email successfully sent to ${actualUserEmail} via ${smtpHost}`);
+      return { sent: true, provider: 'custom_smtp' };
+    } catch (error) {
+      console.error("[CUSTOM SMTP OTP] Error sending real email:", error.message);
+    }
+  }
+
+  // 3. Try Gmail SMTP
   if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
     try {
       const transporter = nodemailer.createTransport({
