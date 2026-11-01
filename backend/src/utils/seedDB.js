@@ -4,24 +4,24 @@
  */
 
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
-const fs       = require('fs');
-const path     = require('path');
+const fs = require('fs');
+const path = require('path');
 const { pool, connectDB } = require('../config/db');
-const User     = require('../models/User');
-const Company  = require('../models/Company');
+const User = require('../models/User');
+const Company = require('../models/Company');
 
 const COMPANY_ID = 'COMP-DEV00001';
-const DATA_DIR   = path.join(__dirname, '../../data');
+const DATA_DIR = path.join(__dirname, '../../data');
 const COMPANY_DIR = path.join(DATA_DIR, COMPANY_ID);
 
 const sampleCompany = {
-  companyId:      COMPANY_ID,
-  companyName:    'Dev Corp (Sample)',
-  headName:       'Suresh Kumar',
-  headEmail:      'suresh@company.com',
-  headPassword:   'password123',
-  hrmsSheetUrl:   'https://docs.google.com/spreadsheets/d/1EjlWbgIPWdQtTtQwEVymXZfJjG3MJbw-yVob1xd42rs/edit',
-  financeSheetUrl:'https://docs.google.com/spreadsheets/d/1EjlWbgIPWdQtTtQwEVymXZfJjG3MJbw-yVob1xd42rs/edit',
+  companyId: COMPANY_ID,
+  companyName: 'Dev Corp (Sample)',
+  headName: 'Suresh Kumar',
+  headEmail: 'suresh@company.com',
+  headPassword: 'password123',
+  hrmsSheetUrl: 'https://docs.google.com/spreadsheets/d/1EjlWbgIPWdQtTtQwEVymXZfJjG3MJbw-yVob1xd42rs/edit',
+  financeSheetUrl: 'https://docs.google.com/spreadsheets/d/1EjlWbgIPWdQtTtQwEVymXZfJjG3MJbw-yVob1xd42rs/edit',
   policy: {
     budgetLimits: { employee: 50000, manager: 150000, finance: 150000, admin: 500000 },
     minAdvanceNoticeDays: 2,
@@ -31,37 +31,37 @@ const sampleCompany = {
 
 const users = [
   {
-    employeeId: 'EMP001', companyId: COMPANY_ID, name: 'Arjun Sharma',  email: 'arjun@company.com',
+    employeeId: 'EMP001', companyId: COMPANY_ID, name: 'Arjun Sharma', email: 'arjun@company.com',
     department: 'Engineering', role: 'employee', loginType: 'email_only',
     managerId: 'EMP005', travelBudgetLimit: 50000
   },
   {
-    employeeId: 'EMP002', companyId: COMPANY_ID, name: 'Priya Mehta',   email: 'priya@company.com',
+    employeeId: 'EMP002', companyId: COMPANY_ID, name: 'Priya Mehta', email: 'priya@company.com',
     department: 'Sales', role: 'employee', loginType: 'email_only',
     managerId: 'EMP006', travelBudgetLimit: 80000
   },
   {
-    employeeId: 'EMP003', companyId: COMPANY_ID, name: 'Rahul Gupta',   email: 'rahul@company.com',
+    employeeId: 'EMP003', companyId: COMPANY_ID, name: 'Rahul Gupta', email: 'rahul@company.com',
     department: 'Marketing', role: 'employee', loginType: 'email_only',
     managerId: 'EMP005', travelBudgetLimit: 50000
   },
   {
-    employeeId: 'EMP005', companyId: COMPANY_ID, name: 'Vikram Nair',   email: 'vikram@company.com',
+    employeeId: 'EMP005', companyId: COMPANY_ID, name: 'Vikram Nair', email: 'vikram@company.com',
     department: 'Engineering', role: 'manager', loginType: 'email_only',
     managerId: 'EMP009', travelBudgetLimit: 150000
   },
   {
-    employeeId: 'EMP006', companyId: COMPANY_ID, name: 'Kavitha Iyer',  email: 'kavitha@company.com',
+    employeeId: 'EMP006', companyId: COMPANY_ID, name: 'Kavitha Iyer', email: 'kavitha@company.com',
     department: 'Sales', role: 'manager', loginType: 'email_only',
     managerId: 'EMP009', travelBudgetLimit: 150000
   },
   {
-    employeeId: 'EMP007', companyId: COMPANY_ID, name: 'Deepak Joshi',  email: 'deepak@company.com',
+    employeeId: 'EMP007', companyId: COMPANY_ID, name: 'Deepak Joshi', email: 'deepak@company.com',
     department: 'Finance', role: 'finance', loginType: 'email_only',
     managerId: 'EMP009', travelBudgetLimit: 100000
   },
   {
-    employeeId: 'ADMIN-001', companyId: COMPANY_ID, name: 'Suresh Kumar',  email: 'suresh@company.com',
+    employeeId: 'ADMIN-001', companyId: COMPANY_ID, name: 'Suresh Kumar', email: 'suresh@company.com',
     password: 'password123', department: 'Management',
     role: 'admin', loginType: 'password', travelBudgetLimit: 500000
   },
@@ -94,7 +94,7 @@ const users = [
 
     const filesToCopy = ['hrms.xlsx', 'finance.xlsx'];
     for (const file of filesToCopy) {
-      const src  = path.join(DATA_DIR, file);
+      const src = path.join(DATA_DIR, file);
       const dest = path.join(COMPANY_DIR, file);
       if (fs.existsSync(src)) {
         fs.copyFileSync(src, dest);

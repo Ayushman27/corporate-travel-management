@@ -162,3 +162,4 @@ CREATE TABLE IF NOT EXISTS logs (
   user_agent TEXT,
   timestamp TIMESTAMPTZ DEFAULT NOW()
 );
+
