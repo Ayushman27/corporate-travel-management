@@ -69,23 +69,81 @@ const validateEmployee = async (companyId, employeeId) => {
   }
 
   // Resolve manager (admin users don't need a manager)
-  if (employee.ManagerID) {
+  const isAdmin = (employee.Role || '').toLowerCase() === 'admin';
+
+  if (isAdmin) {
+    manager = {
+      EmployeeID: employee.EmployeeID,
+      Name: employee.Name,
+      Email: employee.Email
+    };
+    logger.info(`[HRMSAgent] Employee ${employeeId} is an Admin — self-managed`);
+  } else if (employee.ManagerID) {
+    // 1. Try HRMS Excel
     try {
       manager = getEmployeeById(companyId, employee.ManagerID);
-      if (!manager) {
-        // Try DB fallback for manager too
+    } catch (err) {
+      logger.warn(`[HRMSAgent] HRMS Excel manager read error: ${err.message}`);
+    }
+
+    // 2. Try Database lookup
+    if (!manager) {
+      try {
         const dbManager = await User.findOne({ companyId, employeeId: employee.ManagerID });
         if (dbManager) {
-          manager = { EmployeeID: dbManager.employeeId, Name: dbManager.name, Email: dbManager.email };
-        } else {
-          errors.push(`Manager '${employee.ManagerID}' not found in HRMS`);
+          manager = {
+            EmployeeID: dbManager.employeeId,
+            Name: dbManager.name,
+            Email: dbManager.email,
+            Department: dbManager.department,
+            Role: dbManager.role
+          };
+          logger.info(`[HRMSAgent] Resolved manager ${employee.ManagerID} (${dbManager.name}) from database`);
         }
+      } catch (dbErr) {
+        logger.warn(`[HRMSAgent] DB manager lookup error: ${dbErr.message}`);
+      }
+    }
+
+    // 3. Fallback: if assigned manager is not found, auto-route to company admin
+    if (!manager) {
+      try {
+        const adminManager = await User.findOne({ companyId, role: 'admin' });
+        if (adminManager && adminManager.employeeId !== employee.EmployeeID) {
+          manager = {
+            EmployeeID: adminManager.employeeId,
+            Name: adminManager.name,
+            Email: adminManager.email,
+            Department: adminManager.department,
+            Role: adminManager.role
+          };
+          logger.info(`[HRMSAgent] Manager ${employee.ManagerID} not found — falling back to company admin ${adminManager.name}`);
+        }
+      } catch (_) {}
+    }
+
+    if (!manager) {
+      errors.push(`Manager '${employee.ManagerID}' could not be resolved from HRMS or database`);
+    }
+  } else {
+    // Non-admin employee with no ManagerID mapped — auto-route to company admin
+    try {
+      const adminManager = await User.findOne({ companyId, role: 'admin' });
+      if (adminManager) {
+        manager = {
+          EmployeeID: adminManager.employeeId,
+          Name: adminManager.name,
+          Email: adminManager.email,
+          Department: adminManager.department,
+          Role: adminManager.role
+        };
+        logger.info(`[HRMSAgent] No manager in profile for ${employeeId} — routed to company admin ${adminManager.name}`);
+      } else {
+        errors.push('No manager mapped for employee in HRMS or database');
       }
     } catch (_) {
-      errors.push('Could not resolve manager from HRMS');
+      errors.push('No manager mapped for employee in HRMS');
     }
-  } else if (employee.Role !== 'admin') {
-    errors.push('No manager mapped for employee in HRMS');
   }
 
   const result = {
