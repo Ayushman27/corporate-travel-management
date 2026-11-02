@@ -192,6 +192,8 @@ export default function AdminPanel() {
   const [logs,    setLogs]    = useState([]);
   const [trips,   setTrips]   = useState([]);
   const [loading, setLoading] = useState(true);
+  const [budgetModalOpen, setBudgetModalOpen] = useState(false);
+  const [viewingBillTrip, setViewingBillTrip] = useState(null);
 
   useEffect(() => {
     const load = async () => {

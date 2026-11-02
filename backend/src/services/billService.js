@@ -66,3 +66,4 @@ const enrichTripWithBillDetails = async (trip) => {
 };
 
 module.exports = { enrichTripWithBillDetails };
+
