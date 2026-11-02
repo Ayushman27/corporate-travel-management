@@ -16,14 +16,14 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
   if (process.env.BREVO_API_KEY) {
     try {
       const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_EMAIL || 'htrackcom@gmail.com';
-      const senderName = process.env.BREVO_SENDER_NAME || 'AeroSync CTM';
+      const senderName = process.env.BREVO_SENDER_NAME || 'Travello CTM';
 
       const response = await axios.post(
         'https://api.brevo.com/v3/smtp/email',
         {
           sender: { name: senderName, email: senderEmail },
           to: [{ email: actualUserEmail }],
-          subject: `Your AeroSync Verification Code: ${otp}`,
+          subject: `Your Travello Verification Code: ${otp}`,
           htmlContent: getOTPEmailHTML(otp, actualUserEmail),
           textContent: getOTPEmailText(otp, actualUserEmail)
         },
@@ -69,9 +69,9 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
       const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM || process.env.SMTP_EMAIL || 'htrackcom@gmail.com';
 
       await transporter.sendMail({
-        from: `"AeroSync CTM" <${senderEmail}>`,
+        from: `"Travello CTM" <${senderEmail}>`,
         to: actualUserEmail,
-        subject: `Your AeroSync Verification Code: ${otp}`,
+        subject: `Your Travello Verification Code: ${otp}`,
         html: getOTPEmailHTML(otp, actualUserEmail),
         text: getOTPEmailText(otp, actualUserEmail)
       });

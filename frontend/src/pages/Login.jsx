@@ -43,24 +43,22 @@ export default function Login() {
           transition={{ duration: 0.6, ease }}
           style={{ textAlign: 'center', marginBottom: '2rem' }}
         >
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: '64px', height: '64px', borderRadius: '18px',
-              background: 'var(--atmos-accent-grad)', boxShadow: '0 12px 32px var(--atmos-accent-glow)',
-              marginBottom: '1rem',
-            }}
-          >
-            <Plane style={{ color: '#fff', width: '28px', height: '28px' }} />
+          <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+            <img
+              src={isDark ? '/travello-logo-dark.png' : '/travello-logo.png'}
+              alt="Travello"
+              style={{
+                height: '58px',
+                width: 'auto',
+                margin: '0 auto 0.6rem',
+                display: 'block',
+                objectFit: 'contain',
+                filter: isDark
+                  ? 'drop-shadow(0 4px 20px rgba(37,99,235,0.22))'
+                  : 'drop-shadow(0 4px 16px rgba(1,16,78,0.12))',
+              }}
+            />
           </motion.div>
-          <h1 style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontSize: '2.2rem', fontWeight: 700,
-            color: 'var(--atmos-dark)', letterSpacing: '-0.02em', lineHeight: 1.1,
-          }}>
-            AeroSync
-          </h1>
           <p style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: '0.68rem', letterSpacing: '0.15em',

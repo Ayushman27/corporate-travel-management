@@ -11,7 +11,7 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('[AeroSync ErrorBoundary caught]:', error, errorInfo);
+    console.error('[Travello ErrorBoundary caught]:', error, errorInfo);
   }
 
   render() {

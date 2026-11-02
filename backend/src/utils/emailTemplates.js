@@ -1,5 +1,5 @@
 /**
- * Generates a luxury, enterprise-grade, responsive HTML email template for AeroSync CTM OTP.
+ * Generates a luxury, enterprise-grade, responsive HTML email template for Travello CTM OTP.
  * Fully compatible with Gmail (iOS/Android/Web), Apple Mail, and Outlook.
  */
 function getOTPEmailHTML(otp, userEmail) {
@@ -8,7 +8,7 @@ function getOTPEmailHTML(otp, userEmail) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AeroSync Verification Code</title>
+  <title>Travello Verification Code</title>
   <style>
     body {
       margin: 0;
@@ -156,7 +156,7 @@ function getOTPEmailHTML(otp, userEmail) {
     <div class="card">
       <!-- Brand Header -->
       <div class="header-bar">
-        <h1 class="brand-title">✈ AeroSync</h1>
+        <h1 class="brand-title">✈ Travello</h1>
         <div class="brand-sub">Corporate Travel Management</div>
       </div>
 
@@ -182,7 +182,7 @@ function getOTPEmailHTML(otp, userEmail) {
           </tr>
           <tr class="details-row">
             <td class="details-key">Portal:</td>
-            <td class="details-val">AeroSync Employee Dashboard</td>
+            <td class="details-val">Travello Employee Dashboard</td>
           </tr>
           <tr class="details-row">
             <td class="details-key">Security Status:</td>
@@ -192,14 +192,14 @@ function getOTPEmailHTML(otp, userEmail) {
 
         <!-- Security Note -->
         <div class="instructions">
-          <strong>Security Notice:</strong> Never share this code with anyone. AeroSync representatives will never ask you for your verification code. If you did not make this request, you can safely disregard this message.
+          <strong>Security Notice:</strong> Never share this code with anyone. Travello representatives will never ask you for your verification code. If you did not make this request, you can safely disregard this message.
         </div>
       </div>
 
       <!-- Footer -->
       <div class="footer-bar">
         <p class="footer-text">
-          © 2026 AeroSync Corporate Travel Management System.<br>
+          © 2026 Travello Corporate Travel Management System.<br>
           Automated security dispatch — please do not reply to this email.
         </p>
       </div>
@@ -210,7 +210,7 @@ function getOTPEmailHTML(otp, userEmail) {
 }
 
 function getOTPEmailText(otp, userEmail) {
-  return `✈ AEROSYNC CORPORATE TRAVEL MANAGEMENT
+  return `✈ TRAVELLO CORPORATE TRAVEL MANAGEMENT
 ==========================================
 
 Hello,
@@ -223,10 +223,10 @@ Your One-Time Verification Code is:
 (This code expires in 5 minutes)
 
 Security Notice:
-Never share this code with anyone. AeroSync representatives will never ask you for your code. If you did not initiate this request, you can safely disregard this email.
+Never share this code with anyone. Travello representatives will never ask you for your code. If you did not initiate this request, you can safely disregard this email.
 
 --
-© 2026 AeroSync Inc. All rights reserved.
+© 2026 Travello Inc. All rights reserved.
 `;
 }
 

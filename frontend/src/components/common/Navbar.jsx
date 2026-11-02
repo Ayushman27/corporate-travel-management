@@ -74,30 +74,28 @@ export default function Navbar() {
       <Link to="/dashboard" style={{ textDecoration: 'none' }}>
         <motion.div
           style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}
-          whileHover={{ opacity: 0.85 }}
+          whileHover={{ opacity: 0.9 }}
         >
-          <motion.div
+          <img
+            src="/travello-mark.png"
+            alt="Travello"
             style={{
-              width: scrolled ? '32px' : '38px', height: scrolled ? '32px' : '38px',
-              borderRadius: '10px',
-              background: 'var(--atmos-accent-grad)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: isDark ? '0 4px 12px rgba(196,162,93,0.35)' : '0 4px 12px rgba(37,99,235,0.35)',
-              transition: 'all 0.4s cubic-bezier(0.25,1,0.5,1)',
-              flexShrink: 0,
+              height: scrolled ? '28px' : '34px',
+              width: 'auto',
+              objectFit: 'contain',
+              transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
+              filter: 'drop-shadow(0 2px 8px rgba(37,99,235,0.25))'
             }}
-          >
-            <Plane style={{ color: '#fff', width: scrolled ? '15px' : '18px', height: scrolled ? '15px' : '18px', transition: 'all 0.4s ease' }} />
-          </motion.div>
+          />
           <div>
             <div style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: scrolled ? '1.1rem' : '1.3rem',
-              fontWeight: 400, letterSpacing: '-0.02em',
+              fontSize: scrolled ? '1.15rem' : '1.3rem',
+              fontWeight: 800, letterSpacing: '-0.03em',
               color: 'var(--atmos-dark)', lineHeight: 1.1,
-              transition: 'font-size 0.4s ease',
+              transition: 'font-size 0.3s ease',
             }}>
-              AeroSync
+              Travello
             </div>
             {company?.companyName && (
               <div style={{
