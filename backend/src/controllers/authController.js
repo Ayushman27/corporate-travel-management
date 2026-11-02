@@ -168,39 +168,6 @@ const registerCompany = async (req, res, next) => {
     } catch (err) {
       logger.warn(`[Auth] Employee import fallback: ${err.message}`);
     }
-    if (false) // bypassed legacy loop
-    let importedCount = 0;
-    try {
-      const employees = getAllEmployees(companyId);
-      for (const emp of employees) {
-        if (!emp.EmployeeID || !emp.Email) continue;
-        // Skip if same email as head
-        if (emp.Email.toLowerCase().trim() === headEmail.toLowerCase().trim()) continue;
-
-        await User.findOneAndUpdate(
-          { companyId, employeeId: emp.EmployeeID },
-          {
-            companyId,
-            employeeId: emp.EmployeeID,
-            name: emp.Name || emp.EmployeeID,
-            email: (emp.Email || '').toLowerCase().trim(),
-            department: emp.Department || 'General',
-            role: (emp.Role || 'employee').toLowerCase(),
-            loginType: 'email_only',
-            managerId: emp.ManagerID || null,
-            travelBudgetLimit: emp.TravelBudget || 50000,
-            travelBudgetUsed: emp.TravelBudgetUsed || 0,
-            password: null
-          },
-          { upsert: true, new: true }
-        );
-        importedCount++;
-      }
-      logger.info(`[Auth] Imported ${importedCount} employees for company ${companyId}`);
-    } catch (err) {
-      logger.warn(`[Auth] Employee import partially failed: ${err.message}`);
-    }
-
     const token = signToken(headUser._id);
     await audit('COMPANY_REGISTERED', { actor: headUser, details: { companyId, companyName, importedCount } });
 
@@ -490,39 +457,18 @@ const syncSheets = async (req, res, next) => {
     const company = await Company.findOne({ companyId: req.user.companyId });
     if (!company) return res.status(404).json({ success: false, message: 'Company not found' });
 
-    await syncCompanySheets(company.companyId, company.hrmsSheetUrl, company.financeSheetUrl);
-    company.lastSheetSync = new Date();
-    await company.save();
+    const { syncCompanyDataToDB } = require('../services/excelService');
+    const syncRes = await syncCompanyDataToDB(company.companyId, company.hrmsSheetUrl);
 
-    // Re-import employees
-    const employees = getAllEmployees(company.companyId);
-    let importedCount = 0;
-    for (const emp of employees) {
-      if (!emp.EmployeeID || !emp.Email) continue;
-      if (emp.Email.toLowerCase().trim() === company.headEmail.toLowerCase().trim()) continue;
-
-      await User.findOneAndUpdate(
-        { companyId: company.companyId, employeeId: emp.EmployeeID },
-        {
-          companyId: company.companyId,
-          employeeId: emp.EmployeeID,
-          name: emp.Name || emp.EmployeeID,
-          email: (emp.Email || '').toLowerCase().trim(),
-          department: emp.Department || 'General',
-          role: (emp.Role || 'employee').toLowerCase(),
-          loginType: 'email_only',
-          managerId: emp.ManagerID || null,
-          travelBudgetLimit: emp.TravelBudget || 50000,
-          travelBudgetUsed: emp.TravelBudgetUsed || 0
-        },
-        { upsert: true, new: true }
-      );
-      importedCount++;
-    }
-
-    res.json({ success: true, message: `Sheets synced. ${importedCount} employees imported.`, lastSheetSync: company.lastSheetSync });
+    res.json({
+      success: true,
+      message: `Sheets synced successfully: ${syncRes.empSynced} employees, ${syncRes.budgetSynced} budgets updated.`,
+      lastSheetSync: syncRes.lastSheetSync || new Date(),
+      data: syncRes
+    });
   } catch (err) {
-    next(err);
+    logger.error(`[Auth] syncSheets error: ${err.message}`);
+    res.status(500).json({ success: false, message: `Sync failed: ${err.message}` });
   }
 };
 

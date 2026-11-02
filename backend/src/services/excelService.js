@@ -91,6 +91,8 @@ const downloadSheet = async (sheetUrl, destPath) => {
   const exportUrl = toExportUrl(sheetUrl);
   logger.info(`[Excel] Downloading sheet from ${exportUrl}`);
   const response = await axios.get(exportUrl, { responseType: 'arraybuffer', timeout: 30000 });
+  const dir = path.dirname(destPath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(destPath, response.data);
   logger.info(`[Excel] Saved to ${destPath}`);
   return response.data;
@@ -99,6 +101,7 @@ const downloadSheet = async (sheetUrl, destPath) => {
 // ── Generic helpers ──────────────────────────────────────────────────────────
 
 const findSheet = (workbook, namePatterns, fallbackIndex = 0) => {
+  if (!workbook || !workbook.SheetNames) return null;
   const sheetNames = workbook.SheetNames;
   for (const pattern of namePatterns) {
     const match = sheetNames.find(s => s.toLowerCase().includes(pattern.toLowerCase()));
@@ -108,47 +111,74 @@ const findSheet = (workbook, namePatterns, fallbackIndex = 0) => {
 };
 
 const readSheet = (filePath, sheetNameOrIndex = 0) => {
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Excel file not found: ${filePath}`);
+  if (!filePath || !fs.existsSync(filePath)) {
+    return [];
   }
-  const workbook = xlsx.readFile(filePath);
-  let sheetName;
-  if (typeof sheetNameOrIndex === 'number') {
-    sheetName = workbook.SheetNames[sheetNameOrIndex];
-  } else {
-    sheetName = findSheet(workbook, [sheetNameOrIndex], 0);
+  try {
+    const workbook = xlsx.readFile(filePath);
+    let sheetName;
+    if (typeof sheetNameOrIndex === 'number') {
+      sheetName = workbook.SheetNames[sheetNameOrIndex];
+    } else {
+      sheetName = findSheet(workbook, [sheetNameOrIndex], 0);
+    }
+    return (sheetName && workbook.Sheets[sheetName]) ? xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null }) : [];
+  } catch (err) {
+    logger.warn(`[Excel] readSheet failed: ${err.message}`);
+    return [];
   }
-  return xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
 };
 
 const readHrmsSheet = (companyId) => {
-  const filePath = hrmsPath(companyId);
-  const workbook = xlsx.readFile(filePath);
-  const sheetName = findSheet(workbook, ['hrms', 'employee', 'staff', 'people'], 0);
-  return xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
+  try {
+    const filePath = hrmsPath(companyId);
+    if (!filePath || !fs.existsSync(filePath)) return [];
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = findSheet(workbook, ['hrms', 'employee', 'staff', 'people'], 0);
+    return (sheetName && workbook.Sheets[sheetName]) ? xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null }) : [];
+  } catch (err) {
+    logger.warn(`[Excel] readHrmsSheet failed for ${companyId}: ${err.message}`);
+    return [];
+  }
 };
 
 const readFinanceSheet = (companyId) => {
-  const filePath = financePath(companyId);
-  const workbook = xlsx.readFile(filePath);
-  const sheetName = findSheet(workbook, ['finance', 'budget', 'accounts', 'expense'], 1);
-  return xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
+  try {
+    const filePath = financePath(companyId);
+    if (!filePath || !fs.existsSync(filePath)) return [];
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = findSheet(workbook, ['finance', 'budget', 'accounts', 'expense'], 1);
+    return (sheetName && workbook.Sheets[sheetName]) ? xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null }) : [];
+  } catch (err) {
+    logger.warn(`[Excel] readFinanceSheet failed for ${companyId}: ${err.message}`);
+    return [];
+  }
 };
 
 const writeSheet = (filePath, rows, sheetName) => {
-  let workbook;
-  if (fs.existsSync(filePath)) {
-    workbook = xlsx.readFile(filePath);
-  } else {
-    workbook = xlsx.utils.book_new();
+  try {
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    let workbook;
+    if (fs.existsSync(filePath)) {
+      try {
+        workbook = xlsx.readFile(filePath);
+      } catch (_) {
+        workbook = xlsx.utils.book_new();
+      }
+    } else {
+      workbook = xlsx.utils.book_new();
+    }
+    const sheet = xlsx.utils.json_to_sheet(rows);
+    if (workbook.SheetNames.includes(sheetName)) {
+      workbook.Sheets[sheetName] = sheet;
+    } else {
+      xlsx.utils.book_append_sheet(workbook, sheet, sheetName);
+    }
+    xlsx.writeFile(workbook, filePath);
+  } catch (err) {
+    logger.warn(`[Excel] writeSheet failed: ${err.message}`);
   }
-  const sheet = xlsx.utils.json_to_sheet(rows);
-  if (workbook.SheetNames.includes(sheetName)) {
-    workbook.Sheets[sheetName] = sheet;
-  } else {
-    xlsx.utils.book_append_sheet(workbook, sheet, sheetName);
-  }
-  xlsx.writeFile(workbook, filePath);
 };
 
 // ── Full Sync: Google Sheet / Excel → Neon DB ─────────────────────────────────
@@ -175,6 +205,8 @@ const syncCompanyDataToDB = async (companyId, sheetUrlOverride) => {
       // Save local copy if possible
       try {
         const dest = path.join(companyDir(companyId), 'Company.xlsx');
+        const dir = path.dirname(dest);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(dest, response.data);
       } catch (_) {}
     } catch (fetchErr) {
@@ -185,18 +217,20 @@ const syncCompanyDataToDB = async (companyId, sheetUrlOverride) => {
   // Fallback to local files if online fetch wasn't possible
   if (!workbook) {
     const localFile = hrmsPath(companyId);
-    if (fs.existsSync(localFile)) {
-      workbook = xlsx.readFile(localFile);
-    } else {
+    if (localFile && fs.existsSync(localFile)) {
+      try { workbook = xlsx.readFile(localFile); } catch (_) {}
+    }
+    if (!workbook) {
       const fallbackFile = path.join(BASE_DATA_DIR, 'Company.xlsx');
       if (fs.existsSync(fallbackFile)) {
-        workbook = xlsx.readFile(fallbackFile);
+        try { workbook = xlsx.readFile(fallbackFile); } catch (_) {}
       }
     }
   }
 
   if (!workbook) {
-    throw new Error(`No data source found to sync for company ${companyId}`);
+    logger.warn(`[ExcelSync] No data source found to sync for company ${companyId}`);
+    return { empSynced: 0, budgetSynced: 0, hotelsSynced: 0, lastSheetSync: company.lastSheetSync };
   }
 
   // 1. Sync HRMS Employees
@@ -388,8 +422,10 @@ const getAllEmployees = (companyId) => {
 const updateEmployeeBudgetUsed = (companyId, employeeId, additionalAmount) => {
   try {
     const filePath = hrmsPath(companyId);
+    if (!filePath || !fs.existsSync(filePath)) return null;
     const workbook = xlsx.readFile(filePath);
     const sheetName = findSheet(workbook, ['hrms', 'employee', 'staff', 'people'], 0);
+    if (!sheetName || !workbook.Sheets[sheetName]) return null;
     const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
     const idx  = rows.findIndex(r => r.EmployeeID === employeeId);
     if (idx !== -1) {
@@ -418,6 +454,7 @@ const getFinanceData = (companyId) => {
 const getCurrentMonthFinance = (companyId) => {
   try {
     const rows = readFinanceSheet(companyId);
+    if (!rows || rows.length === 0) return null;
     const now  = new Date();
     const currentMonthName = now.toLocaleString('en-US', { month: 'long' }).toLowerCase();
     return rows.find(r => (!r.Department || String(r.Department).trim().toLowerCase() === 'all') && String(r.Month).toLowerCase().includes(currentMonthName)) || rows[0];
@@ -440,6 +477,7 @@ const proposeBudgetUpdate = (companyId, tripId, employeeId, amount, reason) => {
 
   try {
     const filePath = financePath(companyId);
+    if (!filePath || !fs.existsSync(filePath)) return proposal;
     let existing = [];
     try {
       const wb = xlsx.readFile(filePath);
@@ -466,8 +504,10 @@ const proposeBudgetUpdate = (companyId, tripId, employeeId, amount, reason) => {
 const applyBudgetDeduction = (companyId, amount, tripId) => {
   try {
     const filePath = financePath(companyId);
+    if (!filePath || !fs.existsSync(filePath)) return null;
     const workbook = xlsx.readFile(filePath);
     const sheetName = findSheet(workbook, ['finance', 'budget', 'accounts', 'expense'], 1);
+    if (!sheetName || !workbook.Sheets[sheetName]) return null;
     const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
     const now  = new Date();
     const currentMonthName = now.toLocaleString('en-US', { month: 'long' }).toLowerCase();
