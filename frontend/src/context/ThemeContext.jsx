@@ -99,7 +99,7 @@ export const makeInput = (t, extra = {}) => ({
   borderRadius: '0.65rem',
   border: `1px solid ${t.inputBorder}`,
   background: t.inputBg,
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.8rem',
   color: t.text,
   outline: 'none',
@@ -110,7 +110,7 @@ export const makeInput = (t, extra = {}) => ({
 
 export const makeLabel = (t, extra = {}) => ({
   display: 'block',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.62rem',
   fontWeight: 700,
   letterSpacing: '0.1em',

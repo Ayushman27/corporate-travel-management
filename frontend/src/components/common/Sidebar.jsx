@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 const SECTION_LABEL = {
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.58rem',
   fontWeight: 700,
   letterSpacing: '0.14em',
@@ -50,7 +50,7 @@ function SideNavItem({ to, icon: Icon, label, delay = 0 }) {
             }}
           />
           <span style={{
-            fontFamily: 'Montserrat, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: '0.72rem', fontWeight: isActive ? 600 : 500,
             color: isActive ? 'var(--atmos-dark)' : 'var(--atmos-mid)',
             letterSpacing: '0.03em',
@@ -132,17 +132,17 @@ export default function Sidebar() {
           }}
         >
           <p style={{
-            fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 700,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase',
             color: isDark ? 'rgba(196,162,93,0.7)' : 'rgba(37,99,235,0.85)', marginBottom: '0.6rem',
           }}>
             Travel Budget
           </p>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-            <span style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
               ₹{(user.travelBudgetUsed || 0).toLocaleString('en-IN')}
             </span>
-            <span style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', color: 'var(--atmos-muted)' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)' }}>
               ₹{(user.travelBudgetLimit || 50000).toLocaleString('en-IN')}
             </span>
           </div>
@@ -166,7 +166,7 @@ export default function Sidebar() {
             />
           </div>
           <p style={{
-            fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)',
             marginTop: '0.35rem', textAlign: 'right',
           }}>
             {pct.toFixed(0)}% used

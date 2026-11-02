@@ -30,13 +30,13 @@ const inputStyle = {
   borderRadius: '0.6rem',
   border: '1px solid rgba(196,162,93,0.2)',
   background: 'var(--atmos-input-bg)',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.78rem', color: 'var(--atmos-dark)', outline: 'none',
   boxSizing: 'border-box',
 };
 
 const labelStyle = {
-  display: 'block', fontFamily: 'Montserrat', fontSize: '0.6rem',
+  display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem',
   fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
   color: 'var(--atmos-muted)', marginBottom: '0.35rem',
 };
@@ -47,10 +47,10 @@ function BudgetGauge({ allocated, spent }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-        <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>
           Spent: <strong style={{ color: 'var(--atmos-dark)' }}>₹{(spent || 0).toLocaleString('en-IN')}</strong>
         </span>
-        <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>
           Allocated: <strong style={{ color: 'var(--atmos-dark)' }}>₹{(allocated || 0).toLocaleString('en-IN')}</strong>
         </span>
       </div>
@@ -62,7 +62,7 @@ function BudgetGauge({ allocated, spent }) {
           style={{ height: '100%', borderRadius: '999px', background: barColor }}
         />
       </div>
-      <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', marginTop: '0.35rem' }}>
+      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)', marginTop: '0.35rem' }}>
         {pct.toFixed(1)}% utilised
       </p>
     </div>
@@ -96,7 +96,7 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 500, color: 'var(--atmos-dark)' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 500, color: 'var(--atmos-dark)' }}>
             {trip.employeeName} · {trip.department}
           </p>
           <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{trip.tripId}</p>
@@ -106,7 +106,7 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
           background: isExceeded ? 'rgba(232,168,56,0.12)' : 'rgba(26,95,122,0.1)',
           color: isExceeded ? '#D4922A' : '#1A5F7A',
           border: isExceeded ? '1px solid rgba(232,168,56,0.3)' : '1px solid rgba(26,95,122,0.2)',
-          fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600,
+          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600,
           letterSpacing: '0.08em', textTransform: 'uppercase',
         }}>
           {isExceeded ? 'Budget Warning' : 'Finance Review'}
@@ -122,13 +122,13 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
         }}>
           <AlertTriangle style={{ width: '16px', height: '16px', color: '#E8A838', flexShrink: 0, marginTop: '2px' }} />
           <div>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 700, color: '#D4922A', margin: 0 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 700, color: '#D4922A', margin: 0 }}>
               Travel Budget Exceeded Warning
             </p>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.66rem', color: 'var(--atmos-dark)', margin: '0.2rem 0 0', lineHeight: 1.4 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.66rem', color: 'var(--atmos-dark)', margin: '0.2rem 0 0', lineHeight: 1.4 }}>
               Employee budget is <strong>₹{empLimit.toLocaleString('en-IN')}</strong>, but planned bill is <strong>₹{Number(trip.estimatedBudget || 0).toLocaleString('en-IN')}</strong> (Exceeds by <strong>₹{excess.toLocaleString('en-IN')}</strong>).
             </p>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
               ℹ️ Note: Amount will <strong>not</strong> be cut from employee personal budget.
             </p>
           </div>
@@ -143,7 +143,7 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
           ['Employee Budget', `₹${empLimit.toLocaleString('en-IN')}`],
           ['Requested Bill', `₹${(trip.estimatedBudget || 0).toLocaleString('en-IN')}`],
         ].map(([label, value]) => (
-          <div key={label} style={{ display: 'flex', gap: '0.5rem', fontFamily: 'Montserrat', fontSize: '0.72rem' }}>
+          <div key={label} style={{ display: 'flex', gap: '0.5rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem' }}>
             <span style={{ color: 'var(--atmos-muted)', minWidth: '110px' }}>{label}:</span>
             <strong style={{ color: 'var(--atmos-dark)' }}>{value}</strong>
           </div>
@@ -159,7 +159,7 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
             background: 'rgba(196,162,93,0.08)', border: '1px solid rgba(196,162,93,0.25)',
             borderRadius: '0.6rem', padding: '0.5rem 0.8rem',
-            fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600, color: '#C4A25D',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600, color: '#C4A25D',
             cursor: 'pointer'
           }}
         >
@@ -179,24 +179,24 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
             {/* Travel breakdown */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                <span style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 700, color: 'var(--atmos-dark)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 700, color: 'var(--atmos-dark)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   ✈️ Flights & Transit
                 </span>
-                <span style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: '#C4A25D' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600, color: '#C4A25D' }}>
                   ₹{Number(travelCost).toLocaleString('en-IN')}
                 </span>
               </div>
               {(trip.billDetails?.segments && trip.billDetails.segments.length > 0) ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                   {trip.billDetails.segments.map((seg, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.5rem', borderRadius: '0.35rem' }}>
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.5rem', borderRadius: '0.35rem' }}>
                       <span><strong>{(seg.mode || 'transit').toUpperCase()}</strong>: {seg.operator || ''}{seg.flightNo ? ` (${seg.flightNo})` : ''} · {seg.from} → {seg.to}</span>
                       <strong style={{ color: 'var(--atmos-dark)' }}>₹{Number(seg.cost || 0).toLocaleString('en-IN')}</strong>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: 0 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: 0 }}>
                   Standard route transit ({trip.fromCity} → {trip.toCity})
                 </p>
               )}
@@ -206,14 +206,14 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
             {(trip.selectedHotel || trip.billDetails?.hotel) && (
               <div style={{ borderTop: '1px solid rgba(196,162,93,0.1)', paddingTop: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                  <span style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 700, color: 'var(--atmos-dark)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 700, color: 'var(--atmos-dark)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     🏨 Accommodation
                   </span>
-                  <span style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: '#C4A25D' }}>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600, color: '#C4A25D' }}>
                     ₹{Number(hotelCost).toLocaleString('en-IN')}
                   </span>
                 </div>
-                <div style={{ fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.35rem 0.5rem', borderRadius: '0.35rem' }}>
+                <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.35rem 0.5rem', borderRadius: '0.35rem' }}>
                   <p style={{ margin: 0, fontWeight: 600, color: 'var(--atmos-dark)' }}>
                     {trip.selectedHotel?.name || trip.billDetails?.hotel?.name}
                   </p>
@@ -227,10 +227,10 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
 
             {/* Total */}
             <div style={{ borderTop: '1px solid rgba(196,162,93,0.15)', paddingTop: '0.45rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
                 Total Bill Amount:
               </span>
-              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 600, color: '#C4A25D' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.1rem', fontWeight: 600, color: '#C4A25D' }}>
                 ₹{(trip.estimatedBudget || 0).toLocaleString('en-IN')}
               </span>
             </div>
@@ -259,7 +259,7 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
             padding: '0.65rem', borderRadius: '0.7rem',
             background: isDeciding ? 'rgba(39,174,96,0.3)' : 'linear-gradient(135deg, #27AE60, #1E8449)',
             border: 'none', cursor: isDeciding ? 'not-allowed' : 'pointer',
-            fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
             letterSpacing: '0.06em', textTransform: 'uppercase', color: '#fff',
           }}
         >
@@ -275,7 +275,7 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
             padding: '0.65rem', borderRadius: '0.7rem',
             background: 'transparent', border: '1.5px solid rgba(192,57,43,0.4)',
             cursor: isDeciding ? 'not-allowed' : 'pointer',
-            fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
             letterSpacing: '0.06em', textTransform: 'uppercase', color: '#C0392B',
           }}
         >
@@ -296,7 +296,7 @@ function TabBtn({ id, label, active, onClick }) {
         padding: '0.5rem 1.1rem', borderRadius: '0.6rem',
         background: active ? 'linear-gradient(135deg, #C4A25D, #B8923F)' : 'transparent',
         border: 'none', cursor: 'pointer',
-        fontFamily: 'Montserrat', fontSize: '0.68rem',
+        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem',
         fontWeight: active ? 600 : 500, letterSpacing: '0.06em',
         color: active ? '#fff' : 'var(--atmos-mid)',
         boxShadow: active ? '0 4px 12px rgba(196,162,93,0.25)' : 'none',
@@ -417,12 +417,12 @@ export default function FinancePanel() {
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease }}
-                style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2rem', fontWeight: 700, color: 'var(--atmos-dark)' }}
               >
                 Finance Dashboard
               </motion.h1>
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-                style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
               >
                 Live Neon DB sync · Real-time budget expenditure & approvals
               </motion.p>
@@ -441,7 +441,7 @@ export default function FinancePanel() {
                   padding: '0.45rem 1.1rem', borderRadius: '0.65rem',
                   background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.12))',
                   border: '1px solid #C4A25D',
-                  color: 'var(--atmos-dark)', fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600,
+                  color: 'var(--atmos-dark)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
                   cursor: 'pointer', boxShadow: '0 4px 12px rgba(196,162,93,0.15)'
                 }}
               >
@@ -457,7 +457,7 @@ export default function FinancePanel() {
                   display: 'flex', alignItems: 'center', gap: '0.45rem',
                   padding: '0.45rem 1rem', borderRadius: '0.65rem',
                   background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)',
-                  color: '#C4A25D', fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600,
+                  color: '#C4A25D', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
                   cursor: syncing ? 'not-allowed' : 'pointer'
                 }}
               >
@@ -472,7 +472,7 @@ export default function FinancePanel() {
                     display: 'flex', alignItems: 'center', gap: '0.4rem',
                     padding: '0.45rem 0.9rem', borderRadius: '999px',
                     background: 'rgba(196,162,93,0.1)', border: '1px solid rgba(196,162,93,0.3)',
-                    fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 600,
                     letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8B6914',
                   }}
                 >
@@ -535,9 +535,9 @@ export default function FinancePanel() {
                           <Icon style={{ width: '20px', height: '20px', color: '#fff' }} />
                         </div>
                         <div>
-                          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 500, color: 'var(--atmos-dark)', lineHeight: 1 }}>{value}</p>
-                          <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>{label}</p>
-                          {subtext && <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: '#1A7F45', marginTop: '0.25rem', fontWeight: 600 }}>{subtext}</p>}
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.6rem', fontWeight: 500, color: 'var(--atmos-dark)', lineHeight: 1 }}>{value}</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>{label}</p>
+                          {subtext && <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: '#1A7F45', marginTop: '0.25rem', fontWeight: 600 }}>{subtext}</p>}
                         </div>
                       </motion.div>
                     ))}
@@ -551,10 +551,10 @@ export default function FinancePanel() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <div>
-                        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.25rem', fontWeight: 400, color: 'var(--atmos-dark)', margin: 0 }}>
+                        <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 600, color: 'var(--atmos-dark)', margin: 0 }}>
                           Monthly Budget vs Spend (12 Months)
                         </h2>
-                        <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
                           Company-wide budget allocations and actual recorded trip expenses for all 12 months (2026)
                         </p>
                       </div>
@@ -567,7 +567,7 @@ export default function FinancePanel() {
                           display: 'flex', alignItems: 'center', gap: '0.35rem',
                           background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)',
                           borderRadius: '0.5rem', padding: '0.3rem 0.75rem',
-                          fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
                           cursor: 'pointer'
                         }}
                       >
@@ -576,12 +576,12 @@ export default function FinancePanel() {
                     </div>
                     <ResponsiveContainer width="100%" height={240}>
                       <BarChart data={monthlyChartData}>
-                        <XAxis dataKey="name" tick={{ fontFamily: 'Montserrat', fontSize: 11, fill: 'var(--atmos-muted)' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontFamily: 'Montserrat', fontSize: 11, fill: 'var(--atmos-muted)' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
+                        <XAxis dataKey="name" tick={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 11, fill: 'var(--atmos-muted)' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 11, fill: 'var(--atmos-muted)' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v / 1000).toFixed(0)}k`} />
                         <Tooltip
                           cursor={{ fill: 'transparent' }}
                           formatter={v => `₹${v.toLocaleString('en-IN')}`}
-                          contentStyle={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, background: '#ffffff', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '0.6rem', color: '#000000', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
+                          contentStyle={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, background: '#ffffff', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '0.6rem', color: '#000000', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
                           itemStyle={{ color: '#000000' }}
                         />
                         <Bar dataKey="Allocated" fill="rgba(196,162,93,0.2)" radius={[6, 6, 0, 0]} />
@@ -597,7 +597,7 @@ export default function FinancePanel() {
                       transition={{ delay: 0.4, duration: 0.5, ease }}
                       style={{ ...glassCard, padding: '1.5rem' }}
                     >
-                      <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)', marginBottom: '1.25rem' }}>
+                      <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)', marginBottom: '1.25rem' }}>
                         Department Budget Usage
                       </h2>
                       <ResponsiveContainer width="100%" height={240}>
@@ -616,7 +616,7 @@ export default function FinancePanel() {
                               const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
                               const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
                               return (
-                                <text x={x} y={y} fill="#fff" textAnchor="middle" dominantBaseline="central" style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600 }}>
+                                <text x={x} y={y} fill="#fff" textAnchor="middle" dominantBaseline="central" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600 }}>
                                   {`${(percent * 100).toFixed(0)}%`}
                                 </text>
                               );
@@ -624,10 +624,10 @@ export default function FinancePanel() {
                           >
                             {deptChartData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                           </Pie>
-                          <Legend wrapperStyle={{ fontFamily: 'Montserrat', fontSize: '0.68rem', color: 'var(--atmos-dark)' }} />
+                          <Legend wrapperStyle={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-dark)' }} />
                           <Tooltip 
                             formatter={v => `₹${v.toLocaleString('en-IN')}`} 
-                            contentStyle={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, background: '#ffffff', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '0.6rem', color: '#000000', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
+                            contentStyle={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, background: '#ffffff', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '0.6rem', color: '#000000', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
                             itemStyle={{ color: '#000000' }}
                           />
                         </PieChart>
@@ -644,8 +644,8 @@ export default function FinancePanel() {
                       <motion.div animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 2.5, repeat: Infinity }}>
                         <CheckCircle style={{ width: '48px', height: '48px', color: 'rgba(39,174,96,0.4)', margin: '0 auto 1rem' }} />
                       </motion.div>
-                      <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: 'var(--atmos-dark)', marginBottom: '0.5rem' }}>No pending approvals</p>
-                      <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)' }}>All finance reviews are up to date</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', color: 'var(--atmos-dark)', marginBottom: '0.5rem' }}>No pending approvals</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)' }}>All finance reviews are up to date</p>
                     </div>
                   ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
@@ -665,8 +665,8 @@ export default function FinancePanel() {
                 >
                   <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
                     <div>
-                      <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Monthly Budget Report</h2>
-                      <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
+                      <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Monthly Budget Report</h2>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
                         Live from Neon DB · Last Synced: {report?.summary?.lastSyncedAt ? format(new Date(report.summary.lastSyncedAt), 'dd MMM yyyy, hh:mm a') : 'Recently'}
                       </p>
                     </div>
@@ -681,7 +681,7 @@ export default function FinancePanel() {
                           display: 'flex', alignItems: 'center', gap: '0.35rem',
                           background: 'rgba(196,162,93,0.15)', border: '1px solid #C4A25D',
                           borderRadius: '0.5rem', padding: '0.35rem 0.75rem',
-                          fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
                           cursor: 'pointer'
                         }}
                       >
@@ -695,7 +695,7 @@ export default function FinancePanel() {
                         display: 'flex', alignItems: 'center', gap: '0.35rem',
                         background: 'transparent', border: '1px solid rgba(196,162,93,0.3)',
                         borderRadius: '0.5rem', padding: '0.35rem 0.75rem',
-                        fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#C4A25D',
+                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: '#C4A25D',
                         cursor: syncing ? 'not-allowed' : 'pointer'
                       }}
                     >
@@ -709,7 +709,7 @@ export default function FinancePanel() {
                       <thead>
                         <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
                           {['Month', 'Department', 'Allocated', 'Spent', 'Remaining', 'Last Updated', 'Action'].map(h => (
-                            <th key={h} style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontFamily: 'Montserrat', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C4A25D' }}>{h}</th>
+                            <th key={h} style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C4A25D' }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -723,14 +723,14 @@ export default function FinancePanel() {
                             whileHover={{ background: 'rgba(196,162,93,0.04)' }}
                             style={{ borderBottom: '1px solid rgba(196,162,93,0.06)' }}
                           >
-                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>{row.Month}</td>
-                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>{row.Department}</td>
-                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>₹{(row.AllocatedBudget || 0).toLocaleString('en-IN')}</td>
-                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>₹{(row.SpentAmount || 0).toLocaleString('en-IN')}</td>
-                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, color: (row.RemainingBudget || 0) < 0 ? '#C0392B' : '#1A7F45' }}>
+                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>{row.Month}</td>
+                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>{row.Department}</td>
+                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>₹{(row.AllocatedBudget || 0).toLocaleString('en-IN')}</td>
+                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>₹{(row.SpentAmount || 0).toLocaleString('en-IN')}</td>
+                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: (row.RemainingBudget || 0) < 0 ? '#C0392B' : '#1A7F45' }}>
                               ₹{(row.RemainingBudget || 0).toLocaleString('en-IN')}
                             </td>
-                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
+                            <td style={{ padding: '0.8rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
                               {row.LastUpdated ? (() => { try { const d = new Date(row.LastUpdated); if (isNaN(d.getTime())) return '—'; const isMidnight = d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0; return isMidnight ? format(d, 'dd MMM yyyy') : format(d, 'dd MMM yyyy, hh:mm a'); } catch (_) { return '—'; } })() : '—'}
                             </td>
                             <td style={{ padding: '0.8rem 1.25rem' }}>
@@ -747,7 +747,7 @@ export default function FinancePanel() {
                                   display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
                                   background: 'rgba(196,162,93,0.1)', border: '1px solid rgba(196,162,93,0.3)',
                                   borderRadius: '0.4rem', padding: '0.25rem 0.55rem',
-                                  fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, color: '#C4A25D',
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, color: '#C4A25D',
                                   cursor: 'pointer'
                                 }}
                               >

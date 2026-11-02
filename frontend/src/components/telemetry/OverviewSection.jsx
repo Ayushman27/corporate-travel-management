@@ -5,7 +5,7 @@ import { ResponsiveContainer, AreaChart, Area, LineChart, Line, XAxis, YAxis, To
 import { MetricCard, SectionCard, HealthRing, StatusBadge, ProgressBar } from './TelemetryWidgets';
 
 const chartTooltipStyle = {
-  contentStyle: { background: 'var(--tm-surface)', border: '1px solid var(--tm-border)', borderRadius: 8, fontSize: '0.68rem', fontFamily: 'Montserrat' },
+  contentStyle: { background: 'var(--tm-surface)', border: '1px solid var(--tm-border)', borderRadius: 8, fontSize: '0.68rem', fontFamily: "'Plus Jakarta Sans', sans-serif" },
   labelStyle: { color: 'var(--tm-text-2)', fontSize: '0.6rem' },
 };
 

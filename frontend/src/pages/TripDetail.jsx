@@ -55,17 +55,17 @@ function Timeline({ approvals }) {
             {appr.status === 'rejected' && <XCircle style={{ width: '12px', height: '12px', color: '#fff' }} />}
           </div>
           <div>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', textTransform: 'capitalize' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', textTransform: 'capitalize' }}>
               {appr.approvalType} Approval
             </p>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>
               {appr.status === 'pending'
                 ? 'Awaiting approval'
                 : `${appr.status} by ${appr.approverName || '—'}`}
               {appr.decidedAt && ` · ${format(new Date(appr.decidedAt), 'dd MMM HH:mm')}`}
             </p>
             {appr.comments && (
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-mid)', fontStyle: 'italic', marginTop: '0.2rem' }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-mid)', fontStyle: 'italic', marginTop: '0.2rem' }}>
                 "{appr.comments}"
               </p>
             )}
@@ -110,7 +110,7 @@ export default function TripDetail() {
               whileHover={{ x: -3 }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 500,
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 500,
                 color: 'var(--atmos-muted)', marginBottom: '1.5rem', cursor: 'pointer',
               }}
             >
@@ -127,7 +127,7 @@ export default function TripDetail() {
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, ease }}
-                    style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2rem', fontWeight: 700, color: 'var(--atmos-dark)' }}
                   >
                     {trip.fromCity} → {trip.toCity}
                   </motion.h1>
@@ -136,7 +136,7 @@ export default function TripDetail() {
                 <span style={{
                   padding: '0.3rem 0.9rem', borderRadius: '999px',
                   background: badge.bg, color: badge.color,
-                  fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 600,
                   letterSpacing: '0.1em', textTransform: 'uppercase',
                 }}>
                   {trip.status?.replace(/_/g, ' ')}
@@ -153,7 +153,7 @@ export default function TripDetail() {
                     transition={{ duration: 0.5, ease, delay: 0.1 }}
                     style={{ ...glassCard, padding: '1.5rem' }}
                   >
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: 'var(--atmos-dark)', marginBottom: '1.1rem' }}>
+                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 600, color: 'var(--atmos-dark)', marginBottom: '1.1rem' }}>
                       Trip Information
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
@@ -166,17 +166,17 @@ export default function TripDetail() {
                         <div key={label} style={{ display: 'flex', gap: '0.65rem', alignItems: 'flex-start' }}>
                           <Icon style={{ width: '14px', height: '14px', color: '#C4A25D', marginTop: '0.2rem', flexShrink: 0 }} />
                           <div>
-                            <p style={{ fontFamily: 'Montserrat', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label}</p>
-                            <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.1rem' }}>{value}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.1rem' }}>{value}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     {trip.selectedHotel && (
                       <div style={{ marginTop: '1.1rem', paddingTop: '1rem', borderTop: '1px solid rgba(196,162,93,0.12)' }}>
-                        <p style={{ fontFamily: 'Montserrat', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>Hotel</p>
-                        <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.15rem' }}>{trip.selectedHotel.name}</p>
-                        <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{trip.selectedHotel.nights} Nights {trip.selectedHotel.foodingIncluded ? '(Inc. Food)' : ''}</p>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>Hotel</p>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.15rem' }}>{trip.selectedHotel.name}</p>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{trip.selectedHotel.nights} Nights {trip.selectedHotel.foodingIncluded ? '(Inc. Food)' : ''}</p>
                       </div>
                     )}
                     <div style={{ marginTop: '1.1rem', paddingTop: '1rem', borderTop: '1px solid rgba(196,162,93,0.12)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -185,8 +185,8 @@ export default function TripDetail() {
                         { label: 'Approved', value: `₹${(trip.approvedBudget || 0).toLocaleString('en-IN')}`,   color: '#1A7F45' },
                       ].map(({ label, value, color }) => (
                         <div key={label}>
-                          <p style={{ fontFamily: 'Montserrat', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label} Budget</p>
-                          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 500, color, marginTop: '0.15rem' }}>{value}</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label} Budget</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 500, color, marginTop: '0.15rem' }}>{value}</p>
                         </div>
                       ))}
                     </div>
@@ -199,12 +199,12 @@ export default function TripDetail() {
                     transition={{ duration: 0.5, ease, delay: 0.2 }}
                     style={{ ...glassCard, padding: '1.5rem' }}
                   >
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: 'var(--atmos-dark)', marginBottom: '1rem' }}>
+                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 600, color: 'var(--atmos-dark)', marginBottom: '1rem' }}>
                       Approval Timeline
                     </h2>
                     {approvals?.length
                       ? <Timeline approvals={approvals} />
-                      : <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)' }}>No approvals yet</p>
+                      : <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)' }}>No approvals yet</p>
                     }
                   </motion.div>
 
@@ -222,10 +222,10 @@ export default function TripDetail() {
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                         <Ticket style={{ width: '16px', height: '16px', color: '#27AE60' }} />
-                        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 400, color: '#1A7F45' }}>Booking Confirmed</h2>
+                        <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.1rem', fontWeight: 600, color: '#1A7F45' }}>Booking Confirmed</h2>
                       </div>
                       <p style={{ fontFamily: 'monospace', fontSize: '0.68rem', color: '#27AE60', marginBottom: '0.4rem' }}>{booking.bookingId}</p>
-                      <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: '#1A7F45', fontWeight: 500 }}>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', color: '#1A7F45', fontWeight: 500 }}>
                         Total: ₹{booking.totalCost?.toLocaleString('en-IN')}
                       </p>
                       <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -235,10 +235,10 @@ export default function TripDetail() {
                             background: 'rgba(255,255,255,0.7)',
                             border: '1px solid rgba(39,174,96,0.2)',
                           }}>
-                            <p style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: '#1A7F45' }}>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600, color: '#1A7F45' }}>
                               {t.mode?.toUpperCase()} · {t.from} → {t.to}
                             </p>
-                            <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-mid)', marginTop: '0.2rem' }}>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-mid)', marginTop: '0.2rem' }}>
                               Ref: {t.refNo} · Seat: {t.seat} · ₹{t.cost?.toLocaleString('en-IN')}
                             </p>
                           </div>

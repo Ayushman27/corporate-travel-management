@@ -58,8 +58,8 @@ export default function TripRequest() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, ease }}
               style={{
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: '2rem', fontWeight: 400,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '2rem', fontWeight: 700,
                 color: 'var(--atmos-dark)', letterSpacing: '-0.02em',
               }}
             >
@@ -70,7 +70,7 @@ export default function TripRequest() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.15 }}
               style={{
-                fontFamily: 'Montserrat, sans-serif',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontSize: '0.72rem', color: 'var(--atmos-muted)',
                 marginTop: '0.3rem',
               }}
@@ -109,7 +109,7 @@ export default function TripRequest() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.45rem',
                       padding: '0.45rem 1rem', borderRadius: '999px',
-                      fontFamily: 'Montserrat, sans-serif',
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
                       fontSize: '0.7rem', fontWeight: 600,
                       letterSpacing: '0.06em', textTransform: 'uppercase',
                       border: active

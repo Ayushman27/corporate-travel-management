@@ -15,7 +15,7 @@ const inputStyle = {
   borderRadius: '0.6rem',
   border: '1px solid rgba(196,162,93,0.2)',
   background: 'var(--atmos-input-bg)',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.78rem', color: 'var(--atmos-dark)', outline: 'none',
   boxSizing: 'border-box',
 };
@@ -44,7 +44,7 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
             {trip.employeeName}
           </p>
           <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.15rem' }}>
@@ -54,7 +54,7 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
         <span style={{
           padding: '0.2rem 0.75rem', borderRadius: '999px',
           background: 'rgba(196,162,93,0.1)', color: '#8B6914',
-          fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600,
+          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600,
           letterSpacing: '0.1em', textTransform: 'uppercase',
         }}>
           Pending Approval
@@ -71,8 +71,8 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
           <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
             <Icon style={{ width: '13px', height: '13px', color: '#C4A25D', marginTop: '0.2rem', flexShrink: 0 }} />
             <div>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label}</p>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.1rem' }}>{value}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.1rem' }}>{value}</p>
             </div>
           </div>
         ))}
@@ -85,18 +85,18 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
         border: '1px solid rgba(196,162,93,0.1)',
         marginBottom: '1rem',
       }}>
-        <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#C4A25D', marginBottom: '0.3rem' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#C4A25D', marginBottom: '0.3rem' }}>
           Purpose
         </p>
-        <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', color: 'var(--atmos-dark)' }}>{trip.purpose}</p>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: 'var(--atmos-dark)' }}>{trip.purpose}</p>
         {trip.preferenceNote && (
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.35rem' }}>{trip.preferenceNote}</p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.35rem' }}>{trip.preferenceNote}</p>
         )}
       </div>
 
       {/* Comment input */}
       <div style={{ marginBottom: '1rem' }}>
-        <label style={{ display: 'block', fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.35rem' }}>
+        <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.35rem' }}>
           Comments (optional)
         </label>
         <input
@@ -119,7 +119,7 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
             padding: '0.65rem', borderRadius: '0.7rem',
             background: isDeciding ? 'rgba(39,174,96,0.3)' : 'linear-gradient(135deg, #27AE60, #1E8449)',
             border: 'none', cursor: isDeciding ? 'not-allowed' : 'pointer',
-            fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
             letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff',
             boxShadow: '0 4px 12px rgba(39,174,96,0.2)',
           }}
@@ -139,7 +139,7 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
             background: isDeciding ? 'rgba(192,57,43,0.2)' : 'transparent',
             border: '1.5px solid rgba(192,57,43,0.4)',
             cursor: isDeciding ? 'not-allowed' : 'pointer',
-            fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
             letterSpacing: '0.08em', textTransform: 'uppercase', color: '#C0392B',
           }}
         >
@@ -185,7 +185,7 @@ export default function ManagerPanel() {
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, ease }}
-              style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2rem', fontWeight: 700, color: 'var(--atmos-dark)' }}
             >
               Manager Approvals
             </motion.h1>
@@ -193,7 +193,7 @@ export default function ManagerPanel() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.15 }}
-              style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
             >
               Review and approve employee trip requests
             </motion.p>
@@ -218,8 +218,8 @@ export default function ManagerPanel() {
               <motion.div animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 2.5, repeat: Infinity }}>
                 <CheckCircle style={{ width: '48px', height: '48px', color: 'rgba(39,174,96,0.4)', margin: '0 auto 1rem' }} />
               </motion.div>
-              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', color: 'var(--atmos-dark)', marginBottom: '0.5rem' }}>All caught up!</p>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)' }}>No trips pending your approval</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', color: 'var(--atmos-dark)', marginBottom: '0.5rem' }}>All caught up!</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)' }}>No trips pending your approval</p>
             </motion.div>
           ) : (
             <AnimatePresence>

@@ -88,7 +88,7 @@ export default function EmployeeReimbursements() {
         <main style={{ padding: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h1 style={{
-              fontFamily: 'Cormorant Garamond, serif', fontSize: '2.4rem',
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2.4rem',
               color: 'var(--atmos-dark)', fontWeight: 500, margin: 0
             }}>My Reimbursements</h1>
             
@@ -100,7 +100,7 @@ export default function EmployeeReimbursements() {
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
                 padding: '0.6rem 1.25rem', borderRadius: '0.5rem',
                 background: '#C4A25D', color: '#fff', border: 'none',
-                fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600,
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600,
                 letterSpacing: '0.05em', cursor: 'pointer',
                 boxShadow: '0 4px 15px rgba(196,162,93,0.3)'
               }}
@@ -112,7 +112,7 @@ export default function EmployeeReimbursements() {
           {loading ? (
             <p>Loading...</p>
           ) : reimbursements.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--atmos-muted)', fontFamily: 'Montserrat', fontSize: '0.85rem' }}>
+            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--atmos-muted)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>
               <Receipt size={48} style={{ color: '#ffffff', opacity: 0.7, margin: '0 auto 1rem' }} />
               <p>No reimbursement requests found.</p>
             </div>
@@ -129,17 +129,17 @@ export default function EmployeeReimbursements() {
                   }}
                 >
                   <div>
-                    <h3 style={{ margin: '0 0 0.5rem 0', fontFamily: 'Montserrat', fontSize: '0.9rem', color: 'var(--atmos-dark)' }}>{r.title}</h3>
-                    <p style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '0.75rem', color: 'var(--atmos-muted)' }}>
+                    <h3 style={{ margin: '0 0 0.5rem 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', color: 'var(--atmos-dark)' }}>{r.title}</h3>
+                    <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: 'var(--atmos-muted)' }}>
                       {r.bills.length} Bills • {new Date(r.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ margin: '0 0 0.5rem 0', fontFamily: 'Cormorant Garamond', fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
+                    <p style={{ margin: '0 0 0.5rem 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
                       ₹{r.totalRequestedAmount.toLocaleString()}
                     </p>
                     <span style={{
-                      fontSize: '0.65rem', fontFamily: 'Montserrat', padding: '0.2rem 0.6rem', borderRadius: '1rem',
+                      fontSize: '0.65rem', fontFamily: "'Plus Jakarta Sans', sans-serif", padding: '0.2rem 0.6rem', borderRadius: '1rem',
                       background: r.status === 'processed' ? 'rgba(39,174,96,0.1)' : 'rgba(196,162,93,0.1)',
                       color: r.status === 'processed' ? '#27AE60' : '#C4A25D', fontWeight: 600
                     }}>
@@ -167,22 +167,22 @@ export default function EmployeeReimbursements() {
                     border: '1px solid rgba(196,162,93,0.2)'
                   }}
                 >
-                  <h2 style={{ fontFamily: 'Cormorant Garamond', fontSize: '1.8rem', color: '#fff', margin: '0 0 1.5rem' }}>New Reimbursement</h2>
+                  <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.8rem', color: '#fff', margin: '0 0 1.5rem' }}>New Reimbursement</h2>
                   
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', color: 'var(--atmos-muted)', fontSize: '0.75rem', fontFamily: 'Montserrat', marginBottom: '0.5rem' }}>Request Title</label>
+                    <label style={{ display: 'block', color: 'var(--atmos-muted)', fontSize: '0.75rem', fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: '0.5rem' }}>Request Title</label>
                     <input
                       type="text" value={title} onChange={e => setTitle(e.target.value)}
                       placeholder="e.g., Client Visit to Mumbai"
                       style={{
                         width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(196,162,93,0.2)', borderRadius: '0.5rem', color: '#fff', fontFamily: 'Montserrat'
+                        border: '1px solid rgba(196,162,93,0.2)', borderRadius: '0.5rem', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif"
                       }}
                     />
                   </div>
 
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '1rem', background: 'rgba(196,162,93,0.1)', border: '1px dashed #C4A25D', borderRadius: '0.5rem', justifyContent: 'center', color: '#C4A25D', fontFamily: 'Montserrat', fontSize: '0.85rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '1rem', background: 'rgba(196,162,93,0.1)', border: '1px dashed #C4A25D', borderRadius: '0.5rem', justifyContent: 'center', color: '#C4A25D', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>
                       <Upload size={18} />
                       {isScanning ? 'AI is scanning your bill...' : 'Upload & Scan Bill (Image/PDF)'}
                       <input type="file" style={{ display: 'none' }} accept="image/*" onChange={handleFileUpload} disabled={isScanning} />
@@ -194,21 +194,21 @@ export default function EmployeeReimbursements() {
                       {bills.map((b, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem', marginBottom: '0.5rem', border: '1px solid rgba(255,255,255,0.05)' }}>
                           <div>
-                            <span style={{ color: '#fff', fontSize: '0.8rem', fontFamily: 'Montserrat', display: 'block' }}>{b.merchant}</span>
-                            <span style={{ color: 'var(--atmos-muted)', fontSize: '0.65rem', fontFamily: 'Montserrat' }}>{b.extractedCategory}</span>
+                            <span style={{ color: '#fff', fontSize: '0.8rem', fontFamily: "'Plus Jakarta Sans', sans-serif", display: 'block' }}>{b.merchant}</span>
+                            <span style={{ color: 'var(--atmos-muted)', fontSize: '0.65rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{b.extractedCategory}</span>
                           </div>
-                          <span style={{ color: '#C4A25D', fontWeight: 600, fontFamily: 'Montserrat', fontSize: '0.85rem' }}>₹{b.extractedAmount}</span>
+                          <span style={{ color: '#C4A25D', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>₹{b.extractedAmount}</span>
                         </div>
                       ))}
-                      <div style={{ textAlign: 'right', color: '#fff', fontFamily: 'Montserrat', fontSize: '0.9rem', marginTop: '1rem', fontWeight: 600 }}>
+                      <div style={{ textAlign: 'right', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', marginTop: '1rem', fontWeight: 600 }}>
                         Total: ₹{bills.reduce((sum, b) => sum + b.extractedAmount, 0)}
                       </div>
                     </div>
                   )}
 
                   <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                    <button onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1rem', background: 'transparent', color: 'var(--atmos-muted)', border: 'none', cursor: 'pointer', fontFamily: 'Montserrat', fontSize: '0.8rem' }}>Cancel</button>
-                    <button onClick={handleSubmit} disabled={isSubmitting || bills.length === 0 || !title} style={{ padding: '0.6rem 1.25rem', background: '#C4A25D', color: '#fff', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontFamily: 'Montserrat', fontSize: '0.8rem', fontWeight: 600 }}>
+                    <button onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1rem', background: 'transparent', color: 'var(--atmos-muted)', border: 'none', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem' }}>Cancel</button>
+                    <button onClick={handleSubmit} disabled={isSubmitting || bills.length === 0 || !title} style={{ padding: '0.6rem 1.25rem', background: '#C4A25D', color: '#fff', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600 }}>
                       {isSubmitting ? 'Submitting...' : 'Submit Request'}
                     </button>
                   </div>

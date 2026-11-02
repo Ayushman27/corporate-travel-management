@@ -54,14 +54,14 @@ export default function Login() {
             <Plane style={{ color: '#fff', width: '28px', height: '28px' }} />
           </motion.div>
           <h1 style={{
-            fontFamily: 'Cormorant Garamond, serif',
-            fontSize: '2.2rem', fontWeight: 400,
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '2.2rem', fontWeight: 700,
             color: 'var(--atmos-dark)', letterSpacing: '-0.02em', lineHeight: 1.1,
           }}>
             AeroSync
           </h1>
           <p style={{
-            fontFamily: 'Montserrat, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: '0.68rem', letterSpacing: '0.15em',
             textTransform: 'uppercase', color: 'var(--atmos-muted)',
             marginTop: '0.4rem',
@@ -83,7 +83,7 @@ export default function Login() {
           transition={{ delay: 0.8 }}
           style={{
             textAlign: 'center',
-            fontFamily: 'Montserrat, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: '0.6rem', letterSpacing: '0.12em',
             textTransform: 'uppercase', color: 'rgba(168,164,160,0.6)',
             marginTop: '1.5rem',
@@ -125,7 +125,7 @@ const inputStyle = {
   borderRadius: '0.65rem',
   border: '1px solid rgba(196,162,93,0.25)',
   background: 'var(--atmos-input-bg)',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.82rem', color: 'var(--atmos-dark)',
   outline: 'none', boxSizing: 'border-box',
   transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
@@ -133,7 +133,7 @@ const inputStyle = {
 
 const labelStyle = {
   display: 'block',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.65rem', fontWeight: 600,
   letterSpacing: '0.1em', textTransform: 'uppercase',
   color: 'var(--atmos-mid)', marginBottom: '0.4rem',
@@ -155,7 +155,7 @@ function GoldButton({ children, onClick, type = 'button', disabled = false, styl
           ? 'rgba(196,162,93,0.3)'
           : 'linear-gradient(135deg, #C4A25D 0%, #B8923F 100%)',
         border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
-        fontFamily: 'Montserrat, sans-serif',
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
         fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em',
         textTransform: 'uppercase', color: '#fff',
         boxShadow: disabled ? 'none' : '0 4px 16px rgba(196,162,93,0.25)',
@@ -180,7 +180,7 @@ function OutlineButton({ children, onClick, style = {} }) {
         padding: '0.45rem 0.85rem', borderRadius: '0.6rem',
         background: 'transparent',
         border: '1px solid rgba(196,162,93,0.3)',
-        cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
+        cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
         fontSize: '0.72rem', fontWeight: 500, color: 'var(--atmos-mid)',
         ...style,
       }}
@@ -200,7 +200,7 @@ function ErrorBanner({ message, children }) {
         borderRadius: '0.75rem',
         background: 'rgba(192,57,43,0.06)',
         border: '1px solid rgba(192,57,43,0.2)',
-        fontFamily: 'Montserrat, sans-serif',
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
         fontSize: '0.75rem', color: '#C0392B',
       }}
     >
@@ -236,14 +236,14 @@ function RoleChooser({ onSelect }) {
   return (
     <GlassCard>
       <h2 style={{
-        fontFamily: 'Cormorant Garamond, serif',
-        fontSize: '1.5rem', fontWeight: 400,
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontSize: '1.5rem', fontWeight: 600,
         color: 'var(--atmos-dark)', textAlign: 'center', marginBottom: '0.25rem',
       }}>
         Welcome
       </h2>
       <p style={{
-        fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem',
+        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem',
         color: 'var(--atmos-muted)', textAlign: 'center', marginBottom: '1.75rem',
       }}>
         How would you like to proceed?
@@ -275,8 +275,8 @@ function RoleChooser({ onSelect }) {
               <Icon style={{ width: '18px', height: '18px', color: accent }} />
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{title}</p>
-              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{sub}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{title}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{sub}</p>
             </div>
             <ArrowRight style={{ width: '16px', height: '16px', color: '#C4A25D', flexShrink: 0 }} />
           </motion.button>
@@ -287,7 +287,7 @@ function RoleChooser({ onSelect }) {
           <div style={{ flex: 1, height: '1px', background: 'rgba(196,162,93,0.15)' }} />
           <span style={{
             padding: '0 0.85rem',
-            fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem',
             letterSpacing: '0.1em', textTransform: 'uppercase', color: '#FFFFFF',
             fontWeight: 500,
           }}>
@@ -319,8 +319,8 @@ function RoleChooser({ onSelect }) {
             <Building2 style={{ width: '18px', height: '18px', color: '#C4A25D' }} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.82rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Register New Company</p>
-            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>Company head — set up your organisation</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Register New Company</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>Company head — set up your organisation</p>
           </div>
           <ArrowRight style={{ width: '16px', height: '16px', color: '#C4A25D', flexShrink: 0 }} />
         </motion.button>
@@ -399,8 +399,8 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
           <Users style={{ width: '20px', height: '20px', color: '#C4A25D' }} />
         </div>
         <div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Employee Login</h2>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>No password required — just your email</p>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Employee Login</h2>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>No password required — just your email</p>
         </div>
       </div>
 
@@ -412,7 +412,7 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
               whileHover={{ opacity: 0.85 }} whileTap={{ scale: 0.97 }}
               style={{
                 display: 'block', marginTop: '0.5rem',
-                fontFamily: 'Montserrat, sans-serif', fontSize: '0.68rem',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem',
                 fontWeight: 600, color: '#C0392B', background: 'none',
                 border: 'none', cursor: 'pointer', padding: 0,
                 textDecoration: 'underline',
@@ -428,11 +428,11 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
         <div>
           <label style={labelStyle}>Company</label>
           {loadingCos ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'Montserrat', fontSize: '0.75rem', color: '#A8A4A0', padding: '0.5rem 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: '#A8A4A0', padding: '0.5rem 0' }}>
               <Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Loading companies…
             </div>
           ) : companies.length === 0 ? (
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#8B6914', background: 'rgba(196,162,93,0.08)', padding: '0.75rem', borderRadius: '0.6rem' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#8B6914', background: 'rgba(196,162,93,0.08)', padding: '0.75rem', borderRadius: '0.6rem' }}>
               No companies registered yet. Ask your admin to register first.
             </p>
           ) : (
@@ -461,7 +461,7 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
             value={email} onChange={e => setEmail(e.target.value)}
             required autoFocus
           />
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', marginTop: '0.35rem' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)', marginTop: '0.35rem' }}>
             Must match your email in company HRMS records
           </p>
         </div>
@@ -478,15 +478,15 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
             />
             {debugOtp ? (
               <div style={{ marginTop: '0.6rem', padding: '0.6rem 0.8rem', background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#E8D5B5', margin: 0 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#E8D5B5', margin: 0 }}>
                   ⚡ Auto-filled OTP: <strong style={{ color: '#C4A25D', fontSize: '0.95rem', letterSpacing: '2px' }}>{debugOtp}</strong>
                 </p>
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: '#A8A4A0', marginTop: '0.25rem', marginBottom: 0 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: '#A8A4A0', marginTop: '0.25rem', marginBottom: 0 }}>
                   (SMTP not configured on Render — auto-filled for instant login)
                 </p>
               </div>
             ) : (
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
                 OTP sent to {email}. Please check your inbox.
               </p>
             )}
@@ -579,8 +579,8 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
           <ShieldCheck style={{ width: '20px', height: '20px', color: '#27AE60' }} />
         </div>
         <div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Company Admin</h2>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>Login with password or one-time code</p>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Company Admin</h2>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>Login with password or one-time code</p>
         </div>
       </div>
 
@@ -591,7 +591,7 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
           onClick={() => { setMode('password'); setError(''); setRequiresOTP(false); }}
           style={{
             flex: 1, padding: '0.45rem', borderRadius: '6px',
-            fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 600,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
             cursor: 'pointer', transition: 'all 0.2s',
             background: mode === 'password' ? 'rgba(196,162,93,0.2)' : 'transparent',
             color: mode === 'password' ? '#C4A25D' : 'var(--atmos-muted)',
@@ -605,7 +605,7 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
           onClick={() => { setMode('otp'); setError(''); }}
           style={{
             flex: 1, padding: '0.45rem', borderRadius: '6px',
-            fontFamily: 'Montserrat, sans-serif', fontSize: '0.72rem', fontWeight: 600,
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
             cursor: 'pointer', transition: 'all 0.2s',
             background: mode === 'otp' ? 'rgba(196,162,93,0.2)' : 'transparent',
             color: mode === 'otp' ? '#C4A25D' : 'var(--atmos-muted)',
@@ -620,7 +620,7 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
         <ErrorBanner message={error}>
           {deactivatedData && (
             <motion.button type="button" onClick={handleReactivate} whileHover={{ opacity: 0.85 }} whileTap={{ scale: 0.97 }}
-              style={{ display: 'block', marginTop: '0.5rem', fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600, color: '#C0392B', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+              style={{ display: 'block', marginTop: '0.5rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600, color: '#C0392B', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
             >
               Reactivate Account
             </motion.button>
@@ -661,12 +661,12 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
               />
               {debugOtp ? (
                 <div style={{ marginTop: '0.6rem', padding: '0.6rem 0.8rem', background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '8px', textAlign: 'center' }}>
-                  <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#E8D5B5', margin: 0 }}>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#E8D5B5', margin: 0 }}>
                     ⚡ Auto-filled OTP: <strong style={{ color: '#C4A25D', fontSize: '0.95rem', letterSpacing: '2px' }}>{debugOtp}</strong>
                   </p>
                 </div>
               ) : (
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: '#27AE60', marginTop: '0.35rem', textAlign: 'center' }}>
                   Admin OTP sent to {email}. Please check your inbox.
                 </p>
               )}
@@ -726,8 +726,8 @@ function CompanyRegisterForm({ onBack, registerFn, navigate }) {
           <Building2 style={{ width: '20px', height: '20px', color: '#C4A25D' }} />
         </div>
         <div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Register Company</h2>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>Step {step} of 3</p>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Register Company</h2>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>Step {step} of 3</p>
         </div>
       </div>
 
@@ -770,7 +770,7 @@ function CompanyRegisterForm({ onBack, registerFn, navigate }) {
 
         {step === 2 && (
           <motion.div key="s2" variants={cardVariants} initial="initial" animate="animate" exit="exit" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ padding: '0.75rem 1rem', borderRadius: '0.75rem', background: 'rgba(196,162,93,0.06)', border: '1px solid rgba(196,162,93,0.2)', fontFamily: 'Montserrat', fontSize: '0.7rem', color: '#8B6914' }}>
+            <div style={{ padding: '0.75rem 1rem', borderRadius: '0.75rem', background: 'rgba(196,162,93,0.06)', border: '1px solid rgba(196,162,93,0.2)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', color: '#8B6914' }}>
               <strong>📋 Make sheets publicly accessible:</strong> Share → Anyone with link → Viewer
             </div>
             {[
@@ -782,7 +782,7 @@ function CompanyRegisterForm({ onBack, registerFn, navigate }) {
                   <Icon style={{ width: '12px', height: '12px', color }} /> {label}
                 </label>
                 <input style={inputStyle} placeholder="https://docs.google.com/spreadsheets/d/..." value={form[key]} onChange={e => set(key, e.target.value)} />
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}>{hint}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}>{hint}</p>
               </div>
             ))}
             <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -796,7 +796,7 @@ function CompanyRegisterForm({ onBack, registerFn, navigate }) {
 
         {step === 3 && (
           <motion.div key="s3" variants={cardVariants} initial="initial" animate="animate" exit="exit" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>Set travel policy limits (changeable later).</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>Set travel policy limits (changeable later).</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               {[
                 { key: 'employee', label: 'Employee Budget (₹)' },

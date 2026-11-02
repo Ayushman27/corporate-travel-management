@@ -25,7 +25,7 @@ export default class ErrorBoundary extends React.Component {
           justifyContent: 'center',
           background: '#0d0d0d',
           color: '#e5e5e5',
-          fontFamily: 'Montserrat, sans-serif',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
           padding: '2rem',
           textAlign: 'center'
         }}>
@@ -37,7 +37,7 @@ export default class ErrorBoundary extends React.Component {
             padding: '2.5rem',
             boxShadow: '0 12px 40px rgba(0,0,0,0.5)'
           }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', color: '#C4A25D', marginBottom: '0.5rem' }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.8rem', color: '#C4A25D', marginBottom: '0.5rem' }}>
               Something went wrong
             </h2>
             <p style={{ fontSize: '0.78rem', color: '#a3a3a3', marginBottom: '1.5rem', lineHeight: '1.5' }}>

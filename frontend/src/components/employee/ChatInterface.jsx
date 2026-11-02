@@ -87,10 +87,10 @@ export default function ChatInterface({ tripId, onTripUpdated }) {
           <Bot style={{ width: '18px', height: '18px', color: '#fff' }} />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.1rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
             AI Chat Agent
           </p>
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
             Modify your trip conversationally
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function ChatInterface({ tripId, onTripUpdated }) {
             transition={{ duration: 2, repeat: Infinity }}
             style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#27AE60' }}
           />
-          <span style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)' }}>Online</span>
+          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)' }}>Online</span>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export default function ChatInterface({ tripId, onTripUpdated }) {
                 maxWidth: '78%',
                 padding: '0.7rem 0.9rem',
                 borderRadius: msg.role === 'user' ? '1rem 0.25rem 1rem 1rem' : '0.25rem 1rem 1rem 1rem',
-                fontFamily: 'Montserrat', fontSize: '0.75rem', lineHeight: 1.6,
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', lineHeight: 1.6,
                 background: msg.role === 'user'
                   ? 'linear-gradient(135deg, #C4A25D, #B8923F)'
                   : msg.isError
@@ -200,7 +200,7 @@ export default function ChatInterface({ tripId, onTripUpdated }) {
               padding: '0.3rem 0.75rem', borderRadius: '999px',
               background: 'rgba(196,162,93,0.07)',
               border: '1px solid rgba(196,162,93,0.18)',
-              cursor: 'pointer', fontFamily: 'Montserrat',
+              cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: '0.62rem', fontWeight: 500,
               color: 'var(--atmos-muted)', transition: 'all 0.2s ease',
             }}
@@ -227,7 +227,7 @@ export default function ChatInterface({ tripId, onTripUpdated }) {
             borderRadius: '0.75rem',
             border: '1px solid rgba(196,162,93,0.2)',
             background: 'var(--atmos-input-bg)',
-            fontFamily: 'Montserrat', fontSize: '0.78rem',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem',
             color: 'var(--atmos-dark)', outline: 'none',
           }}
         />

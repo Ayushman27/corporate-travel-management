@@ -57,7 +57,7 @@
 .tm-page {
   min-height: 100vh;
   background: var(--tm-bg);
-  font-family: 'Montserrat', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif, system-ui, sans-serif;
   color: var(--tm-text);
 }
 
@@ -76,7 +76,7 @@
 }
 
 .tm-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Plus Jakarta Sans', sans-serif, serif;
   font-size: 1.75rem;
   font-weight: 400;
   color: var(--tm-text);
@@ -121,7 +121,7 @@
   border-bottom: 2px solid transparent;
   white-space: nowrap;
   transition: all 0.2s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif, sans-serif;
 }
 .tm-tab:hover { color: var(--tm-text-2); }
 .tm-tab--active {
@@ -142,7 +142,7 @@
 .tm-filter-select {
   padding: 0.35rem 0.65rem;
   font-size: 0.68rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif, sans-serif;
   color: var(--tm-text);
   background: var(--tm-surface);
   border: 1px solid var(--tm-border);
@@ -278,7 +278,7 @@
 }
 
 .tm-section-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif, sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -573,7 +573,7 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.3rem 0.65rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif, sans-serif;
   font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.04em;

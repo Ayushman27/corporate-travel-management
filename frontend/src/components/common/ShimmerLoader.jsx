@@ -65,7 +65,7 @@ export default function LoadingSpinner({ fullScreen = false, size = 'md' }) {
       style={{ background: 'rgba(244,242,240,0.9)', backdropFilter: 'blur(12px)' }}
     >
       {spinner}
-      <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', letterSpacing: '0.15em',
+      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', letterSpacing: '0.15em',
                   color: '#A8A4A0', marginTop: '1rem', textTransform: 'uppercase' }}>
         Loading…
       </p>

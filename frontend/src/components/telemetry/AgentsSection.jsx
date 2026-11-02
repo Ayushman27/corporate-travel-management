@@ -5,7 +5,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGri
 import { SectionCard, StatusBadge, ProgressBar, fmtDuration, fmtCost } from './TelemetryWidgets';
 
 const chartTooltip = {
-  contentStyle: { background: 'var(--tm-surface)', border: '1px solid var(--tm-border)', borderRadius: 8, fontSize: '0.68rem', fontFamily: 'Montserrat' },
+  contentStyle: { background: 'var(--tm-surface)', border: '1px solid var(--tm-border)', borderRadius: 8, fontSize: '0.68rem', fontFamily: "'Plus Jakarta Sans', sans-serif" },
 };
 
 export default function AgentsSection({ agents }) {

@@ -22,8 +22,8 @@ function ScoreBar({ label, value, color }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-        <span style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>{label}</span>
-        <span style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{num.toFixed(1)}/10</span>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>{label}</span>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{num.toFixed(1)}/10</span>
       </div>
       <div style={{ height: '4px', borderRadius: '999px', background: 'rgba(196,162,93,0.1)', overflow: 'hidden' }}>
         <motion.div
@@ -76,7 +76,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
             }}>
               <Icon style={{ width: '16px', height: '16px', color: '#fff' }} />
             </div>
-            <span style={{ fontFamily: 'Montserrat', fontSize: '0.78rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
               {meta.label}
             </span>
           </div>
@@ -87,7 +87,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
               style={{
                 padding: '0.18rem 0.65rem', borderRadius: '999px',
                 background: 'rgba(39,174,96,0.1)', color: '#1A7F45',
-                fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 700,
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 700,
                 letterSpacing: '0.1em', textTransform: 'uppercase',
               }}
             >
@@ -99,10 +99,10 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
         {/* Price & time */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <div>
-            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 500, color: 'var(--atmos-dark)', lineHeight: 1 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.8rem', fontWeight: 500, color: 'var(--atmos-dark)', lineHeight: 1 }}>
               ₹{(Number(plan.totalCost) || 0).toLocaleString('en-IN')}
             </p>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
               {hrs}h {mins}m total travel
             </p>
           </div>
@@ -112,7 +112,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
                 <span key={m} style={{ fontSize: '1rem' }} title={m}>{MODE_EMOJI[m] || '🚗'}</span>
               ))}
             </div>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)' }}>{plan.segments?.length} segments</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)' }}>{plan.segments?.length} segments</p>
           </div>
         </div>
 
@@ -127,7 +127,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
         {plan.highlights?.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.6rem' }}>
             {plan.highlights.slice(0, 2).map((h, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontFamily: 'Montserrat', fontSize: '0.68rem', color: '#6B6760' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: '#6B6760' }}>
                 <Check style={{ width: '12px', height: '12px', color: '#27AE60', marginTop: '0.15rem', flexShrink: 0 }} /> {h}
               </div>
             ))}
@@ -138,7 +138,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
         {plan.warnings?.length > 0 && (
           <div style={{ padding: '0.5rem 0.75rem', borderRadius: '0.6rem', background: 'rgba(196,162,93,0.08)', border: '1px solid rgba(196,162,93,0.2)', marginBottom: '0.6rem' }}>
             {plan.warnings.map((w, i) => (
-              <p key={i} style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#8B6914' }}>⚠️ {w}</p>
+              <p key={i} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: '#8B6914' }}>⚠️ {w}</p>
             ))}
           </div>
         )}
@@ -152,7 +152,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
           padding: '0.6rem',
           background: 'none', border: 'none', borderTop: '1px solid rgba(196,162,93,0.1)',
-          cursor: 'pointer', fontFamily: 'Montserrat', fontSize: '0.65rem',
+          cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem',
           fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
           color: 'var(--atmos-muted)',
         }}
@@ -179,8 +179,8 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
                 }}>
                   <span style={{ fontSize: '1rem', flexShrink: 0 }}>{MODE_EMOJI[seg.mode] || '🚗'}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{seg.from} → {seg.to}</p>
-                    <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{seg.from} → {seg.to}</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>
                       {seg.operator} · {seg.departureTime}–{seg.arrivalTime} · ₹{(Number(seg.cost) || 0).toLocaleString('en-IN')}
                     </p>
                   </div>
@@ -201,7 +201,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
               flex: 1, padding: '0.6rem', borderRadius: '0.7rem',
               background: 'transparent',
               border: `1.5px solid ${meta.borderActive}`,
-              cursor: 'pointer', fontFamily: 'Montserrat',
+              cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: '0.68rem', fontWeight: 600,
               letterSpacing: '0.06em', textTransform: 'uppercase',
               color: meta.from,
@@ -220,7 +220,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
               padding: '0.6rem', borderRadius: '0.7rem',
               background: booking ? 'rgba(196,162,93,0.3)' : `linear-gradient(135deg, ${meta.from}, ${meta.to})`,
               border: 'none', cursor: booking ? 'not-allowed' : 'pointer',
-              fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600,
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
               letterSpacing: '0.06em', textTransform: 'uppercase', color: '#fff',
               boxShadow: `0 4px 14px ${meta.glow}`,
             }}
@@ -238,7 +238,7 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
               padding: '0.6rem', borderRadius: '0.7rem',
               background: booking ? 'rgba(196,162,93,0.3)' : `linear-gradient(135deg, ${meta.from}, ${meta.to})`,
               border: 'none', cursor: booking ? 'not-allowed' : 'pointer',
-              fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600,
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
               letterSpacing: '0.06em', textTransform: 'uppercase', color: '#fff',
               boxShadow: `0 4px 14px ${meta.glow}`,
             }}
@@ -302,7 +302,7 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
         border: '1px solid rgba(196,162,93,0.15)', borderRadius: '1.2rem',
         padding: '3rem 2rem', textAlign: 'center',
       }}>
-        <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', color: 'var(--atmos-muted)' }}>No plans generated yet</p>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: 'var(--atmos-muted)' }}>No plans generated yet</p>
       </div>
     );
   }
@@ -312,10 +312,10 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
       {!compact && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
           <div>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.5rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
               AI-Generated Plans
             </h2>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
               {trip?.fromCity} → {trip?.toCity} · 3 optimised options
             </p>
           </div>
@@ -327,7 +327,7 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
                 display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
                 background: 'transparent', border: '1px solid rgba(196,162,93,0.3)',
                 borderRadius: '0.6rem', padding: '0.45rem 0.9rem',
-                fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 500,
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 500,
                 color: '#8B8480', cursor: 'pointer',
               }}
             >
@@ -344,7 +344,7 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
           style={{
             marginBottom: '1rem', padding: '0.75rem 1rem', borderRadius: '0.75rem',
             background: 'rgba(196,162,93,0.06)', border: '1px solid rgba(196,162,93,0.2)',
-            fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#8B6914',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#8B6914',
           }}
         >
           ⏳ Trip status: <strong>{trip?.status?.replace(/_/g, ' ')}</strong> — booking available after all approvals
@@ -357,7 +357,7 @@ export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBac
           style={{
             marginBottom: '1rem', padding: '0.75rem 1rem', borderRadius: '0.75rem',
             background: 'rgba(196,162,93,0.06)', border: '1px solid rgba(196,162,93,0.2)',
-            fontFamily: 'Montserrat', fontSize: '0.72rem', color: '#8B6914',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#8B6914',
           }}
         >
           📝 Draft mode — select a plan and send to manager for approval

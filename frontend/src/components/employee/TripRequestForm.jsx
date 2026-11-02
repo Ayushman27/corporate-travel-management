@@ -26,7 +26,7 @@ const tomorrow = () => {
 
 const labelStyle = {
   display: 'block',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.62rem', fontWeight: 700,
   letterSpacing: '0.1em', textTransform: 'uppercase',
   color: 'var(--atmos-muted)', marginBottom: '0.4rem',
@@ -37,7 +37,7 @@ const inputStyle = {
   borderRadius: '0.65rem',
   border: '1px solid rgba(196,162,93,0.2)',
   background: 'var(--atmos-input-bg)',
-  fontFamily: 'Montserrat, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.8rem', color: 'var(--atmos-dark)',
   outline: 'none', boxSizing: 'border-box',
   transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
@@ -99,7 +99,7 @@ export default function TripRequestForm({ onSuccess }) {
           }}>
             <MapPin style={{ width: '18px', height: '18px', color: '#fff' }} />
           </div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.35rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.35rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
             Trip Details
           </h2>
         </div>
@@ -113,7 +113,7 @@ export default function TripRequestForm({ onSuccess }) {
               borderRadius: '0.75rem',
               background: 'rgba(192,57,43,0.06)',
               border: '1px solid rgba(192,57,43,0.2)',
-              fontFamily: 'Montserrat', fontSize: '0.75rem', color: '#C0392B',
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: '#C0392B',
             }}
           >
             {error}
@@ -200,7 +200,7 @@ export default function TripRequestForm({ onSuccess }) {
                   ? 'rgba(196,162,93,0.35)'
                   : 'linear-gradient(135deg, #C4A25D 0%, #B8923F 100%)',
                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600,
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600,
                 letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff',
                 boxShadow: loading ? 'none' : '0 4px 18px rgba(196,162,93,0.3)',
               }}
@@ -211,7 +211,7 @@ export default function TripRequestForm({ onSuccess }) {
               }
             </motion.button>
             <p style={{
-              fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)',
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)',
               textAlign: 'center', marginTop: '0.65rem',
             }}>
               Planning + Optimization agents will generate 3 optimised route options

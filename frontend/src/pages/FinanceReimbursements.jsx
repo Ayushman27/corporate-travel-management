@@ -54,14 +54,14 @@ export default function FinanceReimbursements() {
       }}>
         <main style={{ padding: '2rem' }}>
           <h1 style={{
-            fontFamily: 'Cormorant Garamond, serif', fontSize: '2.4rem',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2.4rem',
             color: 'var(--atmos-dark)', fontWeight: 500, margin: '0 0 2rem 0'
           }}>Finance - Reimbursements</h1>
 
           {loading ? (
             <p>Loading...</p>
           ) : reimbursements.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--atmos-muted)', fontFamily: 'Montserrat', fontSize: '0.85rem' }}>
+            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--atmos-muted)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>
               <Receipt size={48} style={{ color: '#ffffff', opacity: 0.7, margin: '0 auto 1rem' }} />
               <p>No pending reimbursements.</p>
             </div>
@@ -79,14 +79,14 @@ export default function FinanceReimbursements() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '1rem', marginBottom: '1rem' }}>
                     <div>
-                      <h3 style={{ margin: '0 0 0.25rem 0', fontFamily: 'Montserrat', fontSize: '1.1rem', color: 'var(--atmos-dark)' }}>{r.title}</h3>
-                      <p style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '0.8rem', color: 'var(--atmos-mid)' }}>
+                      <h3 style={{ margin: '0 0 0.25rem 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.1rem', color: 'var(--atmos-dark)' }}>{r.title}</h3>
+                      <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: 'var(--atmos-mid)' }}>
                         Employee: {r.employeeId.name} ({r.employeeId.email}) • Dept: {r.employeeId.department}
                       </p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <span style={{
-                        fontSize: '0.7rem', fontFamily: 'Montserrat', padding: '0.25rem 0.75rem', borderRadius: '1rem',
+                        fontSize: '0.7rem', fontFamily: "'Plus Jakarta Sans', sans-serif", padding: '0.25rem 0.75rem', borderRadius: '1rem',
                         background: r.status === 'processed' ? 'rgba(39,174,96,0.1)' : 'rgba(232,168,56,0.1)',
                         color: r.status === 'processed' ? '#27AE60' : '#E8A838', fontWeight: 600
                       }}>
@@ -105,13 +105,13 @@ export default function FinanceReimbursements() {
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                           <img src={b.billUrl} alt="Bill" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '0.25rem', border: '1px solid #ddd' }} />
                           <div>
-                            <p style={{ margin: '0 0 0.2rem 0', fontFamily: 'Montserrat', fontWeight: 600, fontSize: '0.9rem', color: 'var(--atmos-dark)' }}>{b.merchant} - {b.extractedCategory}</p>
-                            <p style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '0.75rem', color: 'var(--atmos-muted)' }}>{b.extractedDate}</p>
+                            <p style={{ margin: '0 0 0.2rem 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '0.9rem', color: 'var(--atmos-dark)' }}>{b.merchant} - {b.extractedCategory}</p>
+                            <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: 'var(--atmos-muted)' }}>{b.extractedDate}</p>
                           </div>
                         </div>
                         
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                          <span style={{ fontFamily: 'Cormorant Garamond', fontSize: '1.3rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
                             ₹{b.extractedAmount}
                           </span>
                           
@@ -136,7 +136,7 @@ export default function FinanceReimbursements() {
                             </div>
                           ) : (
                             <span style={{
-                              fontSize: '0.7rem', fontFamily: 'Montserrat', padding: '0.2rem 0.6rem', borderRadius: '1rem',
+                              fontSize: '0.7rem', fontFamily: "'Plus Jakarta Sans', sans-serif", padding: '0.2rem 0.6rem', borderRadius: '1rem',
                               background: b.status === 'approved' ? 'rgba(39,174,96,0.1)' : 'rgba(192,57,43,0.1)',
                               color: b.status === 'approved' ? '#27AE60' : '#C0392B', fontWeight: 600
                             }}>
@@ -150,12 +150,12 @@ export default function FinanceReimbursements() {
 
                   <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'flex-end', gap: '2rem' }}>
                     <div style={{ textAlign: 'right' }}>
-                      <p style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '0.75rem', color: 'var(--atmos-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Requested</p>
-                      <p style={{ margin: 0, fontFamily: 'Cormorant Garamond', fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>₹{r.totalRequestedAmount.toLocaleString()}</p>
+                      <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: 'var(--atmos-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Requested</p>
+                      <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>₹{r.totalRequestedAmount.toLocaleString()}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <p style={{ margin: 0, fontFamily: 'Montserrat', fontSize: '0.75rem', color: '#27AE60', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Approved So Far</p>
-                      <p style={{ margin: 0, fontFamily: 'Cormorant Garamond', fontSize: '1.4rem', fontWeight: 600, color: '#27AE60' }}>₹{r.totalApprovedAmount.toLocaleString()}</p>
+                      <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: '#27AE60', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Approved So Far</p>
+                      <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: '#27AE60' }}>₹{r.totalApprovedAmount.toLocaleString()}</p>
                     </div>
                   </div>
                 </motion.div>

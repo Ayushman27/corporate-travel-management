@@ -186,7 +186,7 @@ export default function TripMap({ startCity, endCity }) {
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, background: 'rgba(28,25,23,0.6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <div style={{ width: '16px', height: '16px', border: '2px solid #C4A25D', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-            <span style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, color: '#C4A25D' }}>Mapping Route...</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: '#C4A25D' }}>Mapping Route...</span>
           </div>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>

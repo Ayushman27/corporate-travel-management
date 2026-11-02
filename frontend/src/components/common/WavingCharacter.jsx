@@ -70,7 +70,7 @@ export default function WavingCharacter() {
             padding: '0.5rem 0.85rem',
             boxShadow: '0 8px 24px rgba(44,43,41,0.08)',
             fontSize: '0.78rem',
-            fontFamily: 'Montserrat, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontWeight: 500,
             color: '#2C2B29',
             letterSpacing: '0.02em',

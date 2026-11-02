@@ -67,12 +67,12 @@ function StatCard({ title, value, icon: Icon, colorIdx = 0, delay = 0, isDark = 
       </div>
       <div>
         <p style={{
-          fontFamily: 'Cormorant Garamond, serif',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: '1.7rem', fontWeight: 500,
           color: 'var(--atmos-dark)', lineHeight: 1,
         }}>{value}</p>
         <p style={{
-          fontFamily: 'Montserrat, sans-serif',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: '0.65rem', fontWeight: 500,
           letterSpacing: '0.08em', textTransform: 'uppercase',
           color: 'var(--atmos-muted)', marginTop: '0.25rem',
@@ -90,7 +90,7 @@ function StatusBadge({ status }) {
       display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
       padding: '0.2rem 0.65rem', borderRadius: '999px',
       background: cfg.bg, color: cfg.color,
-      fontFamily: 'Montserrat, sans-serif',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
       fontSize: '0.6rem', fontWeight: 600,
       letterSpacing: '0.08em', textTransform: 'uppercase',
     }}>
@@ -130,8 +130,8 @@ export default function Dashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.55, ease }}
                 style={{
-                  fontFamily: 'Cormorant Garamond, serif',
-                  fontSize: '2rem', fontWeight: 400,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: '2rem', fontWeight: 700,
                   color: 'var(--atmos-dark)', letterSpacing: '-0.02em',
                 }}
               >
@@ -142,7 +142,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15, duration: 0.4 }}
                 style={{
-                  fontFamily: 'Montserrat, sans-serif',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontSize: '0.72rem', color: 'var(--atmos-muted)',
                   marginTop: '0.3rem', letterSpacing: '0.05em',
                 }}
@@ -165,7 +165,7 @@ export default function Dashboard() {
                     padding: '0.65rem 1.25rem', borderRadius: '0.8rem',
                     background: 'var(--atmos-accent-grad)',
                     boxShadow: isDark ? '0 4px 16px rgba(196,162,93,0.25)' : '0 4px 16px rgba(37,99,235,0.25)',
-                    fontFamily: 'Montserrat, sans-serif',
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                     fontSize: '0.72rem', fontWeight: 600,
                     letterSpacing: '0.08em', textTransform: 'uppercase',
                     color: '#fff', cursor: 'pointer',
@@ -207,13 +207,13 @@ export default function Dashboard() {
               borderBottom: '1px solid var(--atmos-glass-border)',
             }}>
               <h2 style={{
-                fontFamily: 'Cormorant Garamond, serif',
-                fontSize: '1.25rem', fontWeight: 400, color: 'var(--atmos-dark)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '1.25rem', fontWeight: 600, color: 'var(--atmos-dark)',
               }}>
                 My Trips
               </h2>
               <span style={{
-                fontFamily: 'Montserrat', fontSize: '0.62rem',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem',
                 fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
                 color: 'var(--atmos-gold)',
               }}>
@@ -228,19 +228,18 @@ export default function Dashboard() {
             ) : myTrips.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
                 <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity }}
+                  
                 >
                   <Plane style={{ width: '48px', height: '48px', color: isDark ? 'rgba(196,162,93,0.3)' : 'rgba(37,99,235,0.3)', margin: '0 auto 1rem' }} />
                 </motion.div>
-                <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', color: 'var(--atmos-dark)', marginBottom: '0.5rem' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', color: 'var(--atmos-dark)', marginBottom: '0.5rem' }}>
                   No trips yet
                 </p>
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginBottom: '1.5rem' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)', marginBottom: '1.5rem' }}>
                   Start by creating a new trip request
                 </p>
                 <Link to="/trip/new" style={{ textDecoration: 'none' }}>
-                  <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '0.75rem', background: 'var(--atmos-accent-grad)', color: '#fff', fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
+                  <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', borderRadius: '0.75rem', background: 'var(--atmos-accent-grad)', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
                     <PlusCircle style={{ width: '14px', height: '14px' }} /> Request a Trip
                   </motion.div>
                 </Link>
@@ -253,7 +252,7 @@ export default function Dashboard() {
                       {['Trip ID', 'Route', 'Date', 'Budget', 'Status', ''].map(h => (
                         <th key={h} style={{
                           padding: '0.75rem 1.25rem', textAlign: 'left',
-                          fontFamily: 'Montserrat', fontSize: '0.58rem',
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem',
                           fontWeight: 700, letterSpacing: '0.12em',
                           textTransform: 'uppercase', color: 'var(--atmos-gold)',
                         }}>{h}</th>
@@ -271,11 +270,11 @@ export default function Dashboard() {
                         style={{ borderBottom: '1px solid var(--atmos-glass-border)', cursor: 'default' }}
                       >
                         <td style={{ padding: '0.9rem 1.25rem', fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--atmos-muted)' }}>{trip.tripId}</td>
-                        <td style={{ padding: '0.9rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.78rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{trip.fromCity} → {trip.toCity}</td>
-                        <td style={{ padding: '0.9rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>
+                        <td style={{ padding: '0.9rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{trip.fromCity} → {trip.toCity}</td>
+                        <td style={{ padding: '0.9rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-mid)' }}>
                           {trip.travelDate ? format(new Date(trip.travelDate), 'dd MMM yyyy') : '—'}
                         </td>
-                        <td style={{ padding: '0.9rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>
+                        <td style={{ padding: '0.9rem 1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>
                           ₹{(trip.estimatedBudget || 0).toLocaleString('en-IN')}
                         </td>
                         <td style={{ padding: '0.9rem 1.25rem' }}>
@@ -287,7 +286,7 @@ export default function Dashboard() {
                               whileHover={{ color: isDark ? '#B8923F' : '#1D4ED8', x: 2 }}
                               style={{
                                 display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                                fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600,
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
                                 color: 'var(--atmos-gold)', letterSpacing: '0.05em',
                               }}
                             >

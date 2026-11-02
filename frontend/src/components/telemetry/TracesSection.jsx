@@ -134,7 +134,7 @@ function LogsStream({ logs }) {
             value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search logs..."
             style={{
-              padding: '0.3rem 0.6rem', fontSize: '0.65rem', fontFamily: 'Montserrat',
+              padding: '0.3rem 0.6rem', fontSize: '0.65rem', fontFamily: "'Plus Jakarta Sans', sans-serif",
               background: 'var(--tm-surface-2)', border: '1px solid var(--tm-border)',
               borderRadius: '0.4rem', color: 'var(--tm-text)', outline: 'none', width: 160,
             }}

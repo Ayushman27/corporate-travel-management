@@ -21,7 +21,7 @@ const NavLink = ({ to, children }) => {
         style={{
           display: 'inline-block', padding: '0.35rem 0.9rem',
           borderRadius: '0.6rem',
-          fontFamily: 'Montserrat, sans-serif',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: '0.72rem', fontWeight: 500,
           letterSpacing: '0.1em', textTransform: 'uppercase',
           color: active ? 'var(--atmos-gold)' : 'var(--atmos-mid)',
@@ -91,7 +91,7 @@ export default function Navbar() {
           </motion.div>
           <div>
             <div style={{
-              fontFamily: 'Cormorant Garamond, serif',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: scrolled ? '1.1rem' : '1.3rem',
               fontWeight: 400, letterSpacing: '-0.02em',
               color: 'var(--atmos-dark)', lineHeight: 1.1,
@@ -101,7 +101,7 @@ export default function Navbar() {
             </div>
             {company?.companyName && (
               <div style={{
-                fontFamily: 'Montserrat', fontSize: '0.6rem',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem',
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: 'var(--atmos-gold)', lineHeight: 1,
               }}>
@@ -139,7 +139,7 @@ export default function Navbar() {
             border: isDark ? '1px solid rgba(196,162,93,0.3)' : '1px solid rgba(37,99,235,0.3)',
             color: isDark ? '#C4A25D' : '#2563EB',
             cursor: 'pointer',
-            fontFamily: 'Montserrat, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: '0.68rem',
             fontWeight: 600,
             letterSpacing: '0.08em',
@@ -185,13 +185,13 @@ export default function Navbar() {
               width: '28px', height: '28px', borderRadius: '50%',
               background: 'var(--atmos-accent-grad)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Cormorant Garamond', fontSize: '0.9rem',
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem',
               fontWeight: 500, color: '#fff', flexShrink: 0,
             }}>
               {user?.name?.[0]?.toUpperCase()}
             </div>
             <div style={{ textAlign: 'left' }}>
-              <div style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 500, color: profileHovered ? '#000000' : 'var(--atmos-dark)', lineHeight: 1.2, transition: 'color 0.2s ease' }}>
+              <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 500, color: profileHovered ? '#000000' : 'var(--atmos-dark)', lineHeight: 1.2, transition: 'color 0.2s ease' }}>
                 {user?.name?.split(' ')[0]}
               </div>
               <div style={{
@@ -227,9 +227,9 @@ export default function Navbar() {
               }}
             >
               <div style={{ padding: '1rem', borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.25rem' }}>Signed in as</p>
-                <p style={{ fontFamily: 'Cormorant Garamond', fontSize: '1rem', color: 'var(--atmos-dark)', fontWeight: 400 }}>{user?.name}</p>
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', color: 'var(--atmos-muted)' }}>{user?.email}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.25rem' }}>Signed in as</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1rem', color: 'var(--atmos-dark)', fontWeight: 400 }}>{user?.name}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)' }}>{user?.email}</p>
               </div>
               <motion.button
                 onClick={handleLogout}
@@ -237,7 +237,7 @@ export default function Navbar() {
                   width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem',
                   padding: '0.8rem 1rem', background: 'none', border: 'none',
                   cursor: 'pointer', color: '#C0392B',
-                  fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 500,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 500,
                   letterSpacing: '0.06em',
                 }}
                 whileHover={{ background: 'rgba(192,57,43,0.05)' }}

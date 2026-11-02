@@ -49,7 +49,7 @@ function HotelCard({ hotel, selected, onSelect, index }) {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
         <div>
-          <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', color: 'var(--atmos-dark)', margin: 0 }}>
+          <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', color: 'var(--atmos-dark)', margin: 0 }}>
             {name}
           </h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
@@ -57,10 +57,10 @@ function HotelCard({ hotel, selected, onSelect, index }) {
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', color: 'var(--atmos-dark)' }}>
+          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.5rem', color: 'var(--atmos-dark)' }}>
             ₹{price.toLocaleString('en-IN')}
           </span>
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>per night</p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>per night</p>
         </div>
       </div>
 
@@ -81,8 +81,8 @@ function HotelCard({ hotel, selected, onSelect, index }) {
           {fooding && <Check style={{ width: '12px', height: '12px', color: '#fff' }} />}
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Include Fooding (All Meals)</p>
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>+ ₹{foodCost.toLocaleString('en-IN')} per night</p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Include Fooding (All Meals)</p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>+ ₹{foodCost.toLocaleString('en-IN')} per night</p>
         </div>
         <Coffee style={{ width: '18px', height: '18px', color: fooding ? '#C4A25D' : 'var(--atmos-muted)' }} />
       </div>
@@ -151,10 +151,10 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', color: 'var(--atmos-dark)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.8rem', color: 'var(--atmos-dark)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             Hotels in {trip.toCity}
             <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--atmos-glass)', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '0.6rem', padding: '0.2rem 0.6rem' }}>
-              <span style={{ fontSize: '1rem', fontFamily: 'Montserrat', color: 'var(--atmos-dark)' }}>Nights: </span>
+              <span style={{ fontSize: '1rem', fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--atmos-dark)' }}>Nights: </span>
               <input 
                 type="number" 
                 min="1" 
@@ -163,13 +163,13 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
                 onChange={(e) => setNights(Math.max(1, parseInt(e.target.value) || 1))}
                 style={{
                   width: '3rem', background: 'transparent', border: 'none', 
-                  fontFamily: 'Montserrat', fontSize: '1.1rem', fontWeight: 600, color: '#C4A25D',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.1rem', fontWeight: 600, color: '#C4A25D',
                   outline: 'none', textAlign: 'center', padding: '0.1rem'
                 }}
               />
             </div>
           </h2>
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.8rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}>
             <MapPin style={{ width: '14px', height: '14px', display: 'inline', verticalAlign: 'text-bottom' }} /> Select accommodation for your stay
           </p>
         </div>
@@ -179,7 +179,7 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
               display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
               background: 'transparent', border: '1px solid rgba(196,162,93,0.3)',
               borderRadius: '0.6rem', padding: '0.45rem 0.9rem',
-              fontFamily: 'Montserrat', fontSize: '0.7rem', color: '#8B8480', cursor: 'pointer'
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', color: '#8B8480', cursor: 'pointer'
             }}
           >
             ← Back to Plans
@@ -197,7 +197,7 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
             onSelect={handleSelectHotel}
           />
         )) : (
-          <p style={{ fontFamily: 'Montserrat', fontSize: '0.9rem', color: 'var(--atmos-muted)' }}>No hotels found for this city.</p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', color: 'var(--atmos-muted)' }}>No hotels found for this city.</p>
         )}
       </div>
 
@@ -210,7 +210,7 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
             padding: '0.85rem 1.5rem', borderRadius: '0.75rem',
             background: 'transparent',
             border: '1px solid rgba(196,162,93,0.3)',
-            color: 'var(--atmos-dark)', fontFamily: 'Montserrat', fontSize: '0.82rem', fontWeight: 500,
+            color: 'var(--atmos-dark)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 500,
             cursor: 'pointer'
           }}
         >
@@ -224,7 +224,7 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
           style={{
             padding: '0.85rem 2rem', borderRadius: '0.75rem',
             background: selectedHotelData ? 'linear-gradient(135deg, #C4A25D, #B8923F)' : 'rgba(196,162,93,0.3)',
-            color: '#fff', fontFamily: 'Montserrat', fontSize: '0.85rem', fontWeight: 600,
+            color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem', fontWeight: 600,
             border: 'none', cursor: selectedHotelData ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', gap: '0.5rem',
             boxShadow: selectedHotelData ? '0 8px 24px rgba(196,162,93,0.3)' : 'none'

@@ -102,10 +102,10 @@ export default function SetBudgetModal({
                 <DollarSign style={{ width: '18px', height: '18px', color: '#C4A25D' }} />
               </div>
               <div>
-                <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.45rem', fontWeight: 500, color: '#FFFFFF', margin: 0 }}>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.45rem', fontWeight: 500, color: '#FFFFFF', margin: 0 }}>
                   Set Monthly Budget
                 </h3>
-                <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'rgba(255,255,255,0.5)', margin: '0.2rem 0 0' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'rgba(255,255,255,0.5)', margin: '0.2rem 0 0' }}>
                   Live Neon DB sync · Controls monthly expenditure caps
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default function SetBudgetModal({
             {/* Month Selection */}
             <div>
               <label style={{
-                display: 'block', fontFamily: 'Montserrat', fontSize: '0.6rem',
+                display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem',
                 fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                 color: '#C4A25D', marginBottom: '0.4rem'
               }}>
@@ -142,7 +142,7 @@ export default function SetBudgetModal({
                     borderRadius: '0.65rem',
                     border: '1px solid rgba(196,162,93,0.25)',
                     background: 'rgba(255,255,255,0.05)',
-                    color: '#FFFFFF', fontFamily: 'Montserrat', fontSize: '0.78rem',
+                    color: '#FFFFFF', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem',
                     outline: 'none', cursor: 'pointer', boxSizing: 'border-box'
                   }}
                 >
@@ -157,7 +157,7 @@ export default function SetBudgetModal({
             {/* Allocated Budget */}
             <div>
               <label style={{
-                display: 'block', fontFamily: 'Montserrat', fontSize: '0.6rem',
+                display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem',
                 fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                 color: '#C4A25D', marginBottom: '0.4rem'
               }}>
@@ -182,7 +182,7 @@ export default function SetBudgetModal({
                     borderRadius: '0.65rem',
                     border: '1px solid rgba(196,162,93,0.3)',
                     background: 'rgba(255,255,255,0.06)',
-                    color: '#FFFFFF', fontFamily: 'Montserrat', fontSize: '0.92rem',
+                    color: '#FFFFFF', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.92rem',
                     fontWeight: 600, outline: 'none', boxSizing: 'border-box'
                   }}
                 />
@@ -202,7 +202,7 @@ export default function SetBudgetModal({
                         border: isSelected ? '1px solid #C4A25D' : '1px solid rgba(255,255,255,0.1)',
                         color: isSelected ? '#C4A25D' : 'rgba(255,255,255,0.7)',
                         borderRadius: '0.45rem', padding: '0.25rem 0.55rem',
-                        fontFamily: 'Montserrat', fontSize: '0.63rem', fontWeight: 600,
+                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.63rem', fontWeight: 600,
                         cursor: 'pointer', transition: 'all 0.15s ease'
                       }}
                     >
@@ -216,7 +216,7 @@ export default function SetBudgetModal({
             {/* Department Option */}
             <div>
               <label style={{
-                display: 'block', fontFamily: 'Montserrat', fontSize: '0.6rem',
+                display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem',
                 fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                 color: '#C4A25D', marginBottom: '0.4rem'
               }}>
@@ -230,7 +230,7 @@ export default function SetBudgetModal({
                   borderRadius: '0.65rem',
                   border: '1px solid rgba(196,162,93,0.25)',
                   background: 'rgba(255,255,255,0.05)',
-                  color: '#FFFFFF', fontFamily: 'Montserrat', fontSize: '0.78rem',
+                  color: '#FFFFFF', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem',
                   outline: 'none', cursor: 'pointer', boxSizing: 'border-box'
                 }}
               >
@@ -247,7 +247,7 @@ export default function SetBudgetModal({
             <div style={{
               padding: '0.75rem 1rem', borderRadius: '0.65rem',
               background: 'rgba(196,162,93,0.07)', border: '1px solid rgba(196,162,93,0.2)',
-              fontFamily: 'Montserrat', fontSize: '0.64rem', color: '#E8C97A', lineHeight: 1.4
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.64rem', color: '#E8C97A', lineHeight: 1.4
             }}>
               ✨ <strong>Note:</strong> Saving will update the monthly budget in Neon DB. The remaining balance will automatically adjust against recorded expenditures.
             </div>
@@ -260,7 +260,7 @@ export default function SetBudgetModal({
                 style={{
                   padding: '0.55rem 1.2rem', borderRadius: '0.65rem',
                   background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'rgba(255,255,255,0.7)', fontFamily: 'Montserrat', fontSize: '0.72rem',
+                  color: 'rgba(255,255,255,0.7)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem',
                   cursor: 'pointer'
                 }}
               >
@@ -274,7 +274,7 @@ export default function SetBudgetModal({
                   padding: '0.55rem 1.4rem', borderRadius: '0.65rem',
                   background: 'linear-gradient(135deg, #C4A25D, #A3823B)',
                   border: 'none', color: '#000000',
-                  fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 700,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 700,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   boxShadow: '0 4px 14px rgba(196,162,93,0.35)'
                 }}

@@ -44,7 +44,7 @@ function TabBtn({ id, label, active, onClick }) {
         padding: '0.5rem 1.1rem', borderRadius: '0.6rem',
         background: active ? 'linear-gradient(135deg, #C4A25D, #B8923F)' : 'transparent',
         border: 'none', cursor: 'pointer',
-        fontFamily: 'Montserrat', fontSize: '0.68rem',
+        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem',
         fontWeight: active ? 600 : 500, letterSpacing: '0.06em',
         color: active ? '#fff' : 'var(--atmos-mid)',
         boxShadow: active ? '0 4px 12px rgba(196,162,93,0.25)' : 'none',
@@ -58,13 +58,13 @@ function TabBtn({ id, label, active, onClick }) {
 
 const thStyle = {
   padding: '0.75rem 1rem', textAlign: 'left',
-  fontFamily: 'Montserrat', fontSize: '0.58rem',
+  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem',
   fontWeight: 700, letterSpacing: '0.12em',
   textTransform: 'uppercase', color: '#C4A25D',
 };
 const tdStyle = {
   padding: '0.8rem 1rem',
-  fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)',
+  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)',
 };
 
 function TripBillModal({ trip, onClose }) {
@@ -88,10 +88,10 @@ function TripBillModal({ trip, onClose }) {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.2rem' }}>
           <div>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', color: 'var(--atmos-dark)', margin: 0 }}>
+            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', color: 'var(--atmos-dark)', margin: 0 }}>
               Trip Bill Details & Breakdown
             </h3>
-            <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
               {trip.employeeName} ({trip.department}) · {trip.tripId}
             </p>
           </div>
@@ -108,13 +108,13 @@ function TripBillModal({ trip, onClose }) {
           }}>
             <AlertTriangle style={{ width: '16px', height: '16px', color: '#E8A838', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 700, color: '#D4922A', margin: 0 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 700, color: '#D4922A', margin: 0 }}>
                 Budget Exceeded Warning
               </p>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.66rem', color: 'var(--atmos-dark)', margin: '0.2rem 0 0', lineHeight: 1.4 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.66rem', color: 'var(--atmos-dark)', margin: '0.2rem 0 0', lineHeight: 1.4 }}>
                 Employee budget is <strong>₹{empLimit.toLocaleString('en-IN')}</strong>, but planned bill is <strong>₹{Number(trip.estimatedBudget || 0).toLocaleString('en-IN')}</strong> (Exceeds by <strong>₹{excess.toLocaleString('en-IN')}</strong>).
               </p>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
                 ℹ️ Not deducted from employee personal budget.
               </p>
             </div>
@@ -126,24 +126,24 @@ function TripBillModal({ trip, onClose }) {
           {/* Flights / transit */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.75rem', padding: '0.85rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-              <span style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
                 ✈️ Transport & Flights
               </span>
-              <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
                 ₹{Number(travelCost).toLocaleString('en-IN')}
               </span>
             </div>
             {(trip.billDetails?.segments && trip.billDetails.segments.length > 0) ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                 {trip.billDetails.segments.map((seg, idx) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(0,0,0,0.2)', padding: '0.35rem 0.5rem', borderRadius: '0.35rem' }}>
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(0,0,0,0.2)', padding: '0.35rem 0.5rem', borderRadius: '0.35rem' }}>
                     <span>{(seg.mode || 'transit').toUpperCase()}: {seg.operator || ''}{seg.flightNo ? ` (${seg.flightNo})` : ''} · {seg.from} → {seg.to}</span>
                     <strong style={{ color: 'var(--atmos-dark)' }}>₹{Number(seg.cost || 0).toLocaleString('en-IN')}</strong>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', margin: 0 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.64rem', color: 'var(--atmos-muted)', margin: 0 }}>
                 {trip.fromCity} → {trip.toCity} (Travel Mode: {trip.travelMode})
               </p>
             )}
@@ -153,17 +153,17 @@ function TripBillModal({ trip, onClose }) {
           {(trip.selectedHotel || trip.billDetails?.hotel) && (
             <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.75rem', padding: '0.85rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                <span style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
                   🏨 Accommodation
                 </span>
-                <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
                   ₹{Number(hotelCost).toLocaleString('en-IN')}
                 </span>
               </div>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.66rem', fontWeight: 600, color: 'var(--atmos-dark)', margin: 0 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.66rem', fontWeight: 600, color: 'var(--atmos-dark)', margin: 0 }}>
                 {trip.selectedHotel?.name || trip.billDetails?.hotel?.name}
               </p>
-              <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
                 {trip.selectedHotel?.nights || trip.billDetails?.hotel?.nights || 1} Nights @ ₹{(trip.selectedHotel?.pricePerNight || trip.billDetails?.hotel?.pricePerNight || 0).toLocaleString('en-IN')}/night
                 {(trip.selectedHotel?.foodingIncluded || trip.billDetails?.hotel?.foodingIncluded) ? ' · Fooding included' : ''}
               </p>
@@ -172,10 +172,10 @@ function TripBillModal({ trip, onClose }) {
 
           {/* Total summary */}
           <div style={{ borderTop: '1px solid rgba(196,162,93,0.2)', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
               Total Bill:
             </span>
-            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', fontWeight: 600, color: '#C4A25D' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', fontWeight: 600, color: '#C4A25D' }}>
               ₹{(trip.estimatedBudget || 0).toLocaleString('en-IN')}
             </span>
           </div>
@@ -251,12 +251,12 @@ export default function AdminPanel() {
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease }}
-                style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2rem', fontWeight: 700, color: 'var(--atmos-dark)' }}
               >
                 Admin Panel
               </motion.h1>
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-                style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
               >
                 System management & audit logs
               </motion.p>
@@ -271,7 +271,7 @@ export default function AdminPanel() {
                 padding: '0.5rem 1.15rem', borderRadius: '0.65rem',
                 background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.12))',
                 border: '1px solid #C4A25D',
-                color: 'var(--atmos-dark)', fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600,
+                color: 'var(--atmos-dark)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
                 cursor: 'pointer', boxShadow: '0 4px 12px rgba(196,162,93,0.15)'
               }}
             >
@@ -321,12 +321,12 @@ export default function AdminPanel() {
                           style={{ ...glassCard, padding: '1.5rem', textAlign: 'center' }}
                         >
                           <p style={{
-                            fontFamily: 'Cormorant Garamond, serif', fontSize: '2.2rem', fontWeight: 500,
+                            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '2.2rem', fontWeight: 500,
                             background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
                             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                             lineHeight: 1,
                           }}>{value}</p>
-                          <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginTop: '0.5rem' }}>{label}</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginTop: '0.5rem' }}>{label}</p>
                         </motion.div>
                       );
                     })}
@@ -337,7 +337,7 @@ export default function AdminPanel() {
                   >
                     <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <Activity style={{ width: '16px', height: '16px', color: '#C4A25D' }} />
-                      <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Recent Activity</h2>
+                      <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Recent Activity</h2>
                     </div>
                     <div style={{ padding: '0.5rem 0' }}>
                       {stats.recentLogs?.slice(0, 10).map((log, i) => (
@@ -360,8 +360,8 @@ export default function AdminPanel() {
                           }}>
                             {log.action}
                           </span>
-                          <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-mid)', flex: 1 }}>{log.actorName || '—'}</span>
-                          <span style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-mid)', flex: 1 }}>{log.actorName || '—'}</span>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
                             {format(new Date(log.timestamp), 'dd MMM HH:mm')}
                           </span>
                         </motion.div>
@@ -378,7 +378,7 @@ export default function AdminPanel() {
                 >
                   <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Users style={{ width: '16px', height: '16px', color: '#C4A25D' }} />
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>User Management</h2>
+                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>User Management</h2>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -408,7 +408,7 @@ export default function AdminPanel() {
                                 value={u.role}
                                 onChange={e => handleRoleChange(u._id, e.target.value)}
                                 style={{
-                                  fontFamily: 'Montserrat', fontSize: '0.65rem',
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem',
                                   border: '1px solid rgba(196,162,93,0.25)',
                                   borderRadius: '0.45rem', padding: '0.25rem 0.5rem',
                                   background: 'var(--atmos-input-bg)',
@@ -424,7 +424,7 @@ export default function AdminPanel() {
                                 padding: '0.18rem 0.6rem', borderRadius: '999px',
                                 background: u.isActive ? 'rgba(39,174,96,0.1)' : 'rgba(192,57,43,0.1)',
                                 color: u.isActive ? '#1A7F45' : '#C0392B',
-                                fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600,
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600,
                                 letterSpacing: '0.08em', textTransform: 'uppercase',
                               }}>
                                 {u.isActive ? 'Active' : 'Inactive'}
@@ -456,7 +456,7 @@ export default function AdminPanel() {
                   style={{ ...glassCard, overflow: 'hidden' }}
                 >
                   <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>All Trips</h2>
+                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>All Trips</h2>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -487,7 +487,7 @@ export default function AdminPanel() {
                                       <span style={{
                                         padding: '0.15rem 0.5rem', borderRadius: '999px',
                                         background: 'rgba(232,168,56,0.15)', border: '1px solid rgba(232,168,56,0.3)',
-                                        color: '#D4922A', fontFamily: 'Montserrat', fontSize: '0.55rem', fontWeight: 600,
+                                        color: '#D4922A', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.55rem', fontWeight: 600,
                                       }}>
                                         ⚠️ Exceeds (+₹{(t.budgetExcessAmount || Math.max(0, t.estimatedBudget - (t.employeeBudgetLimit || 20000))).toLocaleString('en-IN')})
                                       </span>
@@ -496,7 +496,7 @@ export default function AdminPanel() {
                                 </div>
                               </td>
                               <td style={tdStyle}>
-                                <span style={{ padding: '0.2rem 0.65rem', borderRadius: '999px', background: badge.bg, color: badge.color, fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                                <span style={{ padding: '0.2rem 0.65rem', borderRadius: '999px', background: badge.bg, color: badge.color, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                                   {t.status?.replace(/_/g, ' ')}
                                 </span>
                               </td>
@@ -516,7 +516,7 @@ export default function AdminPanel() {
                 >
                   <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Shield style={{ width: '16px', height: '16px', color: '#C4A25D' }} />
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Audit Logs</h2>
+                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Audit Logs</h2>
                   </div>
                   <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
                     {logs.map((log, i) => (
@@ -539,17 +539,17 @@ export default function AdminPanel() {
                           {log.action}
                         </span>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)' }}>
                             <strong>{log.actorName || 'System'}</strong>
                             {log.tripId && <> · <span style={{ fontFamily: 'monospace', fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>{log.tripId}</span></>}
                           </p>
                           {log.details && (
-                            <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', marginTop: '0.15rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', marginTop: '0.15rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {JSON.stringify(log.details).substring(0, 100)}
                             </p>
                           )}
                         </div>
-                        <span style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', flexShrink: 0 }}>
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)', flexShrink: 0 }}>
                           {format(new Date(log.timestamp), 'dd MMM HH:mm:ss')}
                         </span>
                       </motion.div>
