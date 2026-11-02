@@ -158,7 +158,17 @@ const registerCompany = async (req, res, next) => {
       travelBudgetLimit: policy?.budgetLimits?.admin || 500000
     });
 
-    // 4. Import employees from the HRMS sheet into MongoDB
+    // 4. Import employees and budgets from the HRMS/Finance sheet into Neon DB
+    let importedCount = 0;
+    try {
+      const { syncCompanyDataToDB } = require('../services/excelService');
+      const syncRes = await syncCompanyDataToDB(companyId, hrmsSheetUrl);
+      importedCount = syncRes.empSynced;
+      logger.info(`[Auth] Synced ${importedCount} employees and ${syncRes.budgetSynced} budgets to Neon DB for company ${companyId}`);
+    } catch (err) {
+      logger.warn(`[Auth] Employee import fallback: ${err.message}`);
+    }
+    if (false) // bypassed legacy loop
     let importedCount = 0;
     try {
       const employees = getAllEmployees(companyId);

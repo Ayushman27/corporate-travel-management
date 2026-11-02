@@ -86,6 +86,7 @@ export const tripAPI = {
 // ── Finance ───────────────────────────────────────────────────────────────────
 export const financeAPI = {
   report:            ()           => api.get('/finance/report'),
+  syncSheets:        ()           => api.post('/finance/sync-sheets'),
   monthlySpend:      ()           => api.get('/finance/monthly-spend'),
   departmentSummary: ()           => api.get('/finance/department-summary'),
   tripsSummary:      ()           => api.get('/finance/trips-summary'),
@@ -96,6 +97,7 @@ export const financeAPI = {
 // ── Admin ─────────────────────────────────────────────────────────────────────
 export const adminAPI = {
   dashboard:      ()           => api.get('/admin/dashboard'),
+  syncSheets:     ()           => api.post('/finance/sync-sheets'),
   users:          ()           => api.get('/admin/users'),
   allTrips:       (params)     => api.get('/admin/trips', { params }),
   auditLogs:      (params)     => api.get('/admin/audit-logs', { params }),

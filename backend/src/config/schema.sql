@@ -29,6 +29,10 @@ CREATE TABLE IF NOT EXISTS users (
   manager_id VARCHAR(64),
   travel_budget_used NUMERIC DEFAULT 0,
   travel_budget_limit NUMERIC DEFAULT 50000,
+  salary NUMERIC,
+  gender VARCHAR(50),
+  age INT,
+  extra_data JSONB DEFAULT '{}',
   is_active BOOLEAN DEFAULT TRUE,
   last_login TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -149,6 +153,22 @@ CREATE TABLE IF NOT EXISTS hotels (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Budgets table (Finance Monthly & Departmental Budgets)
+CREATE TABLE IF NOT EXISTS budgets (
+  id VARCHAR(64) PRIMARY KEY,
+  company_id VARCHAR(64) NOT NULL,
+  month VARCHAR(50) NOT NULL,
+  year INT DEFAULT 2026,
+  department VARCHAR(100) DEFAULT 'All',
+  allocated_budget NUMERIC DEFAULT 0,
+  spent_amount NUMERIC DEFAULT 0,
+  remaining_budget NUMERIC DEFAULT 0,
+  last_updated TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_company_budget UNIQUE(company_id, month, year, department)
+);
+
 -- Logs table
 CREATE TABLE IF NOT EXISTS logs (
   id VARCHAR(64) PRIMARY KEY,
@@ -162,4 +182,3 @@ CREATE TABLE IF NOT EXISTS logs (
   user_agent TEXT,
   timestamp TIMESTAMPTZ DEFAULT NOW()
 );
-

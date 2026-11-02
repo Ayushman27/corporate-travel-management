@@ -2,13 +2,27 @@ const financeAgent = require('../agents/financeAgent');
 const hrmsAgent    = require('../agents/hrmsAgent');
 const Trip         = require('../models/Trip');
 const Booking      = require('../models/Booking');
-const { getFinanceData } = require('../services/excelService');
+const { getFinanceData, syncCompanyDataToDB } = require('../services/excelService');
 
 // GET /api/finance/report
 const getReport = async (req, res, next) => {
   try {
-    const report = financeAgent.generateReport(req.user.companyId);
+    const report = await financeAgent.generateReport(req.user.companyId);
     res.json({ success: true, data: report });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// POST /api/finance/sync-sheets
+const syncSheets = async (req, res, next) => {
+  try {
+    const result = await syncCompanyDataToDB(req.user.companyId);
+    res.json({
+      success: true,
+      message: 'HRMS and Budget data successfully synced to Neon DB',
+      data: result
+    });
   } catch (err) {
     next(err);
   }
@@ -98,6 +112,6 @@ const getEmployeeHistory = async (req, res, next) => {
 };
 
 module.exports = {
-  getReport, checkBudget, getDepartmentSummary,
+  getReport, syncSheets, checkBudget, getDepartmentSummary,
   getMonthlySpend, getTripsSummary, getEmployeeHistory
 };

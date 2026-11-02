@@ -5,7 +5,7 @@ import Sidebar from '../components/common/Sidebar';
 import PageTransition from '../components/common/PageTransition';
 import { financeAPI, tripAPI } from '../services/api';
 import { format } from 'date-fns';
-import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle, RefreshCw, Calendar } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend,
@@ -187,6 +187,27 @@ function TabBtn({ id, label, active, onClick }) {
 
 export default function FinancePanel() {
   const [report,      setReport]      = useState(null);
+  const [syncing,     setSyncing]     = useState(false);
+
+  const handleSyncSheets = async () => {
+    setSyncing(true);
+    try {
+      await financeAPI.syncSheets();
+      toast.success('HRMS and Budget data successfully synced to Neon DB!');
+      const [p, r, d] = await Promise.all([
+        tripAPI.pendingFinance(),
+        financeAPI.report(),
+        financeAPI.departmentSummary(),
+      ]);
+      setPending(p.data.data);
+      setReport(r.data.data);
+      setDeptSummary(d.data.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to sync sheets');
+    } finally {
+      setSyncing(false);
+    }
+  };
   const [pending,     setPending]     = useState([]);
   const [deptSummary, setDeptSummary] = useState({});
   const [loading,     setLoading]     = useState(true);
@@ -239,7 +260,7 @@ export default function FinancePanel() {
       <main style={{ marginLeft: '220px', paddingTop: '68px', padding: '68px 2.5rem 2.5rem 220px' }}>
         <PageTransition>
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
               <motion.h1
                 initial={{ opacity: 0, x: -16 }}
@@ -252,25 +273,43 @@ export default function FinancePanel() {
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
                 style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
               >
-                Budget overview & approval queue
+                Live Neon DB sync · Real-time budget expenditure & approvals
               </motion.p>
             </div>
-            {pending.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <motion.button
+                onClick={handleSyncSheets}
+                disabled={syncing}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '0.4rem',
-                  padding: '0.4rem 0.9rem', borderRadius: '999px',
-                  background: 'rgba(196,162,93,0.1)', border: '1px solid rgba(196,162,93,0.3)',
-                  fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600,
-                  letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8B6914',
+                  display: 'flex', alignItems: 'center', gap: '0.45rem',
+                  padding: '0.45rem 1rem', borderRadius: '0.65rem',
+                  background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)',
+                  color: '#C4A25D', fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600,
+                  cursor: syncing ? 'not-allowed' : 'pointer'
                 }}
               >
-                <AlertTriangle style={{ width: '12px', height: '12px' }} />
-                {pending.length} pending approval{pending.length > 1 ? 's' : ''}
-              </motion.div>
-            )}
+                <RefreshCw style={{ width: '13px', height: '13px', animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+                {syncing ? 'Syncing...' : 'Sync HRMS Data'}
+              </motion.button>
+              {pending.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    padding: '0.45rem 0.9rem', borderRadius: '999px',
+                    background: 'rgba(196,162,93,0.1)', border: '1px solid rgba(196,162,93,0.3)',
+                    fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600,
+                    letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8B6914',
+                  }}
+                >
+                  <AlertTriangle style={{ width: '12px', height: '12px' }} />
+                  {pending.length} pending
+                </motion.div>
+              )}
+            </div>
           </div>
 
           {/* Tabs */}
@@ -306,8 +345,8 @@ export default function FinancePanel() {
                   style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
                 >
                   {/* Stat cards */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                    {STAT_ITEMS.map(({ label, value, icon: Icon, from, to, glow }, i) => (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                    {STAT_ITEMS.map(({ label, value, subtext, icon: Icon, from, to, glow }, i) => (
                       <motion.div
                         key={label}
                         initial={{ opacity: 0, y: 20 }}
@@ -327,6 +366,7 @@ export default function FinancePanel() {
                         <div>
                           <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 500, color: 'var(--atmos-dark)', lineHeight: 1 }}>{value}</p>
                           <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>{label}</p>
+                          {subtext && <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: '#1A7F45', marginTop: '0.25rem', fontWeight: 600 }}>{subtext}</p>}
                         </div>
                       </motion.div>
                     ))}
@@ -430,8 +470,27 @@ export default function FinancePanel() {
                 <motion.div key="reports" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease }}
                   style={{ ...glassCard, overflow: 'hidden' }}
                 >
-                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Monthly Budget Report</h2>
+                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <div>
+                      <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>Monthly Budget Report</h2>
+                      <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
+                        Live from Neon DB · Last Synced: {report?.summary?.lastSyncedAt ? format(new Date(report.summary.lastSyncedAt), 'dd MMM yyyy, hh:mm a') : 'Recently'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleSyncSheets}
+                      disabled={syncing}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.35rem',
+                        background: 'transparent', border: '1px solid rgba(196,162,93,0.3)',
+                        borderRadius: '0.5rem', padding: '0.35rem 0.75rem',
+                        fontFamily: 'Montserrat', fontSize: '0.65rem', color: '#C4A25D',
+                        cursor: syncing ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      <RefreshCw style={{ width: '11px', height: '11px', animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+                      Sync Sheets
+                    </button>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -460,7 +519,7 @@ export default function FinancePanel() {
                               ₹{(row.RemainingBudget || 0).toLocaleString('en-IN')}
                             </td>
                             <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
-                              {row.LastUpdated ? format(new Date(row.LastUpdated), 'dd MMM HH:mm') : '—'}
+                              {row.LastUpdated ? format(new Date(row.LastUpdated), 'dd MMM yyyy, hh:mm a') : 'Synced'}
                             </td>
                           </motion.tr>
                         ))}
