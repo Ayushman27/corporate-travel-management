@@ -1,3 +1,4 @@
+import { useTheme } from '../../context/ThemeContext';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { financeAPI } from '../../services/api';
@@ -269,7 +270,7 @@ isOpen,
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.45rem',
                   padding: '0.55rem 1.4rem',
-                  background: 'var(--atmos-accent-grad)', border: 'none', borderRadius: '0.75rem', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 4px 14px var(--atmos-accent-glow)'
+                  background: 'var(--atmos-accent-grad)', border: 'none', borderRadius: '0.75rem', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 4px 14px var(--atmos-accent-glow)'
                 }}
               >
                 {loading ? <Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> : <Check style={{ width: '13px', height: '13px' }} />}

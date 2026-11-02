@@ -10,11 +10,11 @@ import TripMap from './TripMap';
 
 const ease = [0.25, 1, 0.5, 1];
 
-const PLAN_META = {
+const getPlanMeta = (isDark = true) => ({
   lowest_cost:      { label: 'Lowest Cost',     icon: DollarSign, from: '#27AE60', to: '#1E8449', glow: 'rgba(39,174,96,0.25)',    borderActive: 'rgba(39,174,96,0.4)' },
-  fastest:          { label: 'Fastest Route',   icon: Zap,         from: isDark ? '#C4A25D' : '#2563EB', to: isDark ? '#B8923F' : '#1D4ED8', glow: 'rgba(196,162,93,0.25)',   borderActive: 'rgba(196,162,93,0.5)' },
+  fastest:          { label: 'Fastest Route',   icon: Zap,         from: isDark ? '#C4A25D' : '#2563EB', to: isDark ? '#B8923F' : '#1D4ED8', glow: isDark ? 'rgba(196,162,93,0.25)' : 'rgba(37,99,235,0.25)', borderActive: isDark ? 'rgba(196,162,93,0.5)' : 'rgba(37,99,235,0.5)' },
   most_comfortable: { label: 'Most Comfortable', icon: Smile,      from: '#F59E0B', to: '#D97706', glow: 'rgba(245,158,11,0.25)',   borderActive: 'rgba(245,158,11,0.4)' },
-};
+});
 
 const MODE_EMOJI = { flight: '✈️', train: '🚆', bus: '🚌', metro: '🚇', cab: '🚕', walk: '🚶' };
 
@@ -39,6 +39,8 @@ function ScoreBar({ label, value, color }) {
 }
 
 function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index }) {
+  const { isDark } = useTheme();
+  const PLAN_META = getPlanMeta(isDark);
   const [expanded, setExpanded] = useState(false);
   const meta = PLAN_META[plan.planType] || PLAN_META.fastest;
   const Icon = meta.icon;

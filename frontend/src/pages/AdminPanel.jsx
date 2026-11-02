@@ -188,6 +188,7 @@ function TripBillModal({ trip, onClose }) {
 
 export default function AdminPanel() {
   const { isDark } = useTheme();
+  const STAT_COLORS = getStatColors(isDark);
   const [tab,     setTab]     = useState('dashboard');
   const [stats,   setStats]   = useState(null);
   const [users,   setUsers]   = useState([]);
