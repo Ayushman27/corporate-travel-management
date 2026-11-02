@@ -169,11 +169,14 @@ export default function Navbar() {
               display: 'flex', alignItems: 'center', gap: '0.6rem',
               padding: '0.4rem 0.75rem',
               borderRadius: '0.75rem',
-              background: profileHovered ? '#FFFFFF' : 'var(--atmos-glass)',
-              border: profileHovered ? '1px solid #FFFFFF' : '1px solid rgba(196,162,93,0.2)',
-              boxShadow: profileHovered ? '0 8px 24px rgba(0,0,0,0.15)' : 'none',
+              background: profileHovered
+                ? (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(37, 99, 235, 0.06)')
+                : (isDark ? 'rgba(255, 255, 255, 0.04)' : 'var(--atmos-glass)'),
+              border: isDark
+                ? (profileHovered ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.1)')
+                : (profileHovered ? '1px solid rgba(37, 99, 235, 0.3)' : '1px solid var(--atmos-glass-border)'),
+              boxShadow: profileHovered ? '0 4px 16px rgba(0,0,0,0.1)' : 'none',
               cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
               transition: 'all 0.2s ease',
             }}
             whileTap={{ scale: 0.97 }}
@@ -184,12 +187,12 @@ export default function Navbar() {
               background: 'var(--atmos-accent-grad)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem',
-              fontWeight: 500, color: '#fff', flexShrink: 0,
+              fontWeight: 600, color: '#fff', flexShrink: 0,
             }}>
               {user?.name?.[0]?.toUpperCase()}
             </div>
             <div style={{ textAlign: 'left' }}>
-              <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 500, color: profileHovered ? '#000000' : 'var(--atmos-dark)', lineHeight: 1.2, transition: 'color 0.2s ease' }}>
+              <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: 'var(--atmos-dark)', lineHeight: 1.2 }}>
                 {user?.name?.split(' ')[0]}
               </div>
               <div style={{
@@ -203,9 +206,17 @@ export default function Navbar() {
               </div>
             </div>
             <motion.div animate={{ rotate: menuOpen ? 180 : 0 }} transition={{ duration: 0.25 }}>
-              <ChevronDown style={{ width: '14px', height: '14px', color: profileHovered ? '#000000' : 'var(--atmos-muted)', transition: 'color 0.2s ease' }} />
+              <ChevronDown style={{ width: '14px', height: '14px', color: 'var(--atmos-muted)' }} />
             </motion.div>
           </motion.button>
+
+          {/* Backdrop click outside */}
+          {menuOpen && (
+            <div
+              onClick={() => setMenuOpen(false)}
+              style={{ position: 'fixed', inset: 0, zIndex: 49 }}
+            />
+          )}
 
           {/* Dropdown */}
           {menuOpen && (
@@ -216,31 +227,37 @@ export default function Navbar() {
               transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
               style={{
                 position: 'absolute', right: 0, top: 'calc(100% + 8px)',
-                width: '210px', borderRadius: '1rem',
-                background: 'var(--atmos-glass)',
-                backdropFilter: 'blur(24px)',
-                border: '1px solid rgba(196,162,93,0.2)',
-                boxShadow: '0 16px 48px rgba(44,43,41,0.12)',
+                width: '220px', borderRadius: '1rem',
+                backgroundColor: isDark ? '#161D2B' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #E2E8F0',
+                boxShadow: isDark
+                  ? '0 20px 48px -4px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                  : '0 20px 48px -4px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04)',
                 overflow: 'hidden', zIndex: 50,
               }}
             >
-              <div style={{ padding: '1rem', borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.25rem' }}>Signed in as</p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1rem', color: 'var(--atmos-dark)', fontWeight: 400 }}>{user?.name}</p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)' }}>{user?.email}</p>
+              <div style={{
+                padding: '1rem',
+                backgroundColor: isDark ? '#1B2232' : '#F8FAFC',
+                borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0'
+              }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.25rem', fontWeight: 600 }}>Signed in as</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.95rem', color: 'var(--atmos-dark)', fontWeight: 600 }}>{user?.name}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.1rem', wordBreak: 'break-all' }}>{user?.email}</p>
               </div>
               <motion.button
                 onClick={handleLogout}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem',
-                  padding: '0.8rem 1rem', background: 'none', border: 'none',
-                  cursor: 'pointer', color: '#C0392B',
-                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 500,
-                  letterSpacing: '0.06em',
+                  padding: '0.85rem 1rem', background: 'transparent', border: 'none',
+                  cursor: 'pointer', color: '#EF4444',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 600,
+                  letterSpacing: '0.04em',
+                  transition: 'background 0.15s ease',
                 }}
-                whileHover={{ background: 'rgba(192,57,43,0.05)' }}
+                whileHover={{ background: isDark ? 'rgba(239, 68, 68, 0.12)' : 'rgba(239, 68, 68, 0.06)' }}
               >
-                <LogOut style={{ width: '14px', height: '14px' }} />
+                <LogOut style={{ width: '15px', height: '15px' }} />
                 Sign out
               </motion.button>
             </motion.div>
