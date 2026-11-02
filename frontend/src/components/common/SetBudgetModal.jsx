@@ -10,13 +10,14 @@ const MONTH_NAMES = [
 ];
 
 export default function SetBudgetModal({
-  isOpen,
+isOpen,
   onClose,
   onSuccess,
   initialMonth = 'all',
   initialAmount = 500000,
   initialDept = 'All'
 }) {
+  const { isDark } = useTheme();
   const [month, setMonth] = useState(initialMonth);
   const [amount, setAmount] = useState(initialAmount);
   const [department, setDepartment] = useState(initialDept);
@@ -80,8 +81,7 @@ export default function SetBudgetModal({
           exit={{ scale: 0.96, opacity: 0, y: 10 }}
           transition={{ duration: 0.22, ease: [0.25, 1, 0.5, 1] }}
           style={{
-            background: 'rgba(16, 14, 12, 0.95)',
-            border: '1px solid rgba(196, 162, 93, 0.35)',
+            background: 'var(--atmos-surface)', border: '1px solid var(--atmos-glass-border)',
             borderRadius: '1.3rem',
             width: '100%', maxWidth: '480px',
             padding: '1.75rem',
@@ -95,17 +95,16 @@ export default function SetBudgetModal({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{
                 width: '38px', height: '38px', borderRadius: '10px',
-                background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.1))',
-                border: '1px solid rgba(196,162,93,0.4)',
+                background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
-                <DollarSign style={{ width: '18px', height: '18px', color: '#C4A25D' }} />
+                <DollarSign style={{ width: '18px', height: '18px', color: 'var(--atmos-gold)' }} />
               </div>
               <div>
-                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.45rem', fontWeight: 500, color: '#FFFFFF', margin: 0 }}>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.45rem', fontWeight: 500, color: 'var(--atmos-dark)', margin: 0 }}>
                   Set Monthly Budget
                 </h3>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'rgba(255,255,255,0.5)', margin: '0.2rem 0 0' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
                   Live Neon DB sync · Controls monthly expenditure caps
                 </p>
               </div>
@@ -198,9 +197,7 @@ export default function SetBudgetModal({
                       type="button"
                       onClick={() => setAmount(val)}
                       style={{
-                        background: isSelected ? 'rgba(196,162,93,0.3)' : 'rgba(255,255,255,0.04)',
-                        border: isSelected ? '1px solid #C4A25D' : '1px solid rgba(255,255,255,0.1)',
-                        color: isSelected ? '#C4A25D' : 'rgba(255,255,255,0.7)',
+                        background: isSelected ? 'var(--atmos-accent-subtle)' : 'var(--atmos-glass)', border: isSelected ? '1px solid var(--atmos-gold)' : '1px solid var(--atmos-glass-border)', color: isSelected ? 'var(--atmos-gold)' : 'var(--atmos-muted)',
                         borderRadius: '0.45rem', padding: '0.25rem 0.55rem',
                         fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.63rem', fontWeight: 600,
                         cursor: 'pointer', transition: 'all 0.15s ease'
@@ -271,12 +268,8 @@ export default function SetBudgetModal({
                 disabled={loading}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.45rem',
-                  padding: '0.55rem 1.4rem', borderRadius: '0.65rem',
-                  background: 'linear-gradient(135deg, #C4A25D, #A3823B)',
-                  border: 'none', color: '#000000',
-                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 700,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 4px 14px rgba(196,162,93,0.35)'
+                  padding: '0.55rem 1.4rem',
+                  background: 'var(--atmos-accent-grad)', border: 'none', borderRadius: '0.75rem', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 4px 14px var(--atmos-accent-glow)'
                 }}
               >
                 {loading ? <Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> : <Check style={{ width: '13px', height: '13px' }} />}

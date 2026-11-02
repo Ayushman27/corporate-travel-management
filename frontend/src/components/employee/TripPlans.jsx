@@ -1,3 +1,4 @@
+import { useTheme } from '../../context/ThemeContext';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTrip } from '../../context/TripContext';
@@ -11,7 +12,7 @@ const ease = [0.25, 1, 0.5, 1];
 
 const PLAN_META = {
   lowest_cost:      { label: 'Lowest Cost',     icon: DollarSign, from: '#27AE60', to: '#1E8449', glow: 'rgba(39,174,96,0.25)',    borderActive: 'rgba(39,174,96,0.4)' },
-  fastest:          { label: 'Fastest Route',   icon: Zap,         from: '#C4A25D', to: '#B8923F', glow: 'rgba(196,162,93,0.25)',   borderActive: 'rgba(196,162,93,0.5)' },
+  fastest:          { label: 'Fastest Route',   icon: Zap,         from: isDark ? '#C4A25D' : '#2563EB', to: isDark ? '#B8923F' : '#1D4ED8', glow: 'rgba(196,162,93,0.25)',   borderActive: 'rgba(196,162,93,0.5)' },
   most_comfortable: { label: 'Most Comfortable', icon: Smile,      from: '#F59E0B', to: '#D97706', glow: 'rgba(245,158,11,0.25)',   borderActive: 'rgba(245,158,11,0.4)' },
 };
 
@@ -251,7 +252,9 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
   );
 }
 
-export default function TripPlans({ trip, plans, onPlanSelected, onBooked, onBack, compact }) {
+export default function TripPlans({
+trip, plans, onPlanSelected, onBooked, onBack, compact }) {
+  const { isDark } = useTheme();
   const { bookSelectedPlan } = useTrip();
   const navigate = useNavigate();
   const [selectedPlanId, setSelectedPlanId] = useState(trip?.selectedPlanId || null);

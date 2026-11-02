@@ -4,6 +4,7 @@ import Navbar  from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
 import PageTransition from '../components/common/PageTransition';
 import SetBudgetModal from '../components/common/SetBudgetModal';
+import { useTheme } from '../context/ThemeContext';
 import { adminAPI } from '../services/api';
 import { format } from 'date-fns';
 import { Users, Activity, Loader2, Shield, ToggleLeft, ToggleRight, Sliders, Receipt, AlertTriangle, X } from 'lucide-react';
@@ -15,13 +16,13 @@ const glassCard = {
   background: 'var(--atmos-glass)',
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(196,162,93,0.15)',
+  border: '1px solid var(--atmos-glass-border)',
   borderRadius: '1.2rem',
   boxShadow: '0 4px 20px rgba(44,43,41,0.06)',
 };
 
-const STAT_COLORS = [
-  { from: '#C4A25D', to: '#B8923F', glow: 'rgba(196,162,93,0.3)' },
+const getStatColors = (isDark) => [
+  { from: isDark ? '#C4A25D' : '#2563EB', to: isDark ? '#B8923F' : '#1D4ED8', glow: isDark ? 'rgba(196,162,93,0.3)' : 'rgba(37,99,235,0.3)' },
   { from: '#27AE60', to: '#1E8449', glow: 'rgba(39,174,96,0.3)' },
   { from: '#E8A838', to: '#D4922A', glow: 'rgba(232,168,56,0.3)' },
   { from: '#C0392B', to: '#A93226', glow: 'rgba(192,57,43,0.3)' },
@@ -30,7 +31,7 @@ const STAT_COLORS = [
 const STATUS_BADGE = (status) => {
   if (status === 'booked' || status === 'approved') return { bg: 'rgba(39,174,96,0.1)', color: '#1A7F45' };
   if (status === 'rejected') return { bg: 'rgba(192,57,43,0.1)', color: '#C0392B' };
-  if (status?.startsWith('pending')) return { bg: 'rgba(196,162,93,0.1)', color: '#8B6914' };
+  if (status?.startsWith('pending')) return { bg: 'var(--atmos-glass-border)', color: '#8B6914' };
   return { bg: 'rgba(168,164,160,0.1)', color: '#A8A4A0' };
 };
 
@@ -38,16 +39,16 @@ function TabBtn({ id, label, active, onClick }) {
   return (
     <motion.button
       onClick={() => onClick(id)}
-      whileHover={{ background: active ? undefined : 'rgba(196,162,93,0.08)' }}
+      whileHover={{ background: active ? undefined : 'var(--atmos-accent-subtle)' }}
       whileTap={{ scale: 0.97 }}
       style={{
         padding: '0.5rem 1.1rem', borderRadius: '0.6rem',
-        background: active ? 'linear-gradient(135deg, #C4A25D, #B8923F)' : 'transparent',
+        background: active ? 'var(--atmos-accent-grad)' : 'transparent',
         border: 'none', cursor: 'pointer',
         fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem',
         fontWeight: active ? 600 : 500, letterSpacing: '0.06em',
         color: active ? '#fff' : 'var(--atmos-mid)',
-        boxShadow: active ? '0 4px 12px rgba(196,162,93,0.25)' : 'none',
+        boxShadow: active ? '0 4px 12px var(--atmos-accent-glow)' : 'none',
         transition: 'color 0.2s ease',
       }}
     >
@@ -60,7 +61,7 @@ const thStyle = {
   padding: '0.75rem 1rem', textAlign: 'left',
   fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem',
   fontWeight: 700, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#C4A25D',
+  textTransform: 'uppercase', color: 'var(--atmos-gold)',
 };
 const tdStyle = {
   padding: '0.8rem 1rem',
@@ -124,12 +125,12 @@ function TripBillModal({ trip, onClose }) {
         {/* Breakdown */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '340px', overflowY: 'auto' }}>
           {/* Flights / transit */}
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.75rem', padding: '0.85rem' }}>
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--atmos-glass-border)', borderRadius: '0.75rem', padding: '0.85rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
               <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
                 ✈️ Transport & Flights
               </span>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: 'var(--atmos-gold)' }}>
                 ₹{Number(travelCost).toLocaleString('en-IN')}
               </span>
             </div>
@@ -151,12 +152,12 @@ function TripBillModal({ trip, onClose }) {
 
           {/* Hotel */}
           {(trip.selectedHotel || trip.billDetails?.hotel) && (
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.75rem', padding: '0.85rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--atmos-glass-border)', borderRadius: '0.75rem', padding: '0.85rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                 <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
                   🏨 Accommodation
                 </span>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: 'var(--atmos-gold)' }}>
                   ₹{Number(hotelCost).toLocaleString('en-IN')}
                 </span>
               </div>
@@ -175,7 +176,7 @@ function TripBillModal({ trip, onClose }) {
             <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
               Total Bill:
             </span>
-            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', fontWeight: 600, color: '#C4A25D' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', fontWeight: 600, color: 'var(--atmos-gold)' }}>
               ₹{(trip.estimatedBudget || 0).toLocaleString('en-IN')}
             </span>
           </div>
@@ -186,6 +187,7 @@ function TripBillModal({ trip, onClose }) {
 }
 
 export default function AdminPanel() {
+  const { isDark } = useTheme();
   const [tab,     setTab]     = useState('dashboard');
   const [stats,   setStats]   = useState(null);
   const [users,   setUsers]   = useState([]);
@@ -269,13 +271,10 @@ export default function AdminPanel() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '0.45rem',
                 padding: '0.5rem 1.15rem', borderRadius: '0.65rem',
-                background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.12))',
-                border: '1px solid #C4A25D',
-                color: 'var(--atmos-dark)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
-                cursor: 'pointer', boxShadow: '0 4px 12px rgba(196,162,93,0.15)'
+                background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)', color: 'var(--atmos-dark)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px var(--atmos-accent-glow)'
               }}
             >
-              <Sliders style={{ width: '13px', height: '13px', color: '#C4A25D' }} />
+              <Sliders style={{ width: '13px', height: '13px', color: 'var(--atmos-gold)' }} />
               Set Monthly Budget
             </motion.button>
           </div>
@@ -288,7 +287,7 @@ export default function AdminPanel() {
             style={{
               display: 'flex', gap: '0.25rem', marginBottom: '1.5rem',
               background: 'var(--atmos-glass)', backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.85rem',
+              border: '1px solid var(--atmos-glass-border)', borderRadius: '0.85rem',
               padding: '0.35rem', width: 'fit-content',
             }}
           >
@@ -299,7 +298,7 @@ export default function AdminPanel() {
 
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-              <Loader2 style={{ width: '32px', height: '32px', color: '#C4A25D', animation: 'spin 1s linear infinite' }} />
+              <Loader2 style={{ width: '32px', height: '32px', color: 'var(--atmos-gold)', animation: 'spin 1s linear infinite' }} />
             </div>
           ) : (
             <AnimatePresence mode="wait">
@@ -335,8 +334,8 @@ export default function AdminPanel() {
                   <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.45, ease }}
                     style={{ ...glassCard, overflow: 'hidden' }}
                   >
-                    <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Activity style={{ width: '16px', height: '16px', color: '#C4A25D' }} />
+                    <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--atmos-glass-border)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Activity style={{ width: '16px', height: '16px', color: 'var(--atmos-gold)' }} />
                       <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Recent Activity</h2>
                     </div>
                     <div style={{ padding: '0.5rem 0' }}>
@@ -349,12 +348,12 @@ export default function AdminPanel() {
                           style={{
                             display: 'flex', alignItems: 'center', gap: '0.75rem',
                             padding: '0.65rem 1.5rem',
-                            borderBottom: '1px solid rgba(196,162,93,0.06)',
+                            borderBottom: '1px solid var(--atmos-glass-border)',
                           }}
                         >
                           <span style={{
                             fontFamily: 'monospace', fontSize: '0.65rem',
-                            background: 'rgba(196,162,93,0.08)',
+                            background: 'var(--atmos-accent-subtle)',
                             padding: '0.2rem 0.6rem', borderRadius: '0.4rem',
                             color: '#8B6914', flexShrink: 0,
                           }}>
@@ -376,14 +375,14 @@ export default function AdminPanel() {
                 <motion.div key="users" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease }}
                   style={{ ...glassCard, overflow: 'hidden' }}
                 >
-                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Users style={{ width: '16px', height: '16px', color: '#C4A25D' }} />
+                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--atmos-glass-border)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Users style={{ width: '16px', height: '16px', color: 'var(--atmos-gold)' }} />
                     <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>User Management</h2>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
-                        <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
+                        <tr style={{ borderBottom: '1px solid var(--atmos-glass-border)' }}>
                           {['Emp ID', 'Name', 'Email', 'Department', 'Role', 'Budget Limit', 'Status', ''].map(h => (
                             <th key={h} style={thStyle}>{h}</th>
                           ))}
@@ -396,8 +395,8 @@ export default function AdminPanel() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: i * 0.04 }}
-                            whileHover={{ background: 'rgba(196,162,93,0.04)' }}
-                            style={{ borderBottom: '1px solid rgba(196,162,93,0.06)' }}
+                            whileHover={{ background: 'var(--atmos-accent-subtle)' }}
+                            style={{ borderBottom: '1px solid var(--atmos-glass-border)' }}
                           >
                             <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>{u.employeeId}</td>
                             <td style={{ ...tdStyle, fontWeight: 600 }}>{u.name}</td>
@@ -455,13 +454,13 @@ export default function AdminPanel() {
                 <motion.div key="trips" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease }}
                   style={{ ...glassCard, overflow: 'hidden' }}
                 >
-                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
+                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--atmos-glass-border)' }}>
                     <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>All Trips</h2>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
-                        <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
+                        <tr style={{ borderBottom: '1px solid var(--atmos-glass-border)' }}>
                           {['Trip ID', 'Employee', 'Route', 'Date', 'Budget', 'Status', 'Bill Details'].map(h => (
                             <th key={h} style={thStyle}>{h}</th>
                           ))}
@@ -472,8 +471,8 @@ export default function AdminPanel() {
                           const badge = STATUS_BADGE(t.status);
                           return (
                             <motion.tr key={t._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-                              whileHover={{ background: 'rgba(196,162,93,0.04)' }}
-                              style={{ borderBottom: '1px solid rgba(196,162,93,0.06)' }}
+                              whileHover={{ background: 'var(--atmos-accent-subtle)' }}
+                              style={{ borderBottom: '1px solid var(--atmos-glass-border)' }}
                             >
                               <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>{t.tripId}</td>
                               <td style={tdStyle}>{t.employeeName}</td>
@@ -514,8 +513,8 @@ export default function AdminPanel() {
                 <motion.div key="logs" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease }}
                   style={{ ...glassCard, overflow: 'hidden' }}
                 >
-                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(196,162,93,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Shield style={{ width: '16px', height: '16px', color: '#C4A25D' }} />
+                  <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--atmos-glass-border)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Shield style={{ width: '16px', height: '16px', color: 'var(--atmos-gold)' }} />
                     <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Audit Logs</h2>
                   </div>
                   <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -528,12 +527,12 @@ export default function AdminPanel() {
                         style={{
                           display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
                           padding: '0.75rem 1.5rem',
-                          borderBottom: '1px solid rgba(196,162,93,0.06)',
+                          borderBottom: '1px solid var(--atmos-glass-border)',
                         }}
                       >
                         <span style={{
                           fontFamily: 'monospace', fontSize: '0.62rem', flexShrink: 0,
-                          background: 'rgba(196,162,93,0.08)', padding: '0.2rem 0.6rem',
+                          background: 'var(--atmos-accent-subtle)', padding: '0.2rem 0.6rem',
                           borderRadius: '0.4rem', color: '#8B6914',
                         }}>
                           {log.action}

@@ -30,12 +30,12 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.45, ease, delay: index * 0.07 }}
-      whileHover={{ y: -4, boxShadow: '0 24px 48px rgba(44,43,41,0.1), 0 4px 16px rgba(196,162,93,0.08)', transition: { duration: 0.22 } }}
+      whileHover={{ y: -4, boxShadow: '0 24px 48px rgba(44,43,41,0.1), 0 4px 16px var(--atmos-accent-subtle)', transition: { duration: 0.22 } }}
       style={{
         background: 'var(--atmos-glass)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(196,162,93,0.18)',
+        border: '1px solid var(--atmos-glass-border)',
         borderRadius: '1.2rem',
         padding: '1.5rem',
         boxShadow: '0 4px 20px rgba(44,43,41,0.06)',
@@ -53,7 +53,7 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
         </div>
         <span style={{
           padding: '0.2rem 0.75rem', borderRadius: '999px',
-          background: 'rgba(196,162,93,0.1)', color: '#8B6914',
+          background: 'var(--atmos-glass-border)', color: '#8B6914',
           fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600,
           letterSpacing: '0.1em', textTransform: 'uppercase',
         }}>
@@ -69,7 +69,7 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
           { icon: DollarSign, label: 'Est. Budget', value: `₹${(trip.estimatedBudget || 0).toLocaleString('en-IN')}` },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-            <Icon style={{ width: '13px', height: '13px', color: '#C4A25D', marginTop: '0.2rem', flexShrink: 0 }} />
+            <Icon style={{ width: '13px', height: '13px', color: 'var(--atmos-gold)', marginTop: '0.2rem', flexShrink: 0 }} />
             <div>
               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label}</p>
               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.1rem' }}>{value}</p>
@@ -81,11 +81,11 @@ function ApprovalCard({ trip, onDecision, deciding, index }) {
       {/* Purpose */}
       <div style={{
         padding: '0.75rem 1rem', borderRadius: '0.75rem',
-        background: 'rgba(196,162,93,0.05)',
-        border: '1px solid rgba(196,162,93,0.1)',
+        background: 'var(--atmos-accent-subtle)',
+        border: '1px solid var(--atmos-glass-border)',
         marginBottom: '1rem',
       }}>
-        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#C4A25D', marginBottom: '0.3rem' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-gold)', marginBottom: '0.3rem' }}>
           Purpose
         </p>
         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: 'var(--atmos-dark)' }}>{trip.purpose}</p>
@@ -201,7 +201,7 @@ export default function ManagerPanel() {
 
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-              <Loader2 style={{ width: '32px', height: '32px', color: '#C4A25D', animation: 'spin 1s linear infinite' }} />
+              <Loader2 style={{ width: '32px', height: '32px', color: 'var(--atmos-gold)', animation: 'spin 1s linear infinite' }} />
             </div>
           ) : trips.length === 0 ? (
             <motion.div
@@ -210,7 +210,7 @@ export default function ManagerPanel() {
               transition={{ duration: 0.45, ease }}
               style={{
                 background: 'var(--atmos-glass)', backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(196,162,93,0.15)', borderRadius: '1.25rem',
+                border: '1px solid var(--atmos-glass-border)', borderRadius: '1.25rem',
                 padding: '4rem 2rem', textAlign: 'center',
                 boxShadow: '0 4px 20px rgba(44,43,41,0.05)',
               }}

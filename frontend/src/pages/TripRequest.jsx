@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTrip } from '../context/TripContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import Navbar  from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
 import PageTransition from '../components/common/PageTransition';
@@ -22,6 +23,7 @@ const STEPS = [
 ];
 
 export default function TripRequest() {
+  const { isDark } = useTheme();
   const { currentTrip, currentPlans, loadTripDetail } = useTrip();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -98,12 +100,12 @@ export default function TripRequest() {
                     whileTap={done ? { scale: 0.95 } : {}}
                     animate={{
                       background: active
-                        ? 'linear-gradient(135deg, #C4A25D 0%, #B8923F 100%)'
+                        ? 'var(--atmos-accent-grad)'
                         : done
                           ? 'rgba(39,174,96,0.1)'
-                          : 'rgba(196,162,93,0.08)',
+                          : 'var(--atmos-accent-subtle)',
                       color: active ? '#fff' : done ? '#1A7F45' : 'var(--atmos-muted)',
-                      boxShadow: active ? '0 4px 14px rgba(196,162,93,0.35)' : 'none',
+                      boxShadow: active ? '0 4px 14px var(--atmos-accent-glow)' : 'none',
                     }}
                     transition={{ duration: 0.3 }}
                     style={{
@@ -112,11 +114,7 @@ export default function TripRequest() {
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
                       fontSize: '0.7rem', fontWeight: 600,
                       letterSpacing: '0.06em', textTransform: 'uppercase',
-                      border: active
-                        ? 'none'
-                        : done
-                          ? '1px solid rgba(39,174,96,0.3)'
-                          : '1px solid rgba(196,162,93,0.2)',
+                      border: active ? 'none' : done ? '1px solid rgba(39,174,96,0.3)' : '1px solid var(--atmos-glass-border)',
                       cursor: done ? 'pointer' : 'default',
                     }}
                   >
@@ -125,7 +123,7 @@ export default function TripRequest() {
                   </motion.div>
                   {i < STEPS.length - 1 && (
                     <motion.div
-                      animate={{ background: step > s.id ? '#C4A25D' : 'rgba(196,162,93,0.15)' }}
+                      animate={{ background: step > s.id ? 'var(--atmos-gold)' : 'var(--atmos-glass-border)' }}
                       transition={{ duration: 0.4 }}
                       style={{ width: '2.5rem', height: '2px', borderRadius: '1px' }}
                     />

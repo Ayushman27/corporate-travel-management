@@ -99,10 +99,10 @@ export default function EmployeeReimbursements() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
                 padding: '0.6rem 1.25rem', borderRadius: '0.5rem',
-                background: '#C4A25D', color: '#fff', border: 'none',
+                background: 'var(--atmos-accent-grad)', color: '#fff', border: 'none',
                 fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600,
                 letterSpacing: '0.05em', cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(196,162,93,0.3)'
+                boxShadow: '0 4px 15px var(--atmos-accent-glow)'
               }}
             >
               <Plus size={16} /> New Request
@@ -182,7 +182,7 @@ export default function EmployeeReimbursements() {
                   </div>
 
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '1rem', background: 'rgba(196,162,93,0.1)', border: '1px dashed #C4A25D', borderRadius: '0.5rem', justifyContent: 'center', color: '#C4A25D', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '1rem', background: 'rgba(196,162,93,0.1)', border: '1px dashed var(--atmos-gold)', borderRadius: '0.5rem', justifyContent: 'center', color: 'var(--atmos-gold)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>
                       <Upload size={18} />
                       {isScanning ? 'AI is scanning your bill...' : 'Upload & Scan Bill (Image/PDF)'}
                       <input type="file" style={{ display: 'none' }} accept="image/*" onChange={handleFileUpload} disabled={isScanning} />
@@ -197,7 +197,7 @@ export default function EmployeeReimbursements() {
                             <span style={{ color: '#fff', fontSize: '0.8rem', fontFamily: "'Plus Jakarta Sans', sans-serif", display: 'block' }}>{b.merchant}</span>
                             <span style={{ color: 'var(--atmos-muted)', fontSize: '0.65rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{b.extractedCategory}</span>
                           </div>
-                          <span style={{ color: '#C4A25D', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>₹{b.extractedAmount}</span>
+                          <span style={{ color: 'var(--atmos-gold)', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem' }}>₹{b.extractedAmount}</span>
                         </div>
                       ))}
                       <div style={{ textAlign: 'right', color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', marginTop: '1rem', fontWeight: 600 }}>
@@ -208,7 +208,7 @@ export default function EmployeeReimbursements() {
 
                   <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                     <button onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1rem', background: 'transparent', color: 'var(--atmos-muted)', border: 'none', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem' }}>Cancel</button>
-                    <button onClick={handleSubmit} disabled={isSubmitting || bills.length === 0 || !title} style={{ padding: '0.6rem 1.25rem', background: '#C4A25D', color: '#fff', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600 }}>
+                    <button onClick={handleSubmit} disabled={isSubmitting || bills.length === 0 || !title} style={{ padding: '0.6rem 1.25rem', background: 'var(--atmos-accent-grad)', color: '#fff', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600 }}>
                       {isSubmitting ? 'Submitting...' : 'Submit Request'}
                     </button>
                   </div>

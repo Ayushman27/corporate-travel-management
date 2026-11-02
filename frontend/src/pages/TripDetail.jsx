@@ -16,7 +16,7 @@ const ease = [0.25, 1, 0.5, 1];
 const STATUS_BADGE = (status) => {
   if (status === 'booked' || status === 'approved') return { bg: 'rgba(39,174,96,0.1)', color: '#1A7F45' };
   if (status === 'rejected') return { bg: 'rgba(192,57,43,0.1)', color: '#C0392B' };
-  if (status?.startsWith('pending')) return { bg: 'rgba(196,162,93,0.12)', color: '#8B6914' };
+  if (status?.startsWith('pending')) return { bg: 'var(--atmos-glass-border)', color: '#8B6914' };
   return { bg: 'rgba(168,164,160,0.1)', color: '#A8A4A0' };
 };
 
@@ -24,7 +24,7 @@ const glassCard = {
   background: 'var(--atmos-glass)',
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(196,162,93,0.15)',
+  border: '1px solid var(--atmos-glass-border)',
   borderRadius: '1.2rem',
   boxShadow: '0 4px 20px rgba(44,43,41,0.06)',
 };
@@ -48,7 +48,7 @@ function Timeline({ approvals }) {
               ? 'linear-gradient(135deg, #27AE60, #1E8449)'
               : appr.status === 'rejected'
                 ? 'linear-gradient(135deg, #C0392B, #A93226)'
-                : 'rgba(196,162,93,0.15)',
+                : 'var(--atmos-glass-border)',
             border: appr.status === 'pending' ? '2px solid rgba(196,162,93,0.4)' : 'none',
           }}>
             {appr.status === 'approved' && <CheckCircle style={{ width: '12px', height: '12px', color: '#fff' }} />}
@@ -164,7 +164,7 @@ export default function TripDetail() {
                         { icon: Clock,    label: 'Mode',    value: trip.travelMode },
                       ].map(({ icon: Icon, label, value }) => (
                         <div key={label} style={{ display: 'flex', gap: '0.65rem', alignItems: 'flex-start' }}>
-                          <Icon style={{ width: '14px', height: '14px', color: '#C4A25D', marginTop: '0.2rem', flexShrink: 0 }} />
+                          <Icon style={{ width: '14px', height: '14px', color: 'var(--atmos-gold)', marginTop: '0.2rem', flexShrink: 0 }} />
                           <div>
                             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>{label}</p>
                             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.1rem' }}>{value}</p>
@@ -173,13 +173,13 @@ export default function TripDetail() {
                       ))}
                     </div>
                     {trip.selectedHotel && (
-                      <div style={{ marginTop: '1.1rem', paddingTop: '1rem', borderTop: '1px solid rgba(196,162,93,0.12)' }}>
+                      <div style={{ marginTop: '1.1rem', paddingTop: '1rem', borderTop: '1px solid var(--atmos-glass-border)' }}>
                         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>Hotel</p>
                         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, color: 'var(--atmos-dark)', marginTop: '0.15rem' }}>{trip.selectedHotel.name}</p>
                         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{trip.selectedHotel.nights} Nights {trip.selectedHotel.foodingIncluded ? '(Inc. Food)' : ''}</p>
                       </div>
                     )}
-                    <div style={{ marginTop: '1.1rem', paddingTop: '1rem', borderTop: '1px solid rgba(196,162,93,0.12)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div style={{ marginTop: '1.1rem', paddingTop: '1rem', borderTop: '1px solid var(--atmos-glass-border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                       {[
                         { label: 'Estimated', value: `₹${(trip.estimatedBudget || 0).toLocaleString('en-IN')}`, color: 'var(--atmos-dark)' },
                         { label: 'Approved', value: `₹${(trip.approvedBudget || 0).toLocaleString('en-IN')}`,   color: '#1A7F45' },

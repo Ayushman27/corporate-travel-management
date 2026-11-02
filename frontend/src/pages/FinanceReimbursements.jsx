@@ -73,7 +73,7 @@ export default function FinanceReimbursements() {
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                   style={{
                     padding: '1.5rem', borderRadius: '1rem',
-                    background: 'var(--atmos-glass)', border: '1px solid rgba(196,162,93,0.15)',
+                    background: 'var(--atmos-glass)', border: '1px solid var(--atmos-glass-border)',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
                   }}
                 >

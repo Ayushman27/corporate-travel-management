@@ -91,6 +91,7 @@ function HotelCard({ hotel, selected, onSelect, index }) {
 }
 
 export default function HotelSelection({ trip, onHotelSelected, onBack }) {
+  const { isDark } = useTheme();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHotelData, setSelectedHotelData] = useState(null);
@@ -223,11 +224,11 @@ export default function HotelSelection({ trip, onHotelSelected, onBack }) {
           whileTap={selectedHotelData && !isSubmitting ? { scale: 0.98 } : {}}
           style={{
             padding: '0.85rem 2rem', borderRadius: '0.75rem',
-            background: selectedHotelData ? 'linear-gradient(135deg, #C4A25D, #B8923F)' : 'rgba(196,162,93,0.3)',
+            background: selectedHotelData ? 'var(--atmos-accent-grad)' : 'var(--atmos-accent-subtle)',
             color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem', fontWeight: 600,
             border: 'none', cursor: selectedHotelData ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', gap: '0.5rem',
-            boxShadow: selectedHotelData ? '0 8px 24px rgba(196,162,93,0.3)' : 'none'
+            boxShadow: selectedHotelData ? '0 8px 24px var(--atmos-accent-glow)' : 'none'
           }}
         >
           {isSubmitting ? <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> : 'Continue to Summary'}

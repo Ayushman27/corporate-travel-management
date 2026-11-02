@@ -1,3 +1,4 @@
+import { useTheme } from '../../context/ThemeContext';
 import { useState } from 'react';
 import { useTrip } from '../../context/TripContext';
 import { motion } from 'framer-motion';
@@ -35,7 +36,7 @@ const labelStyle = {
 const inputStyle = {
   width: '100%', padding: '0.65rem 0.9rem',
   borderRadius: '0.65rem',
-  border: '1px solid rgba(196,162,93,0.2)',
+  border: '1px solid var(--atmos-glass-border)',
   background: 'var(--atmos-input-bg)',
   fontFamily: "'Plus Jakarta Sans', sans-serif",
   fontSize: '0.8rem', color: 'var(--atmos-dark)',
@@ -43,7 +44,9 @@ const inputStyle = {
   transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
 };
 
-export default function TripRequestForm({ onSuccess }) {
+export default function TripRequestForm({
+onSuccess }) {
+  const { isDark } = useTheme();
   const { submitTrip, loading } = useTrip();
 
   const [form, setForm] = useState({
@@ -84,18 +87,17 @@ export default function TripRequestForm({ onSuccess }) {
           background: 'var(--atmos-glass)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(196,162,93,0.18)',
+          border: '1px solid var(--atmos-glass-border)',
           borderRadius: '1.25rem',
           padding: '2rem',
-          boxShadow: '0 8px 32px rgba(44,43,41,0.06)',
+          boxShadow: 'var(--atmos-shadow)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.75rem' }}>
           <div style={{
             width: '40px', height: '40px', borderRadius: '11px', flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #C4A25D, #B8923F)',
-            boxShadow: '0 4px 12px rgba(196,162,93,0.3)',
+            background: 'var(--atmos-accent-grad)', boxShadow: '0 4px 12px var(--atmos-accent-glow)',
           }}>
             <MapPin style={{ width: '18px', height: '18px', color: '#fff' }} />
           </div>
@@ -190,19 +192,17 @@ export default function TripRequestForm({ onSuccess }) {
             <motion.button
               type="submit"
               disabled={loading}
-              whileHover={!loading ? { scale: 1.015, boxShadow: '0 10px 28px rgba(196,162,93,0.35)' } : {}}
+              whileHover={!loading ? { scale: 1.015, boxShadow: '0 10px 28px var(--atmos-accent-glow)' } : {}}
               whileTap={!loading ? { scale: 0.97 } : {}}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 gap: '0.5rem', padding: '0.85rem 1.5rem',
                 borderRadius: '0.85rem',
-                background: loading
-                  ? 'rgba(196,162,93,0.35)'
-                  : 'linear-gradient(135deg, #C4A25D 0%, #B8923F 100%)',
+                background: loading ? 'var(--atmos-accent-subtle)' : 'var(--atmos-accent-grad)',
                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                 fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600,
                 letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff',
-                boxShadow: loading ? 'none' : '0 4px 18px rgba(196,162,93,0.3)',
+                boxShadow: loading ? 'none' : '0 4px 18px var(--atmos-accent-glow)',
               }}
             >
               {loading

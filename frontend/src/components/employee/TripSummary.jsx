@@ -1,3 +1,4 @@
+import { useTheme } from '../../context/ThemeContext';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Send, CheckCircle2, PlaneTakeoff, Hotel, Receipt } from 'lucide-react';
@@ -7,7 +8,9 @@ import { useNavigate } from 'react-router-dom';
 
 const ease = [0.25, 1, 0.5, 1];
 
-export default function TripSummary({ trip, onBack }) {
+export default function TripSummary({
+trip, onBack }) {
+  const { isDark } = useTheme();
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -138,11 +141,11 @@ export default function TripSummary({ trip, onBack }) {
         <motion.button
           onClick={handleSendApproval}
           disabled={submitting}
-          whileHover={!submitting ? { scale: 1.02, boxShadow: '0 8px 24px rgba(196,162,93,0.35)' } : {}}
+          whileHover={!submitting ? { scale: 1.02, boxShadow: '0 8px 24px var(--atmos-accent-glow)' } : {}}
           whileTap={!submitting ? { scale: 0.98 } : {}}
           style={{
             padding: '1rem 3rem', borderRadius: '999px',
-            background: 'linear-gradient(135deg, #C4A25D, #B8923F)',
+            background: 'var(--atmos-accent-grad)',
             color: '#fff', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', fontWeight: 600,
             border: 'none', cursor: submitting ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', gap: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em'

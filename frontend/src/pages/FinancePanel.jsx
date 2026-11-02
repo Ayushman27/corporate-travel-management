@@ -4,6 +4,7 @@ import Navbar  from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
 import PageTransition from '../components/common/PageTransition';
 import SetBudgetModal from '../components/common/SetBudgetModal';
+import { useTheme } from '../context/ThemeContext';
 import { financeAPI, tripAPI } from '../services/api';
 import { format } from 'date-fns';
 import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle, RefreshCw, Calendar, Sliders, Edit3, Receipt, ChevronDown, PlaneTakeoff, Hotel } from 'lucide-react';
@@ -20,9 +21,9 @@ const glassCard = {
   background: 'var(--atmos-glass)',
   backdropFilter: 'blur(20px)',
   WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(196,162,93,0.15)',
+  border: '1px solid var(--atmos-glass-border)',
   borderRadius: '1.2rem',
-  boxShadow: '0 4px 20px rgba(44,43,41,0.06)',
+  boxShadow: 'var(--atmos-shadow)',
 };
 
 const inputStyle = {
@@ -290,16 +291,16 @@ function TabBtn({ id, label, active, onClick }) {
   return (
     <motion.button
       onClick={() => onClick(id)}
-      whileHover={{ background: active ? undefined : 'rgba(196,162,93,0.08)' }}
+      whileHover={{ background: active ? undefined : 'var(--atmos-accent-subtle)' }}
       whileTap={{ scale: 0.97 }}
       style={{
         padding: '0.5rem 1.1rem', borderRadius: '0.6rem',
-        background: active ? 'linear-gradient(135deg, #C4A25D, #B8923F)' : 'transparent',
+        background: active ? 'var(--atmos-accent-grad)' : 'transparent',
         border: 'none', cursor: 'pointer',
         fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem',
         fontWeight: active ? 600 : 500, letterSpacing: '0.06em',
         color: active ? '#fff' : 'var(--atmos-mid)',
-        boxShadow: active ? '0 4px 12px rgba(196,162,93,0.25)' : 'none',
+        boxShadow: active ? '0 4px 12px var(--atmos-accent-glow)' : 'none',
         transition: 'color 0.2s ease',
       }}
     >
@@ -309,6 +310,7 @@ function TabBtn({ id, label, active, onClick }) {
 }
 
 export default function FinancePanel() {
+  const { isDark } = useTheme();
   const [report,      setReport]      = useState(null);
   const [syncing,     setSyncing]     = useState(false);
 
@@ -389,7 +391,7 @@ export default function FinancePanel() {
   }));
 
   const STAT_ITEMS = [
-    { label: 'Total Allocated', value: `₹${(report?.summary?.totalAllocated || 0).toLocaleString('en-IN')}`, icon: DollarSign, from: '#C4A25D', to: '#B8923F', glow: 'rgba(196,162,93,0.3)' },
+    { label: 'Total Allocated', value: `₹${(report?.summary?.totalAllocated || 0).toLocaleString('en-IN')}`, icon: DollarSign, from: isDark ? '#C4A25D' : '#2563EB', to: isDark ? '#B8923F' : '#1D4ED8', glow: isDark ? 'rgba(196,162,93,0.3)' : 'rgba(37,99,235,0.3)' },
     { label: 'Total Spent',     value: `₹${(report?.summary?.totalSpent || 0).toLocaleString('en-IN')}`,     icon: TrendingUp, from: '#E8A838', to: '#D4922A', glow: 'rgba(232,168,56,0.3)' },
     { label: 'Remaining Budget', value: `₹${(report?.summary?.totalRemaining || 0).toLocaleString('en-IN')}`, icon: CheckCircle, from: '#1A7F45', to: '#145A32', glow: 'rgba(26,127,69,0.3)' },
     {
@@ -438,26 +440,10 @@ export default function FinancePanel() {
                 whileTap={{ scale: 0.98 }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.45rem',
-                  padding: '0.45rem 1.1rem', borderRadius: '0.65rem',
-                  background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.12))',
-                  border: '1px solid #C4A25D',
-                  color: 'var(--atmos-dark)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
-                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(196,162,93,0.15)'
-                }}
-              >
-                <Sliders style={{ width: '13px', height: '13px', color: '#C4A25D' }} />
-                Set Monthly Budget
-              </motion.button>
-              <motion.button
-                onClick={handleSyncSheets}
-                disabled={syncing}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '0.45rem',
                   padding: '0.45rem 1rem', borderRadius: '0.65rem',
-                  background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)',
-                  color: '#C4A25D', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
+                  background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600,
+                  color: 'var(--atmos-gold)',
                   cursor: syncing ? 'not-allowed' : 'pointer'
                 }}
               >
@@ -565,13 +551,14 @@ export default function FinancePanel() {
                         }}
                         style={{
                           display: 'flex', alignItems: 'center', gap: '0.35rem',
-                          background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)',
+                          background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
                           borderRadius: '0.5rem', padding: '0.3rem 0.75rem',
-                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 600,
+                          color: 'var(--atmos-gold)',
                           cursor: 'pointer'
                         }}
                       >
-                        <Sliders style={{ width: '12px', height: '12px' }} /> Adjust Allocation
+                        <Sliders style={{ width: '12px', height: '12px', color: 'var(--atmos-gold)' }} /> Adjust Allocation
                       </button>
                     </div>
                     <ResponsiveContainer width="100%" height={240}>
@@ -584,8 +571,8 @@ export default function FinancePanel() {
                           contentStyle={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 600, background: '#ffffff', border: '1px solid rgba(196,162,93,0.3)', borderRadius: '0.6rem', color: '#000000', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
                           itemStyle={{ color: '#000000' }}
                         />
-                        <Bar dataKey="Allocated" fill="rgba(196,162,93,0.2)" radius={[6, 6, 0, 0]} />
-                        <Bar dataKey="Spent"     fill="#C4A25D"              radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="Allocated" fill={isDark ? "rgba(196,162,93,0.2)" : "rgba(37,99,235,0.18)"} radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="Spent" fill={isDark ? "#C4A25D" : "#2563EB"} radius={[6, 6, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </motion.div>

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Plane, Building2, Users, Eye, EyeOff, Loader2,
+  Plane, Building2, Users, Sun, Moon, Eye, EyeOff, Loader2,
   ArrowRight, ArrowLeft, FileSpreadsheet, ShieldCheck, ChevronDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,6 +19,7 @@ const cardVariants = {
 };
 
 export default function Login() {
+  const { isDark, toggleTheme } = useTheme();
   const { employeeLogin, adminLogin, registerCompany, user } = useAuth();
   const navigate = useNavigate();
 
@@ -46,8 +48,7 @@ export default function Login() {
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: '64px', height: '64px', borderRadius: '18px',
-              background: 'linear-gradient(135deg, #C4A25D 0%, #B8923F 100%)',
-              boxShadow: '0 12px 32px rgba(196,162,93,0.35)',
+              background: 'var(--atmos-accent-grad)', boxShadow: '0 12px 32px var(--atmos-accent-glow)',
               marginBottom: '1rem',
             }}
           >
@@ -173,13 +174,13 @@ function OutlineButton({ children, onClick, style = {} }) {
     <motion.button
       type="button"
       onClick={onClick}
-      whileHover={{ background: 'rgba(196,162,93,0.08)' }}
+      whileHover={{ background: 'var(--atmos-accent-subtle)' }}
       whileTap={{ scale: 0.97 }}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
         padding: '0.45rem 0.85rem', borderRadius: '0.6rem',
         background: 'transparent',
-        border: '1px solid rgba(196,162,93,0.3)',
+        border: '1px solid var(--atmos-glass-border)',
         cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
         fontSize: '0.72rem', fontWeight: 500, color: 'var(--atmos-mid)',
         ...style,
@@ -278,7 +279,7 @@ function RoleChooser({ onSelect }) {
               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>{title}</p>
               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{sub}</p>
             </div>
-            <ArrowRight style={{ width: '16px', height: '16px', color: '#C4A25D', flexShrink: 0 }} />
+            <ArrowRight style={{ width: '16px', height: '16px', color: 'var(--atmos-gold)', flexShrink: 0 }} />
           </motion.button>
         ))}
 
@@ -316,7 +317,7 @@ function RoleChooser({ onSelect }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'rgba(196,162,93,0.08)', border: '1px solid rgba(196,162,93,0.25)',
           }}>
-            <Building2 style={{ width: '18px', height: '18px', color: '#C4A25D' }} />
+            <Building2 style={{ width: '18px', height: '18px', color: 'var(--atmos-gold)' }} />
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Register New Company</p>
@@ -396,7 +397,7 @@ function EmployeeLoginForm({ onBack, loginFn, navigate }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(196,162,93,0.1)', border: '1px solid rgba(196,162,93,0.25)',
         }}>
-          <Users style={{ width: '20px', height: '20px', color: '#C4A25D' }} />
+          <Users style={{ width: '20px', height: '20px', color: 'var(--atmos-gold)' }} />
         </div>
         <div>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>Employee Login</h2>
@@ -593,9 +594,7 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
             flex: 1, padding: '0.45rem', borderRadius: '6px',
             fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
             cursor: 'pointer', transition: 'all 0.2s',
-            background: mode === 'password' ? 'rgba(196,162,93,0.2)' : 'transparent',
-            color: mode === 'password' ? '#C4A25D' : 'var(--atmos-muted)',
-            border: mode === 'password' ? '1px solid rgba(196,162,93,0.4)' : '1px solid transparent'
+            background: mode === 'password' ? 'var(--atmos-accent-subtle)' : 'transparent', color: mode === 'password' ? 'var(--atmos-gold)' : 'var(--atmos-muted)', border: mode === 'password' ? '1px solid var(--atmos-gold)' : '1px solid transparent'
           }}
         >
           Password
@@ -607,9 +606,7 @@ function AdminLoginForm({ onBack, loginFn, navigate }) {
             flex: 1, padding: '0.45rem', borderRadius: '6px',
             fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
             cursor: 'pointer', transition: 'all 0.2s',
-            background: mode === 'otp' ? 'rgba(196,162,93,0.2)' : 'transparent',
-            color: mode === 'otp' ? '#C4A25D' : 'var(--atmos-muted)',
-            border: mode === 'otp' ? '1px solid rgba(196,162,93,0.4)' : '1px solid transparent'
+            background: mode === 'otp' ? 'var(--atmos-accent-subtle)' : 'transparent', color: mode === 'otp' ? 'var(--atmos-gold)' : 'var(--atmos-muted)', border: mode === 'otp' ? '1px solid var(--atmos-gold)' : '1px solid transparent'
           }}
         >
           Email OTP
