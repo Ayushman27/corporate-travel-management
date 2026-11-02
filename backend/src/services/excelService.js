@@ -8,12 +8,36 @@ const BASE_DATA_DIR = path.join(__dirname, '../../data');
 
 // ── Helper: parse Excel dates or strings safely ──────────────────────────────
 const parseExcelDate = (val) => {
-  if (!val) return new Date();
-  if (typeof val === 'number' && val > 30000) {
-    return new Date(Math.round((val - 25569) * 86400 * 1000));
+  if (val === undefined || val === null || val === '') return null;
+  if (typeof val === 'number') {
+    if (val > 30000) {
+      // Excel serial date (days since 1899-12-30)
+      const d = new Date(Math.round((val - 25569) * 86400 * 1000));
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
   }
-  const d = new Date(val);
-  return isNaN(d.getTime()) ? new Date() : d;
+  const str = String(val).trim();
+  if (!str) return null;
+
+  // DD-MM-YYYY or DD/MM/YYYY
+  const ddmmyyyy = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if (ddmmyyyy) {
+    const [, d, m, y] = ddmmyyyy;
+    const dateObj = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
+    return isNaN(dateObj.getTime()) ? null : dateObj;
+  }
+
+  // YYYY-MM-DD
+  const yyyymmdd = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if (yyyymmdd) {
+    const [, y, m, d] = yyyymmdd;
+    const dateObj = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d)));
+    return isNaN(dateObj.getTime()) ? null : dateObj;
+  }
+
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
 };
 
 // ── Helper: resolve per-company data directory ───────────────────────────────
@@ -218,21 +242,58 @@ const syncCompanyDataToDB = async (companyId, sheetUrlOverride) => {
   let budgetSynced = 0;
   if (finSheetName && workbook.Sheets[finSheetName]) {
     const finRows = xlsx.utils.sheet_to_json(workbook.Sheets[finSheetName]);
+
+    // Aggregate approved trips in CTM so we don't wipe out real-time expenditures
+    const Trip = require('../models/Trip');
+    let approvedTrips = [];
+    try {
+      const allTrips = await Trip.find({ companyId });
+      approvedTrips = (allTrips || []).filter(t => t.status === 'approved' || t.status === 'completed');
+    } catch (_) {}
+
+    const ctmSpendByMonth = {};
+    for (const t of approvedTrips) {
+      const d = new Date(t.travelDate || t.submittedAt || t.createdAt);
+      if (isNaN(d.getTime())) continue;
+      const mName = d.toLocaleString('en-US', { month: 'long' });
+      const cost = Number(t.approvedBudget) || Number(t.estimatedBudget) || 0;
+      const updated = new Date(t.updatedAt || t.submittedAt || t.createdAt);
+
+      if (!ctmSpendByMonth[mName]) {
+        ctmSpendByMonth[mName] = { total: 0, latestUpdate: updated };
+      }
+      ctmSpendByMonth[mName].total += cost;
+      if (updated > ctmSpendByMonth[mName].latestUpdate) {
+        ctmSpendByMonth[mName].latestUpdate = updated;
+      }
+    }
+
     for (const r of finRows) {
       const month = r.Month || 'Unknown';
       const dept = r.Department || 'All';
       const year = Number(r.Year) || 2026;
       const allocated = Number(r.AllocatedBudget) || 0;
-      const spent = Number(r.SpentAmount) || 0;
-      const remaining = r.RemainingBudget !== undefined ? Number(r.RemainingBudget) : (allocated - spent);
-      const lastUpdated = parseExcelDate(r.LastUpdated);
+      const sheetSpent = Number(r.SpentAmount) || 0;
+      const sheetLastUpdated = parseExcelDate(r.LastUpdated);
+
+      const ctmData = (dept === 'All') ? ctmSpendByMonth[month] : null;
+      const ctmSpent = ctmData ? ctmData.total : 0;
+      const totalSpent = sheetSpent + ctmSpent;
+      const remaining = Math.max(0, allocated - totalSpent);
+
+      let effectiveLastUpdated = null;
+      if (ctmData && ctmData.latestUpdate) {
+        effectiveLastUpdated = ctmData.latestUpdate;
+      } else if (sheetLastUpdated && totalSpent > 0) {
+        effectiveLastUpdated = sheetLastUpdated;
+      }
 
       const existing = await Budget.findOne({ companyId, month, year, department: dept });
       if (existing) {
         existing.allocatedBudget = allocated;
-        existing.spentAmount = spent;
+        existing.spentAmount = totalSpent;
         existing.remainingBudget = remaining;
-        existing.lastUpdated = lastUpdated;
+        existing.lastUpdated = effectiveLastUpdated;
         await existing.save();
       } else {
         await Budget.create({
@@ -241,9 +302,9 @@ const syncCompanyDataToDB = async (companyId, sheetUrlOverride) => {
           year,
           department: dept,
           allocatedBudget: allocated,
-          spentAmount: spent,
+          spentAmount: totalSpent,
           remainingBudget: remaining,
-          lastUpdated
+          lastUpdated: effectiveLastUpdated
         });
       }
       budgetSynced++;

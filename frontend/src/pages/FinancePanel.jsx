@@ -249,7 +249,16 @@ export default function FinancePanel() {
   const STAT_ITEMS = [
     { label: 'Total Allocated', value: `₹${(report?.summary?.totalAllocated || 0).toLocaleString('en-IN')}`, icon: DollarSign, from: '#C4A25D', to: '#B8923F', glow: 'rgba(196,162,93,0.3)' },
     { label: 'Total Spent',     value: `₹${(report?.summary?.totalSpent || 0).toLocaleString('en-IN')}`,     icon: TrendingUp, from: '#E8A838', to: '#D4922A', glow: 'rgba(232,168,56,0.3)' },
-    { label: 'Utilisation',     value: `${report?.summary?.overallUtilisation || 0}%`,                      icon: BarChart2,  from: '#8B5CF6', to: '#7C3AED', glow: 'rgba(139,92,246,0.3)' },
+    { label: 'Remaining Budget', value: `₹${(report?.summary?.totalRemaining || 0).toLocaleString('en-IN')}`, icon: CheckCircle, from: '#1A7F45', to: '#145A32', glow: 'rgba(26,127,69,0.3)' },
+    {
+      label: `${report?.summary?.currentMonth?.month || 'Current Month'} Spend`,
+      value: `₹${(report?.summary?.currentMonth?.spent || 0).toLocaleString('en-IN')}`,
+      subtext: `Utilised: ${report?.summary?.currentMonth?.utilisation || 0}% · Remaining: ₹${(report?.summary?.currentMonth?.remaining || 0).toLocaleString('en-IN')}`,
+      icon: Calendar,
+      from: '#8B5CF6',
+      to: '#7C3AED',
+      glow: 'rgba(139,92,246,0.3)'
+    },
   ];
 
   return (
@@ -519,7 +528,7 @@ export default function FinancePanel() {
                               ₹{(row.RemainingBudget || 0).toLocaleString('en-IN')}
                             </td>
                             <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
-                              {row.LastUpdated ? format(new Date(row.LastUpdated), 'dd MMM yyyy, hh:mm a') : 'Synced'}
+                              {row.LastUpdated ? (() => { try { const d = new Date(row.LastUpdated); if (isNaN(d.getTime())) return '—'; const isMidnight = d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0; return isMidnight ? format(d, 'dd MMM yyyy') : format(d, 'dd MMM yyyy, hh:mm a'); } catch (_) { return '—'; } })() : '—'}
                             </td>
                           </motion.tr>
                         ))}

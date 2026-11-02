@@ -7,3 +7,4 @@ class BudgetModel extends BaseModel {
 }
 
 module.exports = new BudgetModel();
+

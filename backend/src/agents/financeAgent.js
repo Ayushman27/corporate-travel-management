@@ -123,12 +123,24 @@ const applyApprovedBudget = async (companyId, tripId, employeeId, amount) => {
   logger.info(`[FinanceAgent] Applying approved budget deduction: trip ${tripId}, ₹${amount}`);
 
   const now = new Date();
-  const currentMonthName = now.toLocaleString('en-US', { month: 'long' });
+  let travelMonth = now.toLocaleString('en-US', { month: 'long' });
+
+  // Resolve travel month from trip
+  const Trip = require('../models/Trip');
+  try {
+    const trip = await Trip.findOne({ tripId });
+    if (trip && trip.travelDate) {
+      const td = new Date(trip.travelDate);
+      if (!isNaN(td.getTime())) {
+        travelMonth = td.toLocaleString('en-US', { month: 'long' });
+      }
+    }
+  } catch (_) {}
 
   // 1. Update Neon DB monthly budget
   let updatedFinance = null;
   try {
-    let budget = await Budget.findOne({ companyId, month: currentMonthName, department: 'All' });
+    let budget = await Budget.findOne({ companyId, month: travelMonth, department: 'All' });
     if (!budget) {
       budget = await Budget.findOne({ companyId, department: 'All' });
     }
@@ -192,35 +204,90 @@ const generateReport = async (companyId) => {
     }
   }
 
+  // 2. Fetch all approved/completed trips for company to guarantee live spend reflection
+  const Trip = require('../models/Trip');
+  let approvedTrips = [];
+  try {
+    const allTrips = await Trip.find({ companyId });
+    approvedTrips = (allTrips || []).filter(t => t.status === 'approved' || t.status === 'completed');
+  } catch (err) {
+    logger.warn(`[FinanceAgent] Error fetching approved trips for report: ${err.message}`);
+  }
+
+  const tripSpendByMonth = {};
+  for (const t of approvedTrips) {
+    const dateVal = t.travelDate || t.submittedAt || t.createdAt;
+    if (!dateVal) continue;
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) continue;
+    const mName = d.toLocaleString('en-US', { month: 'long' });
+    const cost = Number(t.approvedBudget) || Number(t.estimatedBudget) || 0;
+    const updated = new Date(t.updatedAt || t.submittedAt || t.createdAt);
+
+    if (!tripSpendByMonth[mName]) {
+      tripSpendByMonth[mName] = { total: 0, latestUpdate: updated };
+    }
+    tripSpendByMonth[mName].total += cost;
+    if (updated > tripSpendByMonth[mName].latestUpdate) {
+      tripSpendByMonth[mName].latestUpdate = updated;
+    }
+  }
+
   let monthlyRows = [];
   let deptRows = [];
 
   if (dbBudgets && dbBudgets.length > 0) {
     monthlyRows = dbBudgets
       .filter(b => (!b.department || b.department === 'All'))
-      .map(b => ({
-        Month: b.month,
-        Department: b.department || 'All',
-        AllocatedBudget: Number(b.allocatedBudget) || 0,
-        SpentAmount: Number(b.spentAmount) || 0,
-        RemainingBudget: Number(b.remainingBudget) !== undefined
-          ? Number(b.remainingBudget)
-          : ((Number(b.allocatedBudget) || 0) - (Number(b.spentAmount) || 0)),
-        LastUpdated: b.lastUpdated || b.updatedAt || b.createdAt || new Date().toISOString()
-      }));
+      .map(b => {
+        const tripData = tripSpendByMonth[b.month];
+        const ctmSpent = tripData ? tripData.total : 0;
+        const baseSpent = Number(b.spentAmount) || 0;
+        const totalSpent = Math.max(baseSpent, ctmSpent);
+        const allocated = Number(b.allocatedBudget) || 0;
+        const remaining = Math.max(0, allocated - totalSpent);
+
+        // Determine LastUpdated:
+        let lastUpdated = null;
+        if (tripData && tripData.latestUpdate) {
+          lastUpdated = tripData.latestUpdate.toISOString();
+        } else if (b.lastUpdated && totalSpent > 0) {
+          lastUpdated = new Date(b.lastUpdated).toISOString();
+        }
+
+        // Self-heal budget in DB if not up to date
+        if (b.spentAmount < totalSpent || (!b.lastUpdated && lastUpdated)) {
+          b.spentAmount = totalSpent;
+          b.remainingBudget = remaining;
+          b.lastUpdated = lastUpdated ? new Date(lastUpdated) : null;
+          b.save().catch(() => {});
+        }
+
+        return {
+          Month: b.month,
+          Department: b.department || 'All',
+          AllocatedBudget: allocated,
+          SpentAmount: totalSpent,
+          RemainingBudget: remaining,
+          LastUpdated: lastUpdated
+        };
+      });
 
     deptRows = dbBudgets
       .filter(b => b.department && b.department !== 'All')
-      .map(b => ({
-        Month: b.month,
-        Department: b.department,
-        AllocatedBudget: Number(b.allocatedBudget) || 0,
-        SpentAmount: Number(b.spentAmount) || 0,
-        RemainingBudget: Number(b.remainingBudget) !== undefined
-          ? Number(b.remainingBudget)
-          : ((Number(b.allocatedBudget) || 0) - (Number(b.spentAmount) || 0)),
-        LastUpdated: b.lastUpdated || b.updatedAt || b.createdAt || new Date().toISOString()
-      }));
+      .map(b => {
+        const allocated = Number(b.allocatedBudget) || 0;
+        const spent = Number(b.spentAmount) || 0;
+        const remaining = Math.max(0, allocated - spent);
+        return {
+          Month: b.month,
+          Department: b.department,
+          AllocatedBudget: allocated,
+          SpentAmount: spent,
+          RemainingBudget: remaining,
+          LastUpdated: (b.lastUpdated && spent > 0) ? new Date(b.lastUpdated).toISOString() : null
+        };
+      });
   }
 
   // Fallback to Excel if Neon DB had no rows
@@ -234,7 +301,7 @@ const generateReport = async (companyId) => {
       excelRows.forEach(r => {
         const m = r.Month || 'Unknown';
         if (!aggregated[m]) {
-          aggregated[m] = { Month: m, Department: 'All', AllocatedBudget: 0, SpentAmount: 0, LastUpdated: new Date().toISOString() };
+          aggregated[m] = { Month: m, Department: 'All', AllocatedBudget: 0, SpentAmount: 0, LastUpdated: null };
         }
         aggregated[m].AllocatedBudget += (r.AllocatedBudget || 0);
         aggregated[m].SpentAmount += (r.SpentAmount || 0);
@@ -243,8 +310,11 @@ const generateReport = async (companyId) => {
     }
 
     monthlyRows.forEach(r => {
+      const tripData = tripSpendByMonth[r.Month];
+      const ctmSpent = tripData ? tripData.total : 0;
+      r.SpentAmount = Math.max(r.SpentAmount || 0, ctmSpent);
       r.RemainingBudget = (r.AllocatedBudget || 0) - (r.SpentAmount || 0);
-      r.LastUpdated = r.LastUpdated || new Date().toISOString();
+      r.LastUpdated = tripData ? tripData.latestUpdate.toISOString() : (r.LastUpdated || null);
     });
   }
 
