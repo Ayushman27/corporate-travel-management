@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, PlusCircle,
@@ -28,7 +29,7 @@ function SideNavItem({ to, icon: Icon, label, delay = 0 }) {
           transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1], delay }}
           whileHover={{
             x: 3,
-            background: 'rgba(196,162,93,0.08)',
+            background: 'var(--atmos-accent-subtle)',
             transition: { duration: 0.18 },
           }}
           style={{
@@ -36,15 +37,15 @@ function SideNavItem({ to, icon: Icon, label, delay = 0 }) {
             padding: '0.5rem 0.75rem',
             borderRadius: '0.65rem',
             cursor: 'pointer',
-            background: isActive ? 'rgba(196,162,93,0.12)' : 'transparent',
-            borderLeft: isActive ? '2px solid #C4A25D' : '2px solid transparent',
+            background: isActive ? 'var(--atmos-accent-subtle)' : 'transparent',
+            borderLeft: isActive ? '2px solid var(--atmos-gold)' : '2px solid transparent',
             marginBottom: '0.15rem',
           }}
         >
           <Icon
             style={{
               width: '15px', height: '15px', flexShrink: 0,
-              color: isActive ? '#C4A25D' : 'var(--atmos-muted)',
+              color: isActive ? 'var(--atmos-gold)' : 'var(--atmos-muted)',
               transition: 'color 0.2s ease',
             }}
           />
@@ -65,6 +66,7 @@ function SideNavItem({ to, icon: Icon, label, delay = 0 }) {
 
 export default function Sidebar() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const pct = Math.min(100, ((user?.travelBudgetUsed || 0) / (user?.travelBudgetLimit || 50000)) * 100);
 
   return (
@@ -132,7 +134,7 @@ export default function Sidebar() {
           <p style={{
             fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase',
-            color: 'rgba(196,162,93,0.7)', marginBottom: '0.6rem',
+            color: isDark ? 'rgba(196,162,93,0.7)' : 'rgba(37,99,235,0.85)', marginBottom: '0.6rem',
           }}>
             Travel Budget
           </p>
@@ -159,7 +161,7 @@ export default function Sidebar() {
                 borderRadius: '999px',
                 background: pct > 85
                   ? 'linear-gradient(90deg, #C0392B, #E74C3C)'
-                  : 'linear-gradient(90deg, #C4A25D, #E8C97A)',
+                  : (isDark ? 'linear-gradient(90deg, #C4A25D, #E8C97A)' : 'linear-gradient(90deg, #2563EB, #60A5FA)'),
               }}
             />
           </div>
