@@ -9,7 +9,12 @@ const authorize = (...roles) => async (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Not authenticated' });
   }
 
-  if (roles.includes(req.user.role)) {
+  const userRole = (req.user.role || '').toLowerCase();
+  const hasRole = roles.some(r => {
+    const roleLower = r.toLowerCase();
+    return userRole === roleLower || userRole.startsWith(roleLower) || (roleLower === 'finance' && userRole.includes('finance'));
+  });
+  if (hasRole) {
     return next();
   }
 

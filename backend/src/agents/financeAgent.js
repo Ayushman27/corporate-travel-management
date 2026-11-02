@@ -172,12 +172,19 @@ const applyApprovedBudget = async (companyId, tripId, employeeId, amount) => {
         employeeId,
         status: { $in: ['approved', 'booked', 'completed'] }
       });
+      const userLimit = Number(user.travelBudgetLimit) || 50000;
       const trueSpend = allUserTrips.reduce((sum, t) => {
         const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
           ? Number(t.actualCost)
           : (t.approvedBudget !== undefined && t.approvedBudget !== null
             ? Number(t.approvedBudget)
             : (Number(t.estimatedBudget) || 0));
+
+        // Rule: If trip cost exceeds employee budget, do not cut it from personal budget
+        if (cost > userLimit || (sum + cost) > userLimit) {
+          logger.info(`[FinanceAgent] Trip ${t.tripId} cost ₹${cost} exceeds employee ${employeeId} budget ₹${userLimit} — not cutting from personal budget`);
+          return sum;
+        }
         return sum + cost;
       }, 0);
 

@@ -15,6 +15,8 @@ const notificationAgent  = require('./notificationAgent');
 
 const Trip     = require('../models/Trip');
 const Approval = require('../models/Approval');
+const User     = require('../models/User');
+const { enrichTripWithBillDetails } = require('../services/billService');
 const { checkPolicy }  = require('../services/policyService');
 const { audit }        = require('../services/auditService');
 const logger = require('../utils/logger');
@@ -115,6 +117,33 @@ const managerApprove = async (tripId, decision, manager, comments, req) => {
 
     await notificationAgent.notifyManagerApproved({ name: trip.employeeName, email: '' }, trip);
     await audit('MANAGER_APPROVED', { tripId, actor: manager, details: { comments }, req });
+
+    try {
+      const enriched = await enrichTripWithBillDetails(trip);
+      if (enriched.isExceedingBudget) {
+        const staff = await User.find({ companyId: trip.companyId });
+        const targets = staff.filter(s => {
+          const r = (s.role || '').toLowerCase();
+          return r === 'admin' || r.includes('finance');
+        });
+        await notificationAgent.notifyBudgetExceededWarning(targets, { name: trip.employeeName, email: '' }, trip, enriched.billDetails);
+        await audit('BUDGET_EXCEEDED_WARNING', {
+          tripId: trip.tripId,
+          actor: manager,
+          details: {
+            employeeId: trip.employeeId,
+            employeeName: trip.employeeName,
+            employeeBudgetLimit: enriched.employeeBudgetLimit,
+            requestedBill: enriched.billDetails.totalCost,
+            excessAmount: enriched.budgetExcessAmount,
+            billBreakdown: enriched.billDetails
+          },
+          req
+        });
+      }
+    } catch (e) {
+      logger.warn(`[Orchestrator] Failed sending budget exceeded alert: ${e.message}`);
+    }
   } else {
     trip.status = 'rejected';
     await trip.save();
@@ -231,6 +260,33 @@ const sendForApproval = async (tripId, user, req) => {
   }
 
   await audit('SENT_FOR_APPROVAL', { tripId, actor: user, req });
+
+  try {
+    const enriched = await enrichTripWithBillDetails(trip);
+    if (enriched.isExceedingBudget) {
+      const staff = await User.find({ companyId: trip.companyId });
+      const targets = staff.filter(s => {
+        const r = (s.role || '').toLowerCase();
+        return r === 'admin' || r.includes('finance');
+      });
+      await notificationAgent.notifyBudgetExceededWarning(targets, { name: trip.employeeName, email: user.email }, trip, enriched.billDetails);
+      await audit('BUDGET_EXCEEDED_WARNING', {
+        tripId: trip.tripId,
+        actor: user,
+        details: {
+          employeeId: trip.employeeId,
+          employeeName: trip.employeeName,
+          employeeBudgetLimit: enriched.employeeBudgetLimit,
+          requestedBill: enriched.billDetails.totalCost,
+          excessAmount: enriched.budgetExcessAmount,
+          billBreakdown: enriched.billDetails
+        },
+        req
+      });
+    }
+  } catch (e) {
+    logger.warn(`[Orchestrator] Failed sending budget exceeded alert on submit: ${e.message}`);
+  }
   return trip;
 };
 

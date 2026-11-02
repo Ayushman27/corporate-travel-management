@@ -6,7 +6,7 @@ import PageTransition from '../components/common/PageTransition';
 import SetBudgetModal from '../components/common/SetBudgetModal';
 import { financeAPI, tripAPI } from '../services/api';
 import { format } from 'date-fns';
-import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle, RefreshCw, Calendar, Sliders, Edit3 } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle, RefreshCw, Calendar, Sliders, Edit3, Receipt, ChevronDown, PlaneTakeoff, Hotel } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend,
@@ -72,7 +72,15 @@ function BudgetGauge({ allocated, spent }) {
 function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
   const [budgetApproved, setBudgetApproved] = useState(trip.estimatedBudget || '');
   const [comments, setComments] = useState('');
+  const [showBillDetails, setShowBillDetails] = useState(false);
   const isDeciding = deciding === trip.tripId;
+
+  const empLimit = trip.employeeBudgetLimit || 20000;
+  const isExceeded = trip.isExceedingBudget || Number(trip.estimatedBudget || 0) > empLimit;
+  const excess = trip.budgetExcessAmount || Math.max(0, Number(trip.estimatedBudget || 0) - empLimit);
+
+  const travelCost = trip.billDetails?.travelCost || Math.max(0, (trip.estimatedBudget || 0) - (trip.selectedHotel?.totalCost || 0));
+  const hotelCost = trip.selectedHotel?.totalCost || trip.billDetails?.hotelCost || 0;
 
   return (
     <motion.div
@@ -83,37 +91,151 @@ function FinanceApprovalCard({ trip, onDecision, deciding, index }) {
       whileHover={{ y: -4, boxShadow: '0 24px 48px rgba(44,43,41,0.1)', transition: { duration: 0.22 } }}
       style={{
         ...glassCard, padding: '1.5rem',
-        borderLeft: '3px solid #C4A25D',
+        borderLeft: isExceeded ? '3px solid #E8A838' : '3px solid #C4A25D',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 400, color: 'var(--atmos-dark)' }}>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontWeight: 500, color: 'var(--atmos-dark)' }}>
             {trip.employeeName} · {trip.department}
           </p>
           <p style={{ fontFamily: 'monospace', fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.1rem' }}>{trip.tripId}</p>
         </div>
         <span style={{
           padding: '0.2rem 0.75rem', borderRadius: '999px',
-          background: 'rgba(26,95,122,0.1)', color: '#1A5F7A',
+          background: isExceeded ? 'rgba(232,168,56,0.12)' : 'rgba(26,95,122,0.1)',
+          color: isExceeded ? '#D4922A' : '#1A5F7A',
+          border: isExceeded ? '1px solid rgba(232,168,56,0.3)' : '1px solid rgba(26,95,122,0.2)',
           fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600,
-          letterSpacing: '0.1em', textTransform: 'uppercase',
+          letterSpacing: '0.08em', textTransform: 'uppercase',
         }}>
-          Finance Review
+          {isExceeded ? 'Budget Warning' : 'Finance Review'}
         </span>
       </div>
 
+      {/* Budget Warning Box */}
+      {isExceeded && (
+        <div style={{
+          marginBottom: '1rem', padding: '0.75rem 0.9rem', borderRadius: '0.75rem',
+          background: 'rgba(232,168,56,0.1)', border: '1px solid rgba(232,168,56,0.35)',
+          display: 'flex', gap: '0.6rem', alignItems: 'flex-start'
+        }}>
+          <AlertTriangle style={{ width: '16px', height: '16px', color: '#E8A838', flexShrink: 0, marginTop: '2px' }} />
+          <div>
+            <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 700, color: '#D4922A', margin: 0 }}>
+              Travel Budget Exceeded Warning
+            </p>
+            <p style={{ fontFamily: 'Montserrat', fontSize: '0.66rem', color: 'var(--atmos-dark)', margin: '0.2rem 0 0', lineHeight: 1.4 }}>
+              Employee budget is <strong>₹{empLimit.toLocaleString('en-IN')}</strong>, but planned bill is <strong>₹{Number(trip.estimatedBudget || 0).toLocaleString('en-IN')}</strong> (Exceeds by <strong>₹{excess.toLocaleString('en-IN')}</strong>).
+            </p>
+            <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
+              ℹ️ Note: Amount will <strong>not</strong> be cut from employee personal budget.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Basic info */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '1rem' }}>
         {[
           ['Route', `${trip.fromCity} → ${trip.toCity}`],
           ['Date', trip.travelDate ? format(new Date(trip.travelDate), 'dd MMM yyyy') : '—'],
-          ['Requested', `₹${(trip.estimatedBudget || 0).toLocaleString('en-IN')}`],
+          ['Employee Budget', `₹${empLimit.toLocaleString('en-IN')}`],
+          ['Requested Bill', `₹${(trip.estimatedBudget || 0).toLocaleString('en-IN')}`],
         ].map(([label, value]) => (
           <div key={label} style={{ display: 'flex', gap: '0.5rem', fontFamily: 'Montserrat', fontSize: '0.72rem' }}>
-            <span style={{ color: 'var(--atmos-muted)', minWidth: '70px' }}>{label}:</span>
+            <span style={{ color: 'var(--atmos-muted)', minWidth: '110px' }}>{label}:</span>
             <strong style={{ color: 'var(--atmos-dark)' }}>{value}</strong>
           </div>
         ))}
+      </div>
+
+      {/* Itemized Bill Details Toggle & Accordion */}
+      <div style={{ marginBottom: '1.1rem' }}>
+        <button
+          type="button"
+          onClick={() => setShowBillDetails(!showBillDetails)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+            background: 'rgba(196,162,93,0.08)', border: '1px solid rgba(196,162,93,0.25)',
+            borderRadius: '0.6rem', padding: '0.5rem 0.8rem',
+            fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 600, color: '#C4A25D',
+            cursor: 'pointer'
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Receipt style={{ width: '13px', height: '13px' }} />
+            {showBillDetails ? 'Hide Bill Details' : 'View Bill Details (Where Money is Used)'}
+          </span>
+          <ChevronDown style={{ width: '14px', height: '14px', transform: showBillDetails ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+        </button>
+
+        {showBillDetails && (
+          <div style={{
+            marginTop: '0.5rem', padding: '0.85rem', borderRadius: '0.75rem',
+            background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(196,162,93,0.15)',
+            display: 'flex', flexDirection: 'column', gap: '0.65rem'
+          }}>
+            {/* Travel breakdown */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 700, color: 'var(--atmos-dark)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  ✈️ Flights & Transit
+                </span>
+                <span style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: '#C4A25D' }}>
+                  ₹{Number(travelCost).toLocaleString('en-IN')}
+                </span>
+              </div>
+              {(trip.billDetails?.segments && trip.billDetails.segments.length > 0) ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                  {trip.billDetails.segments.map((seg, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.3rem 0.5rem', borderRadius: '0.35rem' }}>
+                      <span><strong>{(seg.mode || 'transit').toUpperCase()}</strong>: {seg.operator || ''}{seg.flightNo ? ` (${seg.flightNo})` : ''} · {seg.from} → {seg.to}</span>
+                      <strong style={{ color: 'var(--atmos-dark)' }}>₹{Number(seg.cost || 0).toLocaleString('en-IN')}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: 0 }}>
+                  Standard route transit ({trip.fromCity} → {trip.toCity})
+                </p>
+              )}
+            </div>
+
+            {/* Hotel breakdown */}
+            {(trip.selectedHotel || trip.billDetails?.hotel) && (
+              <div style={{ borderTop: '1px solid rgba(196,162,93,0.1)', paddingTop: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <span style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 700, color: 'var(--atmos-dark)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    🏨 Accommodation
+                  </span>
+                  <span style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600, color: '#C4A25D' }}>
+                    ₹{Number(hotelCost).toLocaleString('en-IN')}
+                  </span>
+                </div>
+                <div style={{ fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.35rem 0.5rem', borderRadius: '0.35rem' }}>
+                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--atmos-dark)' }}>
+                    {trip.selectedHotel?.name || trip.billDetails?.hotel?.name}
+                  </p>
+                  <p style={{ margin: '0.2rem 0 0' }}>
+                    {trip.selectedHotel?.nights || trip.billDetails?.hotel?.nights || 1} Nights @ ₹{(trip.selectedHotel?.pricePerNight || trip.billDetails?.hotel?.pricePerNight || 0).toLocaleString('en-IN')}/night
+                    {(trip.selectedHotel?.foodingIncluded || trip.billDetails?.hotel?.foodingIncluded) ? ' · Fooding included' : ''}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Total */}
+            <div style={{ borderTop: '1px solid rgba(196,162,93,0.15)', paddingTop: '0.45rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+                Total Bill Amount:
+              </span>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 600, color: '#C4A25D' }}>
+                ₹{(trip.estimatedBudget || 0).toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>

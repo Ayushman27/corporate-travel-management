@@ -3,6 +3,7 @@ const Trip    = require('../models/Trip');
 const Booking = require('../models/Booking');
 const { getRecentLogs, getLogsByAction } = require('../services/auditService');
 const { getAllEmployees } = require('../services/excelService');
+const { enrichTripWithBillDetails } = require('../services/billService');
 
 // GET /api/admin/users
 const getAllUsers = async (req, res, next) => {
@@ -65,7 +66,8 @@ const getAllTrips = async (req, res, next) => {
       .limit(Number(limit));
 
     const total = await Trip.countDocuments(filter);
-    res.json({ success: true, data: trips, pagination: { total, page: Number(page), limit: Number(limit) } });
+    const enriched = await Promise.all(trips.map(enrichTripWithBillDetails));
+    res.json({ success: true, data: enriched, pagination: { total, page: Number(page), limit: Number(limit) } });
   } catch (err) {
     next(err);
   }

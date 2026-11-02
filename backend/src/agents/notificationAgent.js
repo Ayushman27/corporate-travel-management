@@ -36,7 +36,31 @@ const templates = {
   },
 
   tripCancelled: (emp, trip) =>
-    `🚫 *Trip Cancelled*\n\nHello ${emp.name},\nYour trip *${trip.tripId}* (${trip.fromCity} → ${trip.toCity}) has been cancelled.\n\n_CTM System_`
+    `🚫 *Trip Cancelled*\n\nHello ${emp.name},\nYour trip *${trip.tripId}* (${trip.fromCity} → ${trip.toCity}) has been cancelled.\n\n_CTM System_`,
+
+  budgetExceededAlert: (recipient, employee, trip, billDetails) => {
+    const segmentsText = (billDetails?.segments || []).map((s, idx) =>
+      `   ${idx + 1}. ${(s.mode || 'transit').toUpperCase()} (${s.operator || ''}${s.flightNo ? ' ' + s.flightNo : ''}): ${s.from} → ${s.to} (₹${Number(s.cost || 0).toLocaleString('en-IN')})`
+    ).join('\n') || '   • Standard itinerary transit';
+
+    const hotelText = billDetails?.hotel
+      ? `   • ${billDetails.hotel.name} (${billDetails.hotel.nights} Nights @ ₹${(billDetails.hotel.pricePerNight || 0).toLocaleString('en-IN')}/night) — ₹${(billDetails.hotel.totalCost || 0).toLocaleString('en-IN')}`
+      : '   • No hotel booked';
+
+    return `⚠️ *TRAVEL BUDGET WARNING: EXCEEDED*\n\n` +
+      `Hello ${recipient.name},\n` +
+      `Employee *${employee.name}* (${trip.department}) has planned a trip that exceeds their allocated personal travel budget.\n\n` +
+      `📌 *Budget Overview:*\n` +
+      `• Employee Allocated Budget: ₹${(billDetails?.employeeBudgetLimit || 20000).toLocaleString('en-IN')}\n` +
+      `• Requested Trip Bill: ₹${(billDetails?.totalCost || trip.estimatedBudget || 0).toLocaleString('en-IN')}\n` +
+      `• Exceeds Budget By: ₹${(billDetails?.budgetExcessAmount || 0).toLocaleString('en-IN')}\n\n` +
+      `🧾 *Itemized Bill Breakdown (Where Money is Used):*\n` +
+      `*Travel & Transit (₹${(billDetails?.travelCost || 0).toLocaleString('en-IN')}):*\n${segmentsText}\n\n` +
+      `*Accommodation (₹${(billDetails?.hotelCost || 0).toLocaleString('en-IN')}):*\n${hotelText}\n\n` +
+      `*Total Planned Bill: ₹${(billDetails?.totalCost || trip.estimatedBudget || 0).toLocaleString('en-IN')}*\n\n` +
+      `ℹ️ _Note: Per policy, this amount has NOT been deducted from the employee's personal budget. Please review in the portal._\n\n` +
+      `_CTM System Alert_`;
+  }
 };
 
 // ── Generic send wrapper ─────────────────────────────────────────────────────
@@ -81,7 +105,22 @@ const notifyBookingConfirmed = (emp, booking, tickets) =>
 const notifyTripCancelled = (emp, trip) =>
   notify({ to: emp.phone || emp.email, message: templates.tripCancelled(emp, trip), tripId: trip.tripId, event: 'TRIP_CANCELLED' });
 
+const notifyBudgetExceededWarning = async (recipients, employee, trip, billDetails) => {
+  for (const r of (recipients || [])) {
+    if (r.phone || r.email) {
+      await notify({
+        to: r.phone || r.email,
+        message: templates.budgetExceededAlert(r, employee, trip, billDetails),
+        tripId: trip.tripId,
+        actor: employee,
+        event: 'BUDGET_EXCEEDED_WARNING'
+      });
+    }
+  }
+};
+
 module.exports = {
+  notifyBudgetExceededWarning,
   notifyTripSubmitted, notifyManagerApprovalNeeded, notifyManagerApproved,
   notifyManagerRejected, notifyFinanceApproved, notifyBookingConfirmed, notifyTripCancelled
 };

@@ -7,6 +7,7 @@ const Approval     = require('../models/Approval');
 const { audit }    = require('../services/auditService');
 const { getLogsForTrip } = require('../services/auditService');
 const hotelService = require('../utils/hotelService');
+const { enrichTripWithBillDetails } = require('../services/billService');
 const logger = require('../utils/logger');
 
 // POST /api/trip/request
@@ -54,7 +55,8 @@ const getMyTrips = async (req, res, next) => {
     const trips = await Trip.find({ employeeId: req.user.employeeId, companyId: req.user.companyId })
       .sort({ createdAt: -1 })
       .limit(50);
-    res.json({ success: true, data: trips });
+    const enriched = await Promise.all(trips.map(enrichTripWithBillDetails));
+    res.json({ success: true, data: enriched });
   } catch (err) {
     next(err);
   }
@@ -160,7 +162,8 @@ const getPendingManagerApprovals = async (req, res, next) => {
           return true; // Manager sees all pending for now; restrict in production
         });
 
-    res.json({ success: true, data: filtered });
+    const enriched = await Promise.all(filtered.map(enrichTripWithBillDetails));
+    res.json({ success: true, data: enriched });
   } catch (err) {
     next(err);
   }
@@ -170,7 +173,8 @@ const getPendingManagerApprovals = async (req, res, next) => {
 const getPendingFinanceApprovals = async (req, res, next) => {
   try {
     const trips = await Trip.find({ status: 'pending_finance', companyId: req.user.companyId }).sort({ submittedAt: 1 });
-    res.json({ success: true, data: trips });
+    const enriched = await Promise.all(trips.map(enrichTripWithBillDetails));
+    res.json({ success: true, data: enriched });
   } catch (err) {
     next(err);
   }

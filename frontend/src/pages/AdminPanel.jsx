@@ -6,7 +6,7 @@ import PageTransition from '../components/common/PageTransition';
 import SetBudgetModal from '../components/common/SetBudgetModal';
 import { adminAPI } from '../services/api';
 import { format } from 'date-fns';
-import { Users, Activity, Loader2, Shield, ToggleLeft, ToggleRight, Sliders } from 'lucide-react';
+import { Users, Activity, Loader2, Shield, ToggleLeft, ToggleRight, Sliders, Receipt, AlertTriangle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const ease = [0.25, 1, 0.5, 1];
@@ -66,6 +66,124 @@ const tdStyle = {
   padding: '0.8rem 1rem',
   fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-dark)',
 };
+
+function TripBillModal({ trip, onClose }) {
+  if (!trip) return null;
+  const empLimit = trip.employeeBudgetLimit || 20000;
+  const isExceeded = trip.isExceedingBudget || Number(trip.estimatedBudget || 0) > empLimit;
+  const excess = trip.budgetExcessAmount || Math.max(0, Number(trip.estimatedBudget || 0) - empLimit);
+  const travelCost = trip.billDetails?.travelCost || Math.max(0, (trip.estimatedBudget || 0) - (trip.selectedHotel?.totalCost || 0));
+  const hotelCost = trip.selectedHotel?.totalCost || trip.billDetails?.hotelCost || 0;
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 1000,
+      background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+    }} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{
+        background: 'rgba(18,16,14,0.96)', border: '1px solid rgba(196,162,93,0.35)',
+        borderRadius: '1.25rem', width: '100%', maxWidth: '520px', padding: '1.75rem',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.7)', boxSizing: 'border-box'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.2rem' }}>
+          <div>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', color: 'var(--atmos-dark)', margin: 0 }}>
+              Trip Bill Details & Breakdown
+            </h3>
+            <p style={{ fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
+              {trip.employeeName} ({trip.department}) · {trip.tripId}
+            </p>
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px' }}>
+            <X style={{ width: '18px', height: '18px' }} />
+          </button>
+        </div>
+
+        {isExceeded && (
+          <div style={{
+            marginBottom: '1rem', padding: '0.75rem 0.9rem', borderRadius: '0.75rem',
+            background: 'rgba(232,168,56,0.12)', border: '1px solid rgba(232,168,56,0.4)',
+            display: 'flex', gap: '0.6rem', alignItems: 'flex-start'
+          }}>
+            <AlertTriangle style={{ width: '16px', height: '16px', color: '#E8A838', flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 700, color: '#D4922A', margin: 0 }}>
+                Budget Exceeded Warning
+              </p>
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.66rem', color: 'var(--atmos-dark)', margin: '0.2rem 0 0', lineHeight: 1.4 }}>
+                Employee budget is <strong>₹{empLimit.toLocaleString('en-IN')}</strong>, but planned bill is <strong>₹{Number(trip.estimatedBudget || 0).toLocaleString('en-IN')}</strong> (Exceeds by <strong>₹{excess.toLocaleString('en-IN')}</strong>).
+              </p>
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.6rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
+                ℹ️ Not deducted from employee personal budget.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Breakdown */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '340px', overflowY: 'auto' }}>
+          {/* Flights / transit */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.75rem', padding: '0.85rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+              <span style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+                ✈️ Transport & Flights
+              </span>
+              <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
+                ₹{Number(travelCost).toLocaleString('en-IN')}
+              </span>
+            </div>
+            {(trip.billDetails?.segments && trip.billDetails.segments.length > 0) ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                {trip.billDetails.segments.map((seg, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', background: 'rgba(0,0,0,0.2)', padding: '0.35rem 0.5rem', borderRadius: '0.35rem' }}>
+                    <span>{(seg.mode || 'transit').toUpperCase()}: {seg.operator || ''}{seg.flightNo ? ` (${seg.flightNo})` : ''} · {seg.from} → {seg.to}</span>
+                    <strong style={{ color: 'var(--atmos-dark)' }}>₹{Number(seg.cost || 0).toLocaleString('en-IN')}</strong>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.64rem', color: 'var(--atmos-muted)', margin: 0 }}>
+                {trip.fromCity} → {trip.toCity} (Travel Mode: {trip.travelMode})
+              </p>
+            )}
+          </div>
+
+          {/* Hotel */}
+          {(trip.selectedHotel || trip.billDetails?.hotel) && (
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(196,162,93,0.15)', borderRadius: '0.75rem', padding: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                <span style={{ fontFamily: 'Montserrat', fontSize: '0.68rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+                  🏨 Accommodation
+                </span>
+                <span style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600, color: '#C4A25D' }}>
+                  ₹{Number(hotelCost).toLocaleString('en-IN')}
+                </span>
+              </div>
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.66rem', fontWeight: 600, color: 'var(--atmos-dark)', margin: 0 }}>
+                {trip.selectedHotel?.name || trip.billDetails?.hotel?.name}
+              </p>
+              <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
+                {trip.selectedHotel?.nights || trip.billDetails?.hotel?.nights || 1} Nights @ ₹{(trip.selectedHotel?.pricePerNight || trip.billDetails?.hotel?.pricePerNight || 0).toLocaleString('en-IN')}/night
+                {(trip.selectedHotel?.foodingIncluded || trip.billDetails?.hotel?.foodingIncluded) ? ' · Fooding included' : ''}
+              </p>
+            </div>
+          )}
+
+          {/* Total summary */}
+          <div style={{ borderTop: '1px solid rgba(196,162,93,0.2)', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: 'Montserrat', fontSize: '0.75rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+              Total Bill:
+            </span>
+            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', fontWeight: 600, color: '#C4A25D' }}>
+              ₹{(trip.estimatedBudget || 0).toLocaleString('en-IN')}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminPanel() {
   const [tab,     setTab]     = useState('dashboard');
@@ -342,7 +460,7 @@ export default function AdminPanel() {
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
-                          {['Trip ID', 'Employee', 'Route', 'Date', 'Budget', 'Status'].map(h => (
+                          {['Trip ID', 'Employee', 'Route', 'Date', 'Budget', 'Status', 'Bill Details'].map(h => (
                             <th key={h} style={thStyle}>{h}</th>
                           ))}
                         </tr>
@@ -359,7 +477,22 @@ export default function AdminPanel() {
                               <td style={tdStyle}>{t.employeeName}</td>
                               <td style={{ ...tdStyle, fontWeight: 600 }}>{t.fromCity} → {t.toCity}</td>
                               <td style={{ ...tdStyle, fontSize: '0.68rem', color: 'var(--atmos-mid)' }}>{t.travelDate ? format(new Date(t.travelDate), 'dd MMM yyyy') : '—'}</td>
-                              <td style={tdStyle}>₹{(t.estimatedBudget || 0).toLocaleString('en-IN')}</td>
+                              <td style={tdStyle}>
+                                <div>
+                                  <span style={{ fontWeight: 600 }}>₹{(t.estimatedBudget || 0).toLocaleString('en-IN')}</span>
+                                  {(t.isExceedingBudget || (t.estimatedBudget > (t.employeeBudgetLimit || 20000))) && (
+                                    <div style={{ marginTop: '0.2rem' }}>
+                                      <span style={{
+                                        padding: '0.15rem 0.5rem', borderRadius: '999px',
+                                        background: 'rgba(232,168,56,0.15)', border: '1px solid rgba(232,168,56,0.3)',
+                                        color: '#D4922A', fontFamily: 'Montserrat', fontSize: '0.55rem', fontWeight: 600,
+                                      }}>
+                                        ⚠️ Exceeds (+₹{(t.budgetExcessAmount || Math.max(0, t.estimatedBudget - (t.employeeBudgetLimit || 20000))).toLocaleString('en-IN')})
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
                               <td style={tdStyle}>
                                 <span style={{ padding: '0.2rem 0.65rem', borderRadius: '999px', background: badge.bg, color: badge.color, fontFamily: 'Montserrat', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                                   {t.status?.replace(/_/g, ' ')}
@@ -426,6 +559,8 @@ export default function AdminPanel() {
           )}
         </PageTransition>
       </main>
+
+      <TripBillModal trip={viewingBillTrip} onClose={() => setViewingBillTrip(null)} />
 
       <SetBudgetModal
         isOpen={budgetModalOpen}

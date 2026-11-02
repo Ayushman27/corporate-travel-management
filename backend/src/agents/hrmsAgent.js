@@ -246,12 +246,16 @@ const getDepartmentSummary = async (companyId) => {
     // 4. Auto-heal DB user profiles to match their true spend
     for (const dbUser of dbUsers) {
       const userTrips = allTrips.filter(t => t.employeeId === dbUser.employeeId);
+      const userLimit = Number(dbUser.travelBudgetLimit) || 50000;
       const trueSpend = userTrips.reduce((s, t) => {
         const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
           ? Number(t.actualCost)
           : (t.approvedBudget !== undefined && t.approvedBudget !== null
             ? Number(t.approvedBudget)
             : (Number(t.estimatedBudget) || 0));
+        if (cost > userLimit || (s + cost) > userLimit) {
+          return s;
+        }
         return s + cost;
       }, 0);
       if (dbUser.travelBudgetUsed !== trueSpend) {
