@@ -116,7 +116,7 @@ const getDashboard = async (req, res, next) => {
           pendingManagerCount,
           pendingFinanceCount,
           bookedCount,
-          hrmsEmployeeCount: hrmsEmployees.length
+          hrmsEmployeeCount: hrmsEmployees.length > 0 ? hrmsEmployees.length : totalUsers
         },
         recentLogs
       }
