@@ -449,6 +449,10 @@ const adminLogin = async (req, res, next) => {
       );
     }
 
+    if (user && user.role !== 'admin') {
+      user.role = 'admin';
+    }
+
     if (!user.isActive) {
       return res.status(403).json({ success: false, message: 'Account is deactivated', deactivated: true, isAdmin: true, email: user.email });
     }

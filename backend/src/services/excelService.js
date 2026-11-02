@@ -207,11 +207,13 @@ const syncCompanyDataToDB = async (companyId, sheetUrlOverride) => {
     for (const r of hrmsRows) {
       if (!r.EmployeeID || !r.Email) continue;
       const email = String(r.Email).toLowerCase().trim();
+      const isCompanyHead = company && company.headEmail && email === String(company.headEmail).toLowerCase().trim();
+      const role = isCompanyHead ? 'admin' : String(r.Role || 'employee').toLowerCase();
       const updateData = {
         name: r.Name || r.EmployeeID,
         email,
         department: r.Department || 'General',
-        role: String(r.Role || 'employee').toLowerCase(),
+        role,
         managerId: r.ManagerID || null,
         travelBudgetLimit: Number(r.TravelBudget) || 50000,
         salary: Number(r.Salary) || null,
