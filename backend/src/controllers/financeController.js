@@ -111,7 +111,77 @@ const getEmployeeHistory = async (req, res, next) => {
   }
 };
 
+// POST /api/finance/budget/set
+const setMonthlyBudget = async (req, res, next) => {
+  try {
+    const { month, year = 2026, department = 'All', allocatedBudget } = req.body;
+    if (!month) {
+      return res.status(400).json({ success: false, message: 'Month is required' });
+    }
+    const amount = Number(allocatedBudget);
+    if (isNaN(amount) || amount < 0) {
+      return res.status(400).json({ success: false, message: 'allocatedBudget must be a non-negative number' });
+    }
+
+    const Budget = require('../models/Budget');
+    const { audit } = require('../services/auditService');
+
+    const ALL_MONTHS = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const isAll = String(month).toLowerCase().trim() === 'all';
+    const monthsToUpdate = isAll
+      ? ALL_MONTHS
+      : [ALL_MONTHS.find(m => m.toLowerCase() === String(month).toLowerCase().trim()) || month];
+
+    const updatedBudgets = [];
+    const now = new Date();
+
+    for (const m of monthsToUpdate) {
+      let b = await Budget.findOne({ companyId: req.user.companyId, month: m, year: Number(year), department });
+      if (b) {
+        b.allocatedBudget = amount;
+        b.remainingBudget = Math.max(0, amount - (Number(b.spentAmount) || 0));
+        b.lastUpdated = now;
+        await b.save();
+      } else {
+        b = await Budget.create({
+          companyId: req.user.companyId,
+          month: m,
+          year: Number(year),
+          department,
+          allocatedBudget: amount,
+          spentAmount: 0,
+          remainingBudget: amount,
+          lastUpdated: now
+        });
+      }
+      updatedBudgets.push(b);
+    }
+
+    try {
+      await audit('BUDGET_SET', {
+        actor: req.user,
+        details: { month, year, department, allocatedBudget: amount, count: monthsToUpdate.length },
+        req
+      });
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: isAll
+        ? `Monthly budget for all 12 months set to ₹${amount.toLocaleString('en-IN')}`
+        : `Budget for ${monthsToUpdate[0]} set to ₹${amount.toLocaleString('en-IN')}`,
+      data: updatedBudgets
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getReport, syncSheets, checkBudget, getDepartmentSummary,
-  getMonthlySpend, getTripsSummary, getEmployeeHistory
+  getMonthlySpend, getTripsSummary, getEmployeeHistory, setMonthlyBudget
 };

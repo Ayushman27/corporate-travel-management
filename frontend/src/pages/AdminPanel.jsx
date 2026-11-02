@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar  from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
 import PageTransition from '../components/common/PageTransition';
+import SetBudgetModal from '../components/common/SetBudgetModal';
 import { adminAPI } from '../services/api';
 import { format } from 'date-fns';
-import { Users, Activity, Loader2, Shield, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Users, Activity, Loader2, Shield, ToggleLeft, ToggleRight, Sliders } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const ease = [0.25, 1, 0.5, 1];
@@ -124,20 +125,39 @@ export default function AdminPanel() {
       <main style={{ marginLeft: '220px', paddingTop: '68px', padding: '68px 2.5rem 2.5rem 220px' }}>
         <PageTransition>
           {/* Header */}
-          <div style={{ marginBottom: '2rem' }}>
-            <motion.h1
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, ease }}
-              style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}
+          <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, ease }}
+                style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 400, color: 'var(--atmos-dark)' }}
+              >
+                Admin Panel
+              </motion.h1>
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+                style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
+              >
+                System management & audit logs
+              </motion.p>
+            </div>
+
+            <motion.button
+              onClick={() => setBudgetModalOpen(true)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.45rem',
+                padding: '0.5rem 1.15rem', borderRadius: '0.65rem',
+                background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.12))',
+                border: '1px solid #C4A25D',
+                color: 'var(--atmos-dark)', fontFamily: 'Montserrat', fontSize: '0.72rem', fontWeight: 600,
+                cursor: 'pointer', boxShadow: '0 4px 12px rgba(196,162,93,0.15)'
+              }}
             >
-              Admin Panel
-            </motion.h1>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-              style={{ fontFamily: 'Montserrat', fontSize: '0.72rem', color: 'var(--atmos-muted)', marginTop: '0.3rem' }}
-            >
-              System management & audit logs
-            </motion.p>
+              <Sliders style={{ width: '13px', height: '13px', color: '#C4A25D' }} />
+              Set Monthly Budget
+            </motion.button>
           </div>
 
           {/* Tabs */}
@@ -406,6 +426,11 @@ export default function AdminPanel() {
           )}
         </PageTransition>
       </main>
+
+      <SetBudgetModal
+        isOpen={budgetModalOpen}
+        onClose={() => setBudgetModalOpen(false)}
+      />
     </div>
   );
 }

@@ -91,13 +91,15 @@ export const financeAPI = {
   departmentSummary: ()           => api.get('/finance/department-summary'),
   tripsSummary:      ()           => api.get('/finance/trips-summary'),
   checkBudget:       (params)     => api.get('/finance/budget/check', { params }),
-  employeeHistory:   (empId)      => api.get(`/finance/employee-history/${empId}`)
+  employeeHistory:   (empId)      => api.get(`/finance/employee-history/${empId}`),
+  setBudget:         (data)       => api.post('/finance/budget/set', data)
 };
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 export const adminAPI = {
   dashboard:      ()           => api.get('/admin/dashboard'),
   syncSheets:     ()           => api.post('/finance/sync-sheets'),
+  setBudget:      (data)       => api.post('/finance/budget/set', data),
   users:          ()           => api.get('/admin/users'),
   allTrips:       (params)     => api.get('/admin/trips', { params }),
   auditLogs:      (params)     => api.get('/admin/audit-logs', { params }),

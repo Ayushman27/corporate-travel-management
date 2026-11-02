@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar  from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
 import PageTransition from '../components/common/PageTransition';
+import SetBudgetModal from '../components/common/SetBudgetModal';
 import { financeAPI, tripAPI } from '../services/api';
 import { format } from 'date-fns';
-import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle, RefreshCw, Calendar } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, TrendingUp, DollarSign, BarChart2, AlertTriangle, RefreshCw, Calendar, Sliders, Edit3 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Cell, PieChart, Pie, Legend,
@@ -213,6 +214,19 @@ export default function FinancePanel() {
   const [loading,     setLoading]     = useState(true);
   const [deciding,    setDeciding]    = useState(null);
   const [tab,         setTab]         = useState('overview');
+  const [budgetModalOpen,   setBudgetModalOpen]   = useState(false);
+  const [budgetModalConfig, setBudgetModalConfig] = useState({ month: 'all', amount: 500000, dept: 'All' });
+
+  const refreshFinanceData = async () => {
+    try {
+      const [r, d] = await Promise.all([
+        financeAPI.report(),
+        financeAPI.departmentSummary()
+      ]);
+      setReport(r.data.data);
+      setDeptSummary(d.data.data || {});
+    } catch (_) {}
+  };
 
   useEffect(() => {
     Promise.all([
@@ -237,10 +251,16 @@ export default function FinancePanel() {
     } finally { setDeciding(null); }
   };
 
-  const monthlyChartData = report?.monthly?.slice(0, 6).map(m => {
+  const monthlyChartData = (report?.monthly || []).map(m => {
     const monthStr = String(m.Month || 'Unknown');
-    return { name: monthStr.split(' ')[0]?.substring(0, 3) || monthStr, Allocated: m.AllocatedBudget || 0, Spent: m.SpentAmount || 0 };
-  }) || [];
+    return {
+      name: monthStr.split(' ')[0]?.substring(0, 3) || monthStr,
+      fullName: monthStr,
+      Allocated: m.AllocatedBudget || 0,
+      Spent: m.SpentAmount || 0,
+      Remaining: m.RemainingBudget || 0
+    };
+  });
 
   const deptChartData = Object.entries(deptSummary).map(([dept, d]) => ({
     name: dept, value: d.totalBudgetUsed, allocated: d.totalBudgetAllocated,
@@ -286,6 +306,26 @@ export default function FinancePanel() {
               </motion.p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <motion.button
+                onClick={() => {
+                  const currentMonthName = new Date().toLocaleString('en-US', { month: 'long' });
+                  setBudgetModalConfig({ month: currentMonthName, amount: 500000, dept: 'All' });
+                  setBudgetModalOpen(true);
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.45rem',
+                  padding: '0.45rem 1.1rem', borderRadius: '0.65rem',
+                  background: 'linear-gradient(135deg, rgba(196,162,93,0.25), rgba(196,162,93,0.12))',
+                  border: '1px solid #C4A25D',
+                  color: 'var(--atmos-dark)', fontFamily: 'Montserrat', fontSize: '0.7rem', fontWeight: 600,
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(196,162,93,0.15)'
+                }}
+              >
+                <Sliders style={{ width: '13px', height: '13px', color: '#C4A25D' }} />
+                Set Monthly Budget
+              </motion.button>
               <motion.button
                 onClick={handleSyncSheets}
                 disabled={syncing}
@@ -387,9 +427,31 @@ export default function FinancePanel() {
                     transition={{ delay: 0.3, duration: 0.5, ease }}
                     style={{ ...glassCard, padding: '1.5rem' }}
                   >
-                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 400, color: 'var(--atmos-dark)', marginBottom: '1.25rem' }}>
-                      Monthly Budget vs Spend
-                    </h2>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div>
+                        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.25rem', fontWeight: 400, color: 'var(--atmos-dark)', margin: 0 }}>
+                          Monthly Budget vs Spend (12 Months)
+                        </h2>
+                        <p style={{ fontFamily: 'Montserrat', fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: '0.2rem 0 0' }}>
+                          Company-wide budget allocations and actual recorded trip expenses for all 12 months (2026)
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setBudgetModalConfig({ month: 'all', amount: 500000, dept: 'All' });
+                          setBudgetModalOpen(true);
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '0.35rem',
+                          background: 'rgba(196,162,93,0.12)', border: '1px solid rgba(196,162,93,0.3)',
+                          borderRadius: '0.5rem', padding: '0.3rem 0.75rem',
+                          fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Sliders style={{ width: '12px', height: '12px' }} /> Adjust Allocation
+                      </button>
+                    </div>
                     <ResponsiveContainer width="100%" height={240}>
                       <BarChart data={monthlyChartData}>
                         <XAxis dataKey="name" tick={{ fontFamily: 'Montserrat', fontSize: 11, fill: 'var(--atmos-muted)' }} axisLine={false} tickLine={false} />
@@ -486,6 +548,24 @@ export default function FinancePanel() {
                         Live from Neon DB · Last Synced: {report?.summary?.lastSyncedAt ? format(new Date(report.summary.lastSyncedAt), 'dd MMM yyyy, hh:mm a') : 'Recently'}
                       </p>
                     </div>
+                    <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                      <button
+                        onClick={() => {
+                          const currentMonthName = new Date().toLocaleString('en-US', { month: 'long' });
+                          setBudgetModalConfig({ month: currentMonthName, amount: 500000, dept: 'All' });
+                          setBudgetModalOpen(true);
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '0.35rem',
+                          background: 'rgba(196,162,93,0.15)', border: '1px solid #C4A25D',
+                          borderRadius: '0.5rem', padding: '0.35rem 0.75rem',
+                          fontFamily: 'Montserrat', fontSize: '0.65rem', fontWeight: 600, color: '#C4A25D',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Edit3 style={{ width: '11px', height: '11px' }} />
+                        Set Budget
+                      </button>
                     <button
                       onClick={handleSyncSheets}
                       disabled={syncing}
@@ -500,12 +580,13 @@ export default function FinancePanel() {
                       <RefreshCw style={{ width: '11px', height: '11px', animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
                       Sync Sheets
                     </button>
+                    </div>
                   </div>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.1)' }}>
-                          {['Month', 'Department', 'Allocated', 'Spent', 'Remaining', 'Last Updated'].map(h => (
+                          {['Month', 'Department', 'Allocated', 'Spent', 'Remaining', 'Last Updated', 'Action'].map(h => (
                             <th key={h} style={{ padding: '0.75rem 1.25rem', textAlign: 'left', fontFamily: 'Montserrat', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C4A25D' }}>{h}</th>
                           ))}
                         </tr>
@@ -530,6 +611,27 @@ export default function FinancePanel() {
                             <td style={{ padding: '0.8rem 1.25rem', fontFamily: 'Montserrat', fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
                               {row.LastUpdated ? (() => { try { const d = new Date(row.LastUpdated); if (isNaN(d.getTime())) return '—'; const isMidnight = d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0; return isMidnight ? format(d, 'dd MMM yyyy') : format(d, 'dd MMM yyyy, hh:mm a'); } catch (_) { return '—'; } })() : '—'}
                             </td>
+                            <td style={{ padding: '0.8rem 1.25rem' }}>
+                              <button
+                                onClick={() => {
+                                  setBudgetModalConfig({
+                                    month: row.Month,
+                                    amount: row.AllocatedBudget || 500000,
+                                    dept: row.Department || 'All'
+                                  });
+                                  setBudgetModalOpen(true);
+                                }}
+                                style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                  background: 'rgba(196,162,93,0.1)', border: '1px solid rgba(196,162,93,0.3)',
+                                  borderRadius: '0.4rem', padding: '0.25rem 0.55rem',
+                                  fontFamily: 'Montserrat', fontSize: '0.62rem', fontWeight: 600, color: '#C4A25D',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <Edit3 style={{ width: '10px', height: '10px' }} /> Edit
+                              </button>
+                            </td>
                           </motion.tr>
                         ))}
                       </tbody>
@@ -541,6 +643,15 @@ export default function FinancePanel() {
           )}
         </PageTransition>
       </main>
+
+      <SetBudgetModal
+        isOpen={budgetModalOpen}
+        onClose={() => setBudgetModalOpen(false)}
+        onSuccess={refreshFinanceData}
+        initialMonth={budgetModalConfig.month}
+        initialAmount={budgetModalConfig.amount}
+        initialDept={budgetModalConfig.dept}
+      />
     </div>
   );
 }
