@@ -16,6 +16,16 @@ export const AuthProvider = ({ children }) => {
     const storedCo  = localStorage.getItem('ctm_company');
     if (stored && token) {
       try { setUser(JSON.parse(stored)); } catch (_) {}
+      authAPI.me().then(({ data }) => {
+        if (data?.user) {
+          setUser(data.user);
+          localStorage.setItem('ctm_user', JSON.stringify(data.user));
+          if (data.company) {
+            setCompany(data.company);
+            localStorage.setItem('ctm_company', JSON.stringify(data.company));
+          }
+        }
+      }).catch(() => {});
     }
     if (storedCo) {
       try { setCompany(JSON.parse(storedCo)); } catch (_) {}

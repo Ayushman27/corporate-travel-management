@@ -167,7 +167,21 @@ const applyApprovedBudget = async (companyId, tripId, employeeId, amount) => {
   try {
     const user = await User.findOne({ companyId, employeeId });
     if (user) {
-      user.travelBudgetUsed = (Number(user.travelBudgetUsed) || 0) + Number(amount);
+      const allUserTrips = await Trip.find({
+        companyId,
+        employeeId,
+        status: { $in: ['approved', 'booked', 'completed'] }
+      });
+      const trueSpend = allUserTrips.reduce((sum, t) => {
+        const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
+          ? Number(t.actualCost)
+          : (t.approvedBudget !== undefined && t.approvedBudget !== null
+            ? Number(t.approvedBudget)
+            : (Number(t.estimatedBudget) || 0));
+        return sum + cost;
+      }, 0);
+
+      user.travelBudgetUsed = trueSpend;
       await user.save();
       updatedEmployee = {
         employeeId,
@@ -221,7 +235,11 @@ const generateReport = async (companyId) => {
     const d = new Date(dateVal);
     if (isNaN(d.getTime())) continue;
     const mName = d.toLocaleString('en-US', { month: 'long' });
-    const cost = Number(t.approvedBudget) || Number(t.estimatedBudget) || 0;
+    const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
+      ? Number(t.actualCost)
+      : (t.approvedBudget !== undefined && t.approvedBudget !== null
+        ? Number(t.approvedBudget)
+        : (Number(t.estimatedBudget) || 0));
     const updated = new Date(t.updatedAt || t.submittedAt || t.createdAt);
 
     if (!tripSpendByMonth[mName]) {

@@ -148,14 +148,14 @@ const financeApprove = async (tripId, decision, financeUser, budgetApproved, com
       approverId:      financeUser.employeeId,
       approverName:    financeUser.name,
       comments,
-      budgetApproved:  decision === 'approved' ? (budgetApproved || trip.estimatedBudget) : 0,
+      budgetApproved:  decision === 'approved' ? ((budgetApproved !== undefined && budgetApproved !== null && !isNaN(Number(budgetApproved))) ? Number(budgetApproved) : trip.estimatedBudget) : 0,
       decidedAt:       new Date()
     },
     { new: true }
   );
 
   if (decision === 'approved') {
-    const approvedAmount = budgetApproved || trip.estimatedBudget;
+    const approvedAmount = (budgetApproved !== undefined && budgetApproved !== null && !isNaN(Number(budgetApproved))) ? Number(budgetApproved) : trip.estimatedBudget;
     trip.status         = 'approved';
     trip.approvedBudget = approvedAmount;
     await trip.save();

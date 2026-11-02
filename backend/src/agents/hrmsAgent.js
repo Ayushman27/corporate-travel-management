@@ -48,6 +48,14 @@ const validateEmployee = async (companyId, employeeId) => {
     } catch (dbErr) {
       logger.warn(`[HRMSAgent] DB fallback error: ${dbErr.message}`);
     }
+  } else {
+    try {
+      const dbUser = await User.findOne({ companyId, employeeId });
+      if (dbUser && dbUser.travelBudgetUsed !== undefined) {
+        employee.TravelBudgetUsed = dbUser.travelBudgetUsed;
+        if (dbUser.travelBudgetLimit) employee.TravelBudget = dbUser.travelBudgetLimit;
+      }
+    } catch (_) {}
   }
 
   if (!employee) {
@@ -227,13 +235,25 @@ const getDepartmentSummary = async (companyId) => {
       if (!summary[dept]) {
         summary[dept] = { count: 0, totalBudgetAllocated: 0, totalBudgetUsed: 0, employees: [] };
       }
-      summary[dept].totalBudgetUsed += (trip.actualCost || trip.estimatedBudget || 0);
+      const cost = (trip.status === 'booked' && Number(trip.actualCost) > 0)
+        ? Number(trip.actualCost)
+        : (trip.approvedBudget !== undefined && trip.approvedBudget !== null
+          ? Number(trip.approvedBudget)
+          : (Number(trip.estimatedBudget) || 0));
+      summary[dept].totalBudgetUsed += cost;
     }
 
     // 4. Auto-heal DB user profiles to match their true spend
     for (const dbUser of dbUsers) {
       const userTrips = allTrips.filter(t => t.employeeId === dbUser.employeeId);
-      const trueSpend = userTrips.reduce((s, t) => s + (t.actualCost || t.estimatedBudget || 0), 0);
+      const trueSpend = userTrips.reduce((s, t) => {
+        const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
+          ? Number(t.actualCost)
+          : (t.approvedBudget !== undefined && t.approvedBudget !== null
+            ? Number(t.approvedBudget)
+            : (Number(t.estimatedBudget) || 0));
+        return s + cost;
+      }, 0);
       if (dbUser.travelBudgetUsed !== trueSpend) {
         dbUser.travelBudgetUsed = trueSpend;
         await dbUser.save({ validateBeforeSave: false });

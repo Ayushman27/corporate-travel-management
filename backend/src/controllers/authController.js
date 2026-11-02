@@ -475,7 +475,8 @@ const syncSheets = async (req, res, next) => {
 // ── GET /api/auth/me ─────────────────────────────────────────────────────────
 const getMe = async (req, res) => {
   const company = await Company.findOne({ companyId: req.user.companyId }).select('companyId companyName');
-  res.json({ success: true, user: req.user, company });
+  const user = await User.findById(req.user._id).select('-password');
+  res.json({ success: true, user: user || req.user, company });
 };
 
 // ── PUT /api/auth/me ─────────────────────────────────────────────────────────
