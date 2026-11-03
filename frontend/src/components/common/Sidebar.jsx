@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useState, useEffect } from 'react';
+import { tripAPI } from '../../services/api';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, PlusCircle,
@@ -94,7 +96,7 @@ export default function Sidebar() {
 
       <SideNavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard"  delay={0.05} />
       <SideNavItem to="/trip/new"  icon={PlusCircle}      label="New Trip"   delay={0.1} />
-      <SideNavItem to="/messages"       icon={MessageSquare} label="Messages"   delay={0.11} />
+      <SideNavItem to="/messages"       icon={MessageSquare} label="Messages"   delay={0.11} badge={unreadMsgCount > 0 ? unreadMsgCount : null} />
       <SideNavItem to="/reimbursements" icon={Receipt}    label="Reimbursements" delay={0.12} />
 
       {(user?.role === 'manager' || user?.role === 'admin') && (

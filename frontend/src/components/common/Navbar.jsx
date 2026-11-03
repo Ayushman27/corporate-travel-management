@@ -1,10 +1,10 @@
-import MessageBoxPopover from './MessageBoxPopover';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { LogOut, ChevronDown, Sun, Moon, MessageSquare } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { tripAPI } from '../../services/api';
 
 const ROLE_COLOR = {
   employee: { bg: 'rgba(196,162,93,0.12)', color: '#8B6914' },
@@ -17,10 +17,10 @@ const NavLink = ({ to, children }) => {
   const { pathname } = useLocation();
   const active = pathname === to || pathname.startsWith(to + '/');
   return (
-    <Link to={to}>
+    <Link to={to} style={{ textDecoration: 'none' }}>
       <motion.span
         style={{
-          display: 'inline-block', padding: '0.35rem 0.9rem',
+          display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.9rem',
           borderRadius: '0.6rem',
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: '0.72rem', fontWeight: 500,
@@ -45,8 +45,24 @@ export default function Navbar() {
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [scrolled,  setScrolled]  = useState(false);
   const [profileHovered, setProfileHovered] = useState(false);
-  const [msgBoxOpen, setMsgBoxOpen] = useState(false);
   const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchUnread = async () => {
+      try {
+        const res = await tripAPI.getMessages();
+        const msgs = res.data?.data || [];
+        const readIds = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
+        const unread = msgs.filter(m => !readIds.includes(m.id)).length;
+        if (mounted) setUnreadMsgCount(unread);
+      } catch {
+        // non-fatal
+      }
+    };
+    fetchUnread();
+    return () => { mounted = false; };
+  }, [location.pathname]);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 20));
@@ -118,44 +134,20 @@ export default function Navbar() {
       <nav style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
         <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/trip/new">New Trip</NavLink>
-        <div style={{ position: 'relative' }}>
-          <motion.button
-            type="button"
-            onClick={() => setMsgBoxOpen(o => !o)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-              padding: '0.35rem 0.9rem',
-              borderRadius: '0.6rem',
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: '0.72rem', fontWeight: (location.pathname === '/messages' || msgBoxOpen) ? 600 : 500,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: (location.pathname === '/messages' || msgBoxOpen) ? 'var(--atmos-gold)' : 'var(--atmos-mid)',
-              background: (location.pathname === '/messages' || msgBoxOpen) ? 'var(--atmos-accent-subtle)' : 'transparent',
-              border: 'none', cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            whileHover={{ color: 'var(--atmos-gold)', background: 'var(--atmos-accent-subtle)' }}
-          >
-            <span>Messages</span>
-            {unreadMsgCount > 0 && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                minWidth: '16px', height: '16px', borderRadius: '999px',
-                backgroundColor: '#EF4444', color: '#fff',
-                fontSize: '0.58rem', fontWeight: 700, padding: '0 4px',
-                lineHeight: 1
-              }}>
-                {unreadMsgCount}
-              </span>
-            )}
-          </motion.button>
-
-          <MessageBoxPopover
-            isOpen={msgBoxOpen}
-            onClose={() => setMsgBoxOpen(false)}
-            onUnreadChange={(count) => setUnreadMsgCount(count)}
-          />
-        </div>
+        <NavLink to="/messages">
+          <span>Messages</span>
+          {unreadMsgCount > 0 && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              minWidth: '16px', height: '16px', borderRadius: '999px',
+              backgroundColor: '#EF4444', color: '#fff',
+              fontSize: '0.58rem', fontWeight: 700, padding: '0 4px',
+              lineHeight: 1
+            }}>
+              {unreadMsgCount}
+            </span>
+          )}
+        </NavLink>
         {(user?.role === 'manager' || user?.role === 'admin') && <NavLink to="/manager">Approvals</NavLink>}
         {(user?.role === 'finance' || user?.role === 'admin') && <NavLink to="/finance">Finance</NavLink>}
         {user?.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
