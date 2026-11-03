@@ -317,8 +317,63 @@ const setEmployeeBudget = async (req, res, next) => {
   }
 };
 
+
+// POST /api/finance/employee-budget/batch
+const batchSetEmployeeBudgets = async (req, res, next) => {
+  try {
+    const { allocations } = req.body;
+    if (!allocations) {
+      return res.status(400).json({ success: false, message: 'allocations payload is required' });
+    }
+
+    let list = [];
+    if (Array.isArray(allocations)) {
+      list = allocations;
+    } else if (typeof allocations === 'object') {
+      list = Object.entries(allocations).map(([userId, budgetLimit]) => ({ userId, budgetLimit }));
+    }
+
+    if (list.length === 0) {
+      return res.json({ success: true, message: 'No allocations to update', updatedCount: 0 });
+    }
+
+    const companyId = req.user.companyId;
+    let updatedCount = 0;
+
+    for (const item of list) {
+      const id = item.userId || item._id || item.id;
+      const limit = Number(item.budgetLimit);
+      if (!id || isNaN(limit) || limit < 0) continue;
+
+      const user = await User.findOne({ _id: id, companyId });
+      if (user) {
+        user.travelBudgetLimit = limit;
+        await user.save({ validateBeforeSave: false });
+        updatedCount++;
+      }
+    }
+
+    try {
+      const { audit } = require('../services/auditService');
+      await audit('EMPLOYEE_BUDGET_BATCH_SET', {
+        actor: req.user,
+        details: { updatedCount, totalInBatch: list.length },
+        req
+      });
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: `Successfully updated budgets for ${updatedCount} team member${updatedCount === 1 ? '' : 's'}`,
+      updatedCount
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getReport, syncSheets, checkBudget, getDepartmentSummary,
   getMonthlySpend, getTripsSummary, getEmployeeHistory, setMonthlyBudget,
-  getBudgetDistribution, setEmployeeBudget
+  getBudgetDistribution, setEmployeeBudget, batchSetEmployeeBudgets
 };

@@ -14,6 +14,7 @@ router.get('/department-summary',   authorize('finance', 'admin', 'manager'), ct
 router.get('/trips-summary',        authorize('finance', 'admin'), ctrl.getTripsSummary);
 router.get('/distribution',         authorize('finance', 'admin'), ctrl.getBudgetDistribution);
 router.patch('/employee-budget/:id', authorize('finance', 'admin'), ctrl.setEmployeeBudget);
+router.post('/employee-budget/batch', authorize('finance', 'admin'), ctrl.batchSetEmployeeBudgets);
 router.get('/employee-history/:employeeId', ctrl.getEmployeeHistory);
 
 module.exports = router;

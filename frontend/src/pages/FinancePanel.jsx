@@ -342,8 +342,9 @@ export default function FinancePanel() {
   const [budgetModalConfig, setBudgetModalConfig] = useState({ month: 'all', amount: 500000, dept: 'All' });
   const [distribution,      setDistribution]      = useState(null);
   const [distLoading,       setDistLoading]       = useState(false);
-  const [updatingEmpId,     setUpdatingEmpId]     = useState(null);
+  const [savingBatch,       setSavingBatch]       = useState(false);
   const [inputAmounts,      setInputAmounts]      = useState({});
+  const [initialAmounts,    setInitialAmounts]    = useState({});
   const [selectedDistMonth, setSelectedDistMonth] = useState(() => new Date().toLocaleString('en-US', { month: 'long' }));
 
   const fetchDistribution = async (m = selectedDistMonth) => {
@@ -360,6 +361,7 @@ export default function FinancePanel() {
           });
         });
         setInputAmounts(initialInputs);
+        setInitialAmounts(initialInputs);
       }
     } catch (err) {
       // non-fatal
@@ -374,22 +376,56 @@ export default function FinancePanel() {
     }
   }, [tab, selectedDistMonth]);
 
-  const handleSavePersonBudget = async (empId, empName) => {
-    const val = Number(inputAmounts[empId]);
-    if (isNaN(val) || val < 0) {
-      return toast.error('Please enter a valid non-negative budget');
+  // Dynamic calculations based on live inputs
+  const computeDeptAllocated = (dept) => {
+    return dept.employees.reduce((sum, emp) => {
+      const val = Number(inputAmounts[emp._id] !== undefined ? inputAmounts[emp._id] : (emp.travelBudgetLimit || 0));
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+  };
+
+  const computedTotalAssigned = (distribution?.departments || []).reduce((acc, dept) => {
+    return acc + computeDeptAllocated(dept);
+  }, 0);
+
+  const totalMonthlyPool = distribution?.totalMonthlyBudget || 500000;
+  const computedUnallocatedPool = totalMonthlyPool - computedTotalAssigned;
+
+  const changedEmployees = Object.keys(inputAmounts).filter(
+    id => Number(inputAmounts[id]) !== Number(initialAmounts[id])
+  );
+  const changedCount = changedEmployees.length;
+
+  const handleSaveAllAllocations = async () => {
+    const changedAllocations = [];
+    for (const id of changedEmployees) {
+      const num = Number(inputAmounts[id]);
+      if (isNaN(num) || num < 0) {
+        return toast.error('Please enter valid non-negative amounts for all modified employees');
+      }
+      changedAllocations.push({ userId: id, budgetLimit: num });
     }
-    setUpdatingEmpId(empId);
+
+    if (changedAllocations.length === 0) {
+      return toast('No changes to save', { icon: 'ℹ️' });
+    }
+
+    setSavingBatch(true);
     try {
-      await financeAPI.setEmployeeBudget(empId, val);
-      toast.success(`Assigned ₹${val.toLocaleString('en-IN')} to ${empName}`);
+      const res = await financeAPI.batchSetEmployeeBudgets(changedAllocations);
+      toast.success(res.data?.message || `Successfully updated ${changedAllocations.length} employee budget${changedAllocations.length === 1 ? '' : 's'}!`);
       await fetchDistribution(selectedDistMonth);
       await refreshFinanceData();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update employee budget');
+      toast.error(err.response?.data?.message || 'Failed to update employee budgets');
     } finally {
-      setUpdatingEmpId(null);
+      setSavingBatch(false);
     }
+  };
+
+  const handleDiscardChanges = () => {
+    setInputAmounts({ ...initialAmounts });
+    toast.success('Reverted all unsaved changes');
   };
 
   const refreshFinanceData = async () => {
@@ -716,7 +752,7 @@ export default function FinancePanel() {
                           Monthly Budget Distribution
                         </h2>
                         <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', color: 'var(--atmos-muted)', margin: '0.25rem 0 0' }}>
-                          Fixed company monthly budget pool distributed person-wise under each department. Remaining pool auto-reduces as budgets are assigned.
+                          Edit employee budgets across departments. Live preview updates automatically; click <strong>Save All Allocations</strong> when done.
                         </p>
                       </div>
 
@@ -732,7 +768,7 @@ export default function FinancePanel() {
                               fetchDistribution(m);
                             }}
                             style={{
-                              padding: '0.4rem 0.75rem', borderRadius: '0.55rem',
+                              padding: '0.42rem 0.75rem', borderRadius: '0.55rem',
                               border: '1px solid rgba(196,162,93,0.3)',
                               background: 'var(--atmos-input-bg)', color: 'var(--atmos-dark)',
                               fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 600,
@@ -751,12 +787,12 @@ export default function FinancePanel() {
                         <button
                           type="button"
                           onClick={() => {
-                            setBudgetModalConfig({ month: selectedDistMonth, amount: distribution?.totalMonthlyBudget || 500000, dept: 'All' });
+                            setBudgetModalConfig({ month: selectedDistMonth, amount: totalMonthlyPool, dept: 'All' });
                             setBudgetModalOpen(true);
                           }}
                           style={{
                             display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                            padding: '0.42rem 0.85rem', borderRadius: '0.6rem',
+                            padding: '0.45rem 0.85rem', borderRadius: '0.6rem',
                             background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
                             fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
                             color: 'var(--atmos-gold)', cursor: 'pointer'
@@ -765,10 +801,56 @@ export default function FinancePanel() {
                           <Sliders style={{ width: '13px', height: '13px' }} />
                           Set Total Monthly Budget
                         </button>
+
+                        {/* FINAL SAVE ALL BUTTON (PREVENTS EXCESS REQUESTS) */}
+                        <button
+                          type="button"
+                          disabled={savingBatch || changedCount === 0}
+                          onClick={handleSaveAllAllocations}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+                            padding: '0.45rem 1.15rem', borderRadius: '0.65rem',
+                            background: changedCount > 0 ? 'var(--atmos-accent-grad)' : 'rgba(255,255,255,0.06)',
+                            border: changedCount > 0 ? 'none' : '1px solid var(--atmos-glass-border)',
+                            color: changedCount > 0 ? '#FFFFFF' : 'var(--atmos-muted)',
+                            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', fontWeight: 700,
+                            cursor: (savingBatch || changedCount === 0) ? 'not-allowed' : 'pointer',
+                            boxShadow: changedCount > 0 ? '0 4px 16px var(--atmos-accent-glow)' : 'none',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {savingBatch ? <Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> : <Check style={{ width: '13px', height: '13px' }} />}
+                          <span>Save All Allocations</span>
+                          {changedCount > 0 && (
+                            <span style={{
+                              padding: '0.1rem 0.45rem', borderRadius: '999px',
+                              backgroundColor: '#FFFFFF', color: '#1E40AF',
+                              fontSize: '0.6rem', fontWeight: 800
+                            }}>
+                              {changedCount} modified
+                            </span>
+                          )}
+                        </button>
+
+                        {changedCount > 0 && (
+                          <button
+                            type="button"
+                            disabled={savingBatch}
+                            onClick={handleDiscardChanges}
+                            style={{
+                              padding: '0.45rem 0.75rem', borderRadius: '0.6rem',
+                              background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.4)',
+                              color: '#EF4444', fontFamily: "'Plus Jakarta Sans', sans-serif",
+                              fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer'
+                            }}
+                          >
+                            Discard
+                          </button>
+                        )}
                       </div>
                     </div>
 
-                    {/* 3 Metric Cards */}
+                    {/* 3 Metric Cards (Calculated Live!) */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
                       {/* Total Monthly Pool */}
                       <div style={{
@@ -780,7 +862,7 @@ export default function FinancePanel() {
                           Total Monthly Budget (Fixed Pool)
                         </span>
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.65rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
-                          ₹{(distribution?.totalMonthlyBudget || 0).toLocaleString('en-IN')}
+                          ₹{totalMonthlyPool.toLocaleString('en-IN')}
                         </span>
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
                           Company-wide cap for {selectedDistMonth} 2026
@@ -793,40 +875,47 @@ export default function FinancePanel() {
                         background: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F8FAFC',
                         border: '1px solid var(--atmos-glass-border)', display: 'flex', flexDirection: 'column', gap: '0.35rem'
                       }}>
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>
-                          Total Assigned to People
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--atmos-muted)' }}>
+                            Total Assigned to People
+                          </span>
+                          {changedCount > 0 && (
+                            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', color: 'var(--atmos-gold)', fontWeight: 700 }}>
+                              Preview
+                            </span>
+                          )}
+                        </div>
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.65rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
-                          ₹{(distribution?.totalAssigned || 0).toLocaleString('en-IN')}
+                          ₹{computedTotalAssigned.toLocaleString('en-IN')}
                         </span>
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
-                          {distribution?.totalMonthlyBudget ? `${Math.round(((distribution.totalAssigned || 0) / distribution.totalMonthlyBudget) * 100)}% allocated across ${distribution.departments?.reduce((acc, d) => acc + d.employees.length, 0) || 0} employees` : 'Across all team members'}
+                          {totalMonthlyPool ? `${Math.round((computedTotalAssigned / totalMonthlyPool) * 100)}% allocated across all team members` : 'Across all team members'}
                         </span>
                       </div>
 
                       {/* Remaining Unallocated Pool */}
                       <div style={{
                         padding: '1.1rem 1.25rem', borderRadius: '1rem',
-                        background: (distribution?.unallocatedPool || 0) >= 0 ? 'rgba(39, 174, 96, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-                        border: (distribution?.unallocatedPool || 0) >= 0 ? '1px solid rgba(39, 174, 96, 0.3)' : '1px solid rgba(239, 68, 68, 0.35)',
+                        background: computedUnallocatedPool >= 0 ? 'rgba(39, 174, 96, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                        border: computedUnallocatedPool >= 0 ? '1px solid rgba(39, 174, 96, 0.3)' : '1px solid rgba(239, 68, 68, 0.35)',
                         display: 'flex', flexDirection: 'column', gap: '0.35rem'
                       }}>
                         <span style={{
                           fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-                          color: (distribution?.unallocatedPool || 0) >= 0 ? '#16A34A' : '#EF4444'
+                          color: computedUnallocatedPool >= 0 ? '#16A34A' : '#EF4444'
                         }}>
-                          {(distribution?.unallocatedPool || 0) >= 0 ? 'Unallocated Remaining Pool' : 'Budget Pool Exceeded'}
+                          {computedUnallocatedPool >= 0 ? 'Unallocated Remaining Pool' : 'Budget Pool Exceeded'}
                         </span>
                         <span style={{
                           fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.65rem', fontWeight: 700,
-                          color: (distribution?.unallocatedPool || 0) >= 0 ? '#16A34A' : '#EF4444'
+                          color: computedUnallocatedPool >= 0 ? '#16A34A' : '#EF4444'
                         }}>
-                          ₹{Math.abs(distribution?.unallocatedPool || 0).toLocaleString('en-IN')}
+                          ₹{Math.abs(computedUnallocatedPool).toLocaleString('en-IN')}
                         </span>
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: (distribution?.unallocatedPool || 0) >= 0 ? '#16A34A' : '#EF4444', fontWeight: 500 }}>
-                          {(distribution?.unallocatedPool || 0) >= 0
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: computedUnallocatedPool >= 0 ? '#16A34A' : '#EF4444', fontWeight: 500 }}>
+                          {computedUnallocatedPool >= 0
                             ? 'Available to distribute to team members'
-                            : `⚠️ Total assigned exceeds monthly pool by ₹${Math.abs(distribution?.unallocatedPool || 0).toLocaleString('en-IN')}`}
+                            : `⚠️ Total assigned exceeds monthly pool by ₹${Math.abs(computedUnallocatedPool).toLocaleString('en-IN')}`}
                         </span>
                       </div>
                     </div>
@@ -843,218 +932,294 @@ export default function FinancePanel() {
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      {distribution.departments.map((dept) => (
-                        <div key={dept.name} style={{ ...glassCard, overflow: 'hidden' }}>
-                          {/* Department Header */}
-                          <div style={{
-                            padding: '1.15rem 1.5rem',
-                            borderBottom: '1px solid rgba(196,162,93,0.12)',
-                            background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                              <div style={{
-                                width: '36px', height: '36px', borderRadius: '10px',
-                                background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                              }}>
-                                <Layers style={{ width: '16px', height: '16px', color: 'var(--atmos-gold)' }} />
+                      {distribution.departments.map((dept) => {
+                        const deptAssigned = computeDeptAllocated(dept);
+                        return (
+                          <div key={dept.name} style={{ ...glassCard, overflow: 'hidden' }}>
+                            {/* Department Header */}
+                            <div style={{
+                              padding: '1.15rem 1.5rem',
+                              borderBottom: '1px solid rgba(196,162,93,0.12)',
+                              background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <div style={{
+                                  width: '36px', height: '36px', borderRadius: '10px',
+                                  background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                  <Layers style={{ width: '16px', height: '16px', color: 'var(--atmos-gold)' }} />
+                                </div>
+                                <div>
+                                  <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 700, color: 'var(--atmos-dark)', margin: 0 }}>
+                                    {dept.name}
+                                  </h3>
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
+                                    {dept.employees.length} {dept.employees.length === 1 ? 'Person' : 'People'} under this department
+                                  </span>
+                                </div>
                               </div>
-                              <div>
-                                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 700, color: 'var(--atmos-dark)', margin: 0 }}>
-                                  {dept.name}
-                                </h3>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)' }}>
-                                  {dept.employees.length} {dept.employees.length === 1 ? 'Person' : 'People'} under this department
-                                </span>
+
+                              {/* Department Aggregates */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                <div style={{
+                                  padding: '0.35rem 0.85rem', borderRadius: '0.6rem',
+                                  background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
+                                  display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                }}>
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                    Assigned:
+                                  </span>
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 700, color: 'var(--atmos-gold)' }}>
+                                    ₹{deptAssigned.toLocaleString('en-IN')}
+                                  </span>
+                                </div>
+
+                                <div style={{
+                                  padding: '0.35rem 0.85rem', borderRadius: '0.6rem',
+                                  background: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
+                                  border: '1px solid var(--atmos-glass-border)',
+                                  display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                }}>
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                    Spent:
+                                  </span>
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
+                                    ₹{dept.totalSpent.toLocaleString('en-IN')}
+                                  </span>
+                                </div>
                               </div>
                             </div>
 
-                            {/* Department Aggregates */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                              <div style={{
-                                padding: '0.35rem 0.85rem', borderRadius: '0.6rem',
-                                background: 'var(--atmos-accent-subtle)', border: '1px solid var(--atmos-gold)',
-                                display: 'flex', alignItems: 'center', gap: '0.4rem'
-                              }}>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                                  Assigned:
-                                </span>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 700, color: 'var(--atmos-gold)' }}>
-                                  ₹{dept.totalAllocated.toLocaleString('en-IN')}
-                                </span>
-                              </div>
+                            {/* People Table */}
+                            <div style={{ overflowX: 'auto' }}>
+                              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead>
+                                  <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.08)' }}>
+                                    {['Team Member', 'Role', 'Current Spend', 'Assigned Travel Budget (Per Person)', 'Status'].map(h => (
+                                      <th key={h} style={{
+                                        padding: '0.75rem 1.25rem', textAlign: 'left',
+                                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem',
+                                        fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C4A25D'
+                                      }}>
+                                        {h}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {dept.employees.map((emp) => {
+                                    const currentVal = inputAmounts[emp._id] ?? emp.travelBudgetLimit ?? 0;
+                                    const isModified = Number(inputAmounts[emp._id]) !== Number(initialAmounts[emp._id]);
+                                    const isExceeded = (emp.travelBudgetUsed || 0) > Number(currentVal);
 
-                              <div style={{
-                                padding: '0.35rem 0.85rem', borderRadius: '0.6rem',
-                                background: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
-                                border: '1px solid var(--atmos-glass-border)',
-                                display: 'flex', alignItems: 'center', gap: '0.4rem'
-                              }}>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600, color: 'var(--atmos-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                                  Spent:
-                                </span>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 700, color: 'var(--atmos-dark)' }}>
-                                  ₹{dept.totalSpent.toLocaleString('en-IN')}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
+                                    return (
+                                      <tr key={emp._id} style={{
+                                        borderBottom: '1px solid rgba(196,162,93,0.05)',
+                                        background: isModified ? 'rgba(196,162,93,0.04)' : 'transparent',
+                                        transition: 'background 0.2s ease'
+                                      }}>
+                                        {/* Member */}
+                                        <td style={{ padding: '0.9rem 1.25rem' }}>
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                                            <div style={{
+                                              width: '32px', height: '32px', borderRadius: '50%',
+                                              background: 'var(--atmos-accent-grad)',
+                                              color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 700
+                                            }}>
+                                              {emp.name?.charAt(0) || 'U'}
+                                            </div>
+                                            <div>
+                                              <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
+                                                {emp.name}
+                                              </div>
+                                              <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
+                                                {emp.email} · {emp.employeeId}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </td>
 
-                          {/* People Table */}
-                          <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                              <thead>
-                                <tr style={{ borderBottom: '1px solid rgba(196,162,93,0.08)' }}>
-                                  {['Team Member', 'Role', 'Current Spend', 'Assigned Travel Budget (Per Person)', 'Action'].map(h => (
-                                    <th key={h} style={{
-                                      padding: '0.75rem 1.25rem', textAlign: 'left',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem',
-                                      fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C4A25D'
-                                    }}>
-                                      {h}
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {dept.employees.map((emp) => {
-                                  const isSaving = updatingEmpId === emp._id;
-                                  const isExceeded = (emp.travelBudgetUsed || 0) > (emp.travelBudgetLimit || 0);
-
-                                  return (
-                                    <tr key={emp._id} style={{ borderBottom: '1px solid rgba(196,162,93,0.05)' }}>
-                                      {/* Member */}
-                                      <td style={{ padding: '0.9rem 1.25rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                                          <div style={{
-                                            width: '32px', height: '32px', borderRadius: '50%',
-                                            background: 'var(--atmos-accent-grad)',
-                                            color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', fontWeight: 700
+                                        {/* Role */}
+                                        <td style={{ padding: '0.9rem 1.25rem' }}>
+                                          <span style={{
+                                            padding: '0.2rem 0.55rem', borderRadius: '6px',
+                                            background: isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9',
+                                            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem',
+                                            fontWeight: 600, textTransform: 'capitalize', color: 'var(--atmos-mid)'
                                           }}>
-                                            {emp.name?.charAt(0) || 'U'}
+                                            {emp.role || 'Employee'}
+                                          </span>
+                                        </td>
+
+                                        {/* Spend */}
+                                        <td style={{ padding: '0.9rem 1.25rem' }}>
+                                          <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 700, color: isExceeded ? '#EF4444' : 'var(--atmos-dark)' }}>
+                                            ₹{(emp.travelBudgetUsed || 0).toLocaleString('en-IN')}
                                           </div>
-                                          <div>
-                                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
-                                              {emp.name}
+                                          {isExceeded && (
+                                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', color: '#EF4444', fontWeight: 600 }}>
+                                              Over budget by ₹{((emp.travelBudgetUsed || 0) - Number(currentVal)).toLocaleString('en-IN')}
                                             </div>
-                                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
-                                              {emp.email} · {emp.employeeId}
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </td>
+                                          )}
+                                        </td>
 
-                                      {/* Role */}
-                                      <td style={{ padding: '0.9rem 1.25rem' }}>
-                                        <span style={{
-                                          padding: '0.2rem 0.55rem', borderRadius: '6px',
-                                          background: isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9',
-                                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem',
-                                          fontWeight: 600, textTransform: 'capitalize', color: 'var(--atmos-mid)'
-                                        }}>
-                                          {emp.role || 'Employee'}
-                                        </span>
-                                      </td>
-
-                                      {/* Spend */}
-                                      <td style={{ padding: '0.9rem 1.25rem' }}>
-                                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 700, color: isExceeded ? '#EF4444' : 'var(--atmos-dark)' }}>
-                                          ₹{(emp.travelBudgetUsed || 0).toLocaleString('en-IN')}
-                                        </div>
-                                        {isExceeded && (
-                                          <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', color: '#EF4444', fontWeight: 600 }}>
-                                            Over budget by ₹{((emp.travelBudgetUsed || 0) - (emp.travelBudgetLimit || 0)).toLocaleString('en-IN')}
-                                          </div>
-                                        )}
-                                      </td>
-
-                                      {/* Person-wise Budget Allocation Input */}
-                                      <td style={{ padding: '0.9rem 1.25rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                          <div style={{ position: 'relative', width: '140px' }}>
-                                            <span style={{
-                                              position: 'absolute', left: '0.7rem', top: '50%', transform: 'translateY(-50%)',
-                                              color: 'var(--atmos-gold)', fontSize: '0.8rem', fontWeight: 700
-                                            }}>₹</span>
-                                            <input
-                                              type="number"
-                                              min="0"
-                                              step="5000"
-                                              value={inputAmounts[emp._id] ?? emp.travelBudgetLimit ?? 0}
-                                              onChange={(e) => {
-                                                const val = e.target.value;
-                                                setInputAmounts(prev => ({
-                                                  ...prev,
-                                                  [emp._id]: val
-                                                }));
-                                              }}
-                                              style={{
-                                                width: '100%', boxSizing: 'border-box',
-                                                padding: '0.4rem 0.6rem 0.4rem 1.6rem',
-                                                borderRadius: '0.55rem',
-                                                border: '1px solid rgba(196,162,93,0.35)',
-                                                background: 'var(--atmos-input-bg)',
-                                                color: 'var(--atmos-dark)',
-                                                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                                fontSize: '0.8rem', fontWeight: 600, outline: 'none'
-                                              }}
-                                            />
-                                          </div>
-
-                                          {/* Quick Presets */}
-                                          <div style={{ display: 'flex', gap: '0.25rem' }}>
-                                            {[20000, 50000, 100000].map(pVal => (
-                                              <button
-                                                key={pVal}
-                                                type="button"
-                                                onClick={() => setInputAmounts(prev => ({ ...prev, [emp._id]: pVal }))}
-                                                style={{
-                                                  padding: '0.2rem 0.4rem', borderRadius: '4px',
-                                                  border: '1px solid rgba(196,162,93,0.2)',
-                                                  background: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
-                                                  color: 'var(--atmos-muted)',
-                                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 600,
-                                                  cursor: 'pointer'
+                                        {/* Person-wise Budget Allocation Input */}
+                                        <td style={{ padding: '0.9rem 1.25rem' }}>
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            <div style={{ position: 'relative', width: '140px' }}>
+                                              <span style={{
+                                                position: 'absolute', left: '0.7rem', top: '50%', transform: 'translateY(-50%)',
+                                                color: 'var(--atmos-gold)', fontSize: '0.8rem', fontWeight: 700
+                                              }}>₹</span>
+                                              <input
+                                                type="number"
+                                                min="0"
+                                                step="5000"
+                                                value={currentVal}
+                                                onChange={(e) => {
+                                                  const val = e.target.value;
+                                                  setInputAmounts(prev => ({
+                                                    ...prev,
+                                                    [emp._id]: val
+                                                  }));
                                                 }}
-                                              >
-                                                ₹{pVal / 1000}k
-                                              </button>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      </td>
+                                                style={{
+                                                  width: '100%', boxSizing: 'border-box',
+                                                  padding: '0.4rem 0.6rem 0.4rem 1.6rem',
+                                                  borderRadius: '0.55rem',
+                                                  border: isModified
+                                                    ? '1px solid var(--atmos-gold)'
+                                                    : '1px solid rgba(196,162,93,0.35)',
+                                                  background: isModified
+                                                    ? (isDark ? 'rgba(196,162,93,0.1)' : 'rgba(37,99,235,0.06)')
+                                                    : 'var(--atmos-input-bg)',
+                                                  color: 'var(--atmos-dark)',
+                                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                                  fontSize: '0.8rem', fontWeight: 600, outline: 'none'
+                                                }}
+                                              />
+                                            </div>
 
-                                      {/* Save Action */}
-                                      <td style={{ padding: '0.9rem 1.25rem' }}>
-                                        <button
-                                          type="button"
-                                          disabled={isSaving}
-                                          onClick={() => handleSavePersonBudget(emp._id, emp.name)}
-                                          style={{
-                                            display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                                            padding: '0.4rem 0.8rem', borderRadius: '0.55rem',
-                                            background: 'var(--atmos-accent-grad)',
-                                            color: '#fff', border: 'none',
-                                            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600,
-                                            cursor: isSaving ? 'not-allowed' : 'pointer',
-                                            boxShadow: '0 2px 8px var(--atmos-accent-glow)'
-                                          }}
-                                        >
-                                          {isSaving ? <Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} /> : <Check style={{ width: '12px', height: '12px' }} />}
-                                          {isSaving ? 'Saving...' : 'Set Budget'}
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
+                                            {/* Quick Presets */}
+                                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                              {[20000, 50000, 100000].map(pVal => (
+                                                <button
+                                                  key={pVal}
+                                                  type="button"
+                                                  onClick={() => setInputAmounts(prev => ({ ...prev, [emp._id]: pVal }))}
+                                                  style={{
+                                                    padding: '0.2rem 0.45rem', borderRadius: '4px',
+                                                    border: '1px solid rgba(196,162,93,0.2)',
+                                                    background: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
+                                                    color: 'var(--atmos-muted)',
+                                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', fontWeight: 600,
+                                                    cursor: 'pointer'
+                                                  }}
+                                                >
+                                                  ₹{pVal / 1000}k
+                                                </button>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </td>
+
+                                        {/* Status */}
+                                        <td style={{ padding: '0.9rem 1.25rem' }}>
+                                          {isModified ? (
+                                            <span style={{
+                                              display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                              padding: '0.25rem 0.65rem', borderRadius: '999px',
+                                              background: 'rgba(196,162,93,0.15)', border: '1px solid var(--atmos-gold)',
+                                              color: 'var(--atmos-gold)', fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                              fontSize: '0.62rem', fontWeight: 700
+                                            }}>
+                                              ● Modified
+                                            </span>
+                                          ) : (
+                                            <span style={{
+                                              display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                              padding: '0.25rem 0.65rem', borderRadius: '999px',
+                                              background: isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
+                                              color: 'var(--atmos-muted)', fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                              fontSize: '0.62rem', fontWeight: 600
+                                            }}>
+                                              Current
+                                            </span>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
+                  )}
+
+                  {/* Sticky bottom banner when changes exist */}
+                  {changedCount > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      style={{
+                        position: 'sticky', bottom: '1.5rem', zIndex: 30,
+                        padding: '1rem 1.5rem', borderRadius: '1rem',
+                        background: 'var(--atmos-surface)', border: '1px solid var(--atmos-gold)',
+                        boxShadow: '0 12px 36px rgba(0,0,0,0.3)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        flexWrap: 'wrap', gap: '1rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <span style={{
+                          width: '8px', height: '8px', borderRadius: '50%',
+                          backgroundColor: 'var(--atmos-gold)'
+                        }} />
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
+                          You have modified budget allocations for <strong>{changedCount} team member{changedCount === 1 ? '' : 's'}</strong>.
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <button
+                          type="button"
+                          disabled={savingBatch}
+                          onClick={handleDiscardChanges}
+                          style={{
+                            padding: '0.45rem 0.9rem', borderRadius: '0.6rem',
+                            background: 'transparent', border: '1px solid rgba(239, 68, 68, 0.4)',
+                            color: '#EF4444', fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer'
+                          }}
+                        >
+                          Discard Changes
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={savingBatch}
+                          onClick={handleSaveAllAllocations}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+                            padding: '0.5rem 1.35rem', borderRadius: '0.65rem',
+                            background: 'var(--atmos-accent-grad)', border: 'none',
+                            color: '#FFFFFF', fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontSize: '0.75rem', fontWeight: 700,
+                            cursor: savingBatch ? 'not-allowed' : 'pointer',
+                            boxShadow: '0 4px 16px var(--atmos-accent-glow)'
+                          }}
+                        >
+                          {savingBatch ? <Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> : <Check style={{ width: '13px', height: '13px' }} />}
+                          <span>Save All Allocations ({changedCount})</span>
+                        </button>
+                      </div>
+                    </motion.div>
                   )}
                 </motion.div>
               )}

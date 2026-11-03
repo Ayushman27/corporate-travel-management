@@ -44,7 +44,7 @@ api.interceptors.response.use(
       localStorage.removeItem('ctm_company');
       window.location.href = '/login';
     }
-    if (err.response?.status !== 404) toast.error(msg);
+    if (err.response?.status !== 404) toast.error(msg, { id: msg });
     return Promise.reject(err);
   }
 );
@@ -95,7 +95,8 @@ export const financeAPI = {
   employeeHistory:   (empId)      => api.get(`/finance/employee-history/${empId}`),
   setBudget:         (data)       => api.post('/finance/budget/set', data),
   getDistribution:   (params)     => api.get('/finance/distribution', { params }),
-  setEmployeeBudget: (id, budgetLimit) => api.patch(`/finance/employee-budget/${id}`, { budgetLimit })
+  setEmployeeBudget: (id, budgetLimit) => api.patch(`/finance/employee-budget/${id}`, { budgetLimit }),
+  batchSetEmployeeBudgets: (allocations) => api.post('/finance/employee-budget/batch', { allocations })
 };
 
 // ── Admin ─────────────────────────────────────────────────────────────────────

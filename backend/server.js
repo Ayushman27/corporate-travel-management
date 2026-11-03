@@ -16,6 +16,7 @@ const reimbursementRoutes = require('./src/routes/reimbursementRoutes');
 const hotelRoutes = require('./src/routes/hotelRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Connect MongoDB (skip in automated tests)
 if (process.env.NODE_ENV !== 'test') {
@@ -61,12 +62,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ── Rate limiting — 100 req / 15 min per IP
+// ── Rate limiting — per-user keying so admin actions never throttle employees
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 2000,
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Isolate by authenticated user token so each user has their own independent quota
+    if (req.headers.authorization) {
+      return req.headers.authorization;
+    }
+    return req.ip || req.headers['x-forwarded-for'] || 'anonymous';
+  },
   message: { success: false, message: 'Too many requests — try again later.' }
 });
 app.use('/api/', limiter);
