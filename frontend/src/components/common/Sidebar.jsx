@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, PlusCircle,
-  CheckCircle, DollarSign, Users, Receipt, Activity
+  MessageSquare, CheckCircle, DollarSign, Users, Receipt, Activity
 } from 'lucide-react';
 
 const SECTION_LABEL = {
@@ -94,6 +94,7 @@ export default function Sidebar() {
 
       <SideNavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard"  delay={0.05} />
       <SideNavItem to="/trip/new"  icon={PlusCircle}      label="New Trip"   delay={0.1} />
+      <SideNavItem to="/messages"       icon={MessageSquare} label="Messages"   delay={0.11} />
       <SideNavItem to="/reimbursements" icon={Receipt}    label="Reimbursements" delay={0.12} />
 
       {(user?.role === 'manager' || user?.role === 'admin') && (

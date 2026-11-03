@@ -10,6 +10,7 @@ router.use(protect);
 // Employee
 router.post('/request',  tripRequestRules, handleValidation, ctrl.requestTrip);
 router.get ('/my',       ctrl.getMyTrips);
+router.get ('/messages', ctrl.getMyMessages);
 router.post('/chat',     ctrl.chatWithAgent);
 router.get ('/plans/:tripId',  ctrl.getPlans);
 router.get ('/:tripId',        ctrl.getTripById);

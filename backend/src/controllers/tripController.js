@@ -62,6 +62,80 @@ const getMyTrips = async (req, res, next) => {
   }
 };
 
+// GET /api/trip/messages - Retrieves official decision notes & trip details for requested trips
+const getMyMessages = async (req, res, next) => {
+  try {
+    const companyId = req.user.companyId;
+    const employeeId = req.user.employeeId;
+
+    // 1. Fetch trips for this employee
+    const trips = await Trip.find({ employeeId, companyId });
+    if (!trips || trips.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const tripMap = {};
+    const tripIds = [];
+    trips.forEach(t => {
+      tripMap[t.tripId] = t;
+      tripIds.push(t.tripId);
+    });
+
+    // 2. Fetch all decided approvals for these trips
+    const approvals = await Approval.find({
+      tripId: { $in: tripIds }
+    });
+
+    const decided = (approvals || []).filter(
+      a => a.status === 'approved' || a.status === 'rejected'
+    );
+
+    // 3. Map into decision message objects with attached notes & trip details
+    const messages = await Promise.all(decided.map(async (a) => {
+      const rawTrip = tripMap[a.tripId] || {};
+      const trip = await enrichTripWithBillDetails(rawTrip);
+      const isFinance = a.approvalType === 'finance';
+      const isApproved = a.status === 'approved';
+
+      const departmentLabel = isFinance ? 'Finance Department' : 'Manager';
+      const decisionLabel   = isApproved ? 'Approved' : 'Rejected';
+
+      return {
+        id: a.id || `${a.tripId}-${a.approvalType}`,
+        tripId: a.tripId,
+        approvalType: a.approvalType,
+        status: a.status,
+        title: `${departmentLabel} ${decisionLabel}`,
+        approverName: a.approverName || (isFinance ? 'Finance Team' : 'Reporting Manager'),
+        approverId: a.approverId,
+        note: a.comments || '',
+        budgetApproved: a.budgetApproved || (isApproved ? trip.approvedBudget || trip.estimatedBudget : 0),
+        budgetRequested: a.budgetRequested || trip.estimatedBudget || 0,
+        decidedAt: a.decidedAt || a.updatedAt || a.createdAt || new Date(),
+        trip: {
+          tripId: trip.tripId,
+          fromCity: trip.fromCity,
+          toCity: trip.toCity,
+          travelDate: trip.travelDate,
+          returnDate: trip.returnDate,
+          travelMode: trip.travelMode,
+          purpose: trip.purpose,
+          estimatedBudget: trip.estimatedBudget,
+          approvedBudget: trip.approvedBudget,
+          currentStatus: trip.status,
+          selectedHotel: trip.selectedHotel,
+          billDetails: trip.billDetails || null
+        }
+      };
+    }));
+
+    messages.sort((a, b) => new Date(b.decidedAt) - new Date(a.decidedAt));
+    res.json({ success: true, data: messages });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // GET /api/trip/:tripId
 const getTripById = async (req, res, next) => {
   try {
@@ -303,6 +377,7 @@ const sendForApproval = async (req, res, next) => {
 };
 
 module.exports = {
+  getMyMessages,
   requestTrip, getPlans, getMyTrips, getTripById, chatWithAgent,
   managerApprove, financeApprove, bookTrip,
   getPendingManagerApprovals, getPendingFinanceApprovals, cancelTrip, selectPlan, sendForApproval,

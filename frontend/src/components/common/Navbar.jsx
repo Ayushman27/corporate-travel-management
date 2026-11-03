@@ -1,8 +1,9 @@
+import MessageBoxPopover from './MessageBoxPopover';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Plane, LogOut, ChevronDown, Sun, Moon } from 'lucide-react';
+import { LogOut, ChevronDown, Sun, Moon, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 
 const ROLE_COLOR = {
@@ -40,9 +41,12 @@ export default function Navbar() {
   const { user, company, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [scrolled,  setScrolled]  = useState(false);
   const [profileHovered, setProfileHovered] = useState(false);
+  const [msgBoxOpen, setMsgBoxOpen] = useState(false);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 20));
@@ -114,6 +118,44 @@ export default function Navbar() {
       <nav style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
         <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/trip/new">New Trip</NavLink>
+        <div style={{ position: 'relative' }}>
+          <motion.button
+            type="button"
+            onClick={() => setMsgBoxOpen(o => !o)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+              padding: '0.35rem 0.9rem',
+              borderRadius: '0.6rem',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: '0.72rem', fontWeight: (location.pathname === '/messages' || msgBoxOpen) ? 600 : 500,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              color: (location.pathname === '/messages' || msgBoxOpen) ? 'var(--atmos-gold)' : 'var(--atmos-mid)',
+              background: (location.pathname === '/messages' || msgBoxOpen) ? 'var(--atmos-accent-subtle)' : 'transparent',
+              border: 'none', cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            whileHover={{ color: 'var(--atmos-gold)', background: 'var(--atmos-accent-subtle)' }}
+          >
+            <span>Messages</span>
+            {unreadMsgCount > 0 && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                minWidth: '16px', height: '16px', borderRadius: '999px',
+                backgroundColor: '#EF4444', color: '#fff',
+                fontSize: '0.58rem', fontWeight: 700, padding: '0 4px',
+                lineHeight: 1
+              }}>
+                {unreadMsgCount}
+              </span>
+            )}
+          </motion.button>
+
+          <MessageBoxPopover
+            isOpen={msgBoxOpen}
+            onClose={() => setMsgBoxOpen(false)}
+            onUnreadChange={(count) => setUnreadMsgCount(count)}
+          />
+        </div>
         {(user?.role === 'manager' || user?.role === 'admin') && <NavLink to="/manager">Approvals</NavLink>}
         {(user?.role === 'finance' || user?.role === 'admin') && <NavLink to="/finance">Finance</NavLink>}
         {user?.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}

@@ -66,6 +66,7 @@ export const authAPI = {
 export const tripAPI = {
   request:     (data)            => api.post('/trip/request', data),
   myTrips:     ()                => api.get('/trip/my'),
+  getMessages: ()                => api.get('/trip/messages'),
   getById:     (tripId)          => api.get(`/trip/${tripId}`),
   getPlans:    (tripId)          => api.get(`/trip/plans/${tripId}`),
   chat:        (tripId, message) => api.post('/trip/chat', { tripId, message }),

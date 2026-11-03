@@ -14,6 +14,7 @@ import AdminPanel   from './pages/AdminPanel';
 import EmployeeReimbursements from './pages/EmployeeReimbursements';
 import FinanceReimbursements from './pages/FinanceReimbursements';
 import AdminTelemetry from './pages/AdminTelemetry';
+import Messages from './pages/Messages';
 import LoadingSpinner     from './components/common/ShimmerLoader';
 import AnimatedBackground from './components/common/AnimatedBackground';
 import ErrorBoundary      from './components/common/ErrorBoundary';
@@ -52,6 +53,9 @@ const AppRoutes = () => {
           } />
           <Route path="/admin" element={
             <ProtectedRoute roles={['admin']}><AdminPanel /></ProtectedRoute>
+          } />
+          <Route path="/messages" element={
+            <ProtectedRoute><Messages /></ProtectedRoute>
           } />
           <Route path="/reimbursements" element={
             <ProtectedRoute><EmployeeReimbursements /></ProtectedRoute>
