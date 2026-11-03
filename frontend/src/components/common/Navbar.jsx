@@ -46,23 +46,67 @@ export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [profileHovered, setProfileHovered] = useState(false);
   const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+  const [pendingManagerCount, setPendingManagerCount] = useState(0);
+  const [pendingFinanceCount, setPendingFinanceCount] = useState(0);
 
   useEffect(() => {
     let mounted = true;
-    const fetchUnread = async () => {
-      try {
-        const res = await tripAPI.getMessages();
-        const msgs = res.data?.data || [];
-        const readIds = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
-        const unread = msgs.filter(m => !readIds.includes(m.id)).length;
-        if (mounted) setUnreadMsgCount(unread);
-      } catch {
-        // non-fatal
+
+    const fetchAllCounts = async () => {
+      // 1. Messages count
+      if (location.pathname === '/messages') {
+        if (mounted) setUnreadMsgCount(0);
+      } else {
+        try {
+          const res = await tripAPI.getMessages();
+          const msgs = res.data?.data || [];
+          const readIds = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
+          const unread = msgs.filter(m => !readIds.includes(m.id)).length;
+          if (mounted) setUnreadMsgCount(unread);
+        } catch {}
+      }
+
+      // 2. Manager pending approvals count
+      if (user?.role === 'manager' || user?.role === 'admin') {
+        try {
+          const res = await tripAPI.pendingManager();
+          const count = res.data?.data?.length || 0;
+          if (mounted) setPendingManagerCount(count);
+        } catch {}
+      } else {
+        if (mounted) setPendingManagerCount(0);
+      }
+
+      // 3. Finance pending approvals count
+      if (user?.role === 'finance' || user?.role === 'admin') {
+        try {
+          const res = await tripAPI.pendingFinance();
+          const count = res.data?.data?.length || 0;
+          if (mounted) setPendingFinanceCount(count);
+        } catch {}
+      } else {
+        if (mounted) setPendingFinanceCount(0);
       }
     };
-    fetchUnread();
-    return () => { mounted = false; };
-  }, [location.pathname]);
+
+    fetchAllCounts();
+
+    const interval = setInterval(fetchAllCounts, 20000);
+    const onApprovalsUpdated = () => fetchAllCounts();
+    const onMessagesRead = () => fetchAllCounts();
+
+    window.addEventListener('ctm_approvals_updated', onApprovalsUpdated);
+    window.addEventListener('ctm_messages_read', onMessagesRead);
+    window.addEventListener('storage', onMessagesRead);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      window.removeEventListener('ctm_approvals_updated', onApprovalsUpdated);
+      window.removeEventListener('ctm_messages_read', onMessagesRead);
+      window.removeEventListener('storage', onMessagesRead);
+    };
+  }, [location.pathname, user?.role]);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, 'change', (v) => setScrolled(v > 20));
@@ -148,8 +192,38 @@ export default function Navbar() {
             </span>
           )}
         </NavLink>
-        {(user?.role === 'manager' || user?.role === 'admin') && <NavLink to="/manager">Approvals</NavLink>}
-        {(user?.role === 'finance' || user?.role === 'admin') && <NavLink to="/finance">Finance</NavLink>}
+        {(user?.role === 'manager' || user?.role === 'admin') && (
+          <NavLink to="/manager">
+            <span>Approvals</span>
+            {pendingManagerCount > 0 && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                minWidth: '16px', height: '16px', borderRadius: '999px',
+                backgroundColor: '#EF4444', color: '#fff',
+                fontSize: '0.58rem', fontWeight: 700, padding: '0 4px',
+                lineHeight: 1
+              }}>
+                {pendingManagerCount}
+              </span>
+            )}
+          </NavLink>
+        )}
+        {(user?.role === 'finance' || user?.role === 'admin') && (
+          <NavLink to="/finance">
+            <span>Finance</span>
+            {pendingFinanceCount > 0 && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                minWidth: '16px', height: '16px', borderRadius: '999px',
+                backgroundColor: '#EF4444', color: '#fff',
+                fontSize: '0.58rem', fontWeight: 700, padding: '0 4px',
+                lineHeight: 1
+              }}>
+                {pendingFinanceCount}
+              </span>
+            )}
+          </NavLink>
+        )}
         {user?.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
       </nav>
 

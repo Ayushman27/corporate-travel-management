@@ -32,7 +32,16 @@ export default function Messages() {
     try {
       setLoading(true);
       const res = await tripAPI.getMessages();
-      setMessages(res.data?.data || []);
+      const data = res.data?.data || [];
+      setMessages(data);
+
+      // Auto-mark loaded messages as seen once viewed on this page
+      const allIds = data.map(m => m.id);
+      const prevRead = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
+      const combined = Array.from(new Set([...prevRead, ...allIds]));
+      localStorage.setItem('ctm_read_messages', JSON.stringify(combined));
+      setReadIds(combined);
+      window.dispatchEvent(new CustomEvent('ctm_messages_read'));
     } catch {
       // Non-fatal
     } finally {
@@ -46,8 +55,11 @@ export default function Messages() {
 
   const markAllRead = () => {
     const allIds = messages.map(m => m.id);
-    setReadIds(allIds);
-    localStorage.setItem('ctm_read_messages', JSON.stringify(allIds));
+    const prevRead = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
+    const combined = Array.from(new Set([...prevRead, ...allIds]));
+    setReadIds(combined);
+    localStorage.setItem('ctm_read_messages', JSON.stringify(combined));
+    window.dispatchEvent(new CustomEvent('ctm_messages_read'));
   };
 
   const markSingleRead = (id) => {
@@ -55,6 +67,7 @@ export default function Messages() {
       const next = [...readIds, id];
       setReadIds(next);
       localStorage.setItem('ctm_read_messages', JSON.stringify(next));
+      window.dispatchEvent(new CustomEvent('ctm_messages_read'));
     }
   };
 

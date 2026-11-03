@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useState, useEffect } from 'react';
@@ -81,7 +81,10 @@ function SideNavItem({ to, icon: Icon, label, delay = 0, badge = null }) {
 export default function Sidebar() {
   const { user } = useAuth();
   const { isDark } = useTheme();
+  const location = useLocation();
   const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+  const [pendingManagerCount, setPendingManagerCount] = useState(0);
+  const [pendingFinanceCount, setPendingFinanceCount] = useState(0);
   const [tripsSpend, setTripsSpend] = useState(null);
 
   useEffect(() => {
@@ -111,20 +114,62 @@ export default function Sidebar() {
 
   useEffect(() => {
     let mounted = true;
-    const fetchUnread = async () => {
-      try {
-        const res = await tripAPI.getMessages();
-        const msgs = res.data?.data || [];
-        const readIds = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
-        const unread = msgs.filter(m => !readIds.includes(m.id)).length;
-        if (mounted) setUnreadMsgCount(unread);
-      } catch {
-        // non-fatal
+
+    const fetchAllCounts = async () => {
+      // 1. Messages count
+      if (location.pathname === '/messages') {
+        if (mounted) setUnreadMsgCount(0);
+      } else {
+        try {
+          const res = await tripAPI.getMessages();
+          const msgs = res.data?.data || [];
+          const readIds = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
+          const unread = msgs.filter(m => !readIds.includes(m.id)).length;
+          if (mounted) setUnreadMsgCount(unread);
+        } catch {}
+      }
+
+      // 2. Manager pending approvals count
+      if (user?.role === 'manager' || user?.role === 'admin') {
+        try {
+          const res = await tripAPI.pendingManager();
+          const count = res.data?.data?.length || 0;
+          if (mounted) setPendingManagerCount(count);
+        } catch {}
+      } else {
+        if (mounted) setPendingManagerCount(0);
+      }
+
+      // 3. Finance pending approvals count
+      if (user?.role === 'finance' || user?.role === 'admin') {
+        try {
+          const res = await tripAPI.pendingFinance();
+          const count = res.data?.data?.length || 0;
+          if (mounted) setPendingFinanceCount(count);
+        } catch {}
+      } else {
+        if (mounted) setPendingFinanceCount(0);
       }
     };
-    fetchUnread();
-    return () => { mounted = false; };
-  }, []);
+
+    fetchAllCounts();
+
+    const interval = setInterval(fetchAllCounts, 20000);
+    const onApprovalsUpdated = () => fetchAllCounts();
+    const onMessagesRead = () => fetchAllCounts();
+
+    window.addEventListener('ctm_approvals_updated', onApprovalsUpdated);
+    window.addEventListener('ctm_messages_read', onMessagesRead);
+    window.addEventListener('storage', onMessagesRead);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      window.removeEventListener('ctm_approvals_updated', onApprovalsUpdated);
+      window.removeEventListener('ctm_messages_read', onMessagesRead);
+      window.removeEventListener('storage', onMessagesRead);
+    };
+  }, [location.pathname, user?.role]);
 
   return (
     <motion.aside
@@ -157,14 +202,14 @@ export default function Sidebar() {
       {(user?.role === 'manager' || user?.role === 'admin') && (
         <>
           <p style={SECTION_LABEL}>Manager</p>
-          <SideNavItem to="/manager" icon={CheckCircle} label="Trip Approvals" delay={0.15} />
+          <SideNavItem to="/manager" icon={CheckCircle} label="Trip Approvals" delay={0.15} badge={pendingManagerCount > 0 ? pendingManagerCount : null} />
         </>
       )}
 
       {(user?.role === 'finance' || user?.role === 'admin') && (
         <>
           <p style={SECTION_LABEL}>Finance</p>
-          <SideNavItem to="/finance" icon={DollarSign} label="Finance Dashboard" delay={0.2} />
+          <SideNavItem to="/finance" icon={DollarSign} label="Finance Dashboard" delay={0.2} badge={pendingFinanceCount > 0 ? pendingFinanceCount : null} />
           <SideNavItem to="/finance-reimbursements" icon={Receipt} label="Reimbursements" delay={0.22} />
         </>
       )}

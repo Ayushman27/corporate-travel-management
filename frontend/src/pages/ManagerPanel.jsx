@@ -170,6 +170,7 @@ export default function ManagerPanel() {
       await tripAPI.managerApprove({ tripId, status, comments });
       toast.success(`Trip ${status} successfully`);
       fetchPending();
+      window.dispatchEvent(new CustomEvent('ctm_approvals_updated'));
     } finally { setDeciding(null); }
   };
 

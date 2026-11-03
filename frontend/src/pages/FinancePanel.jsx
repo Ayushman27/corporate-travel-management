@@ -460,6 +460,7 @@ export default function FinancePanel() {
       const [p, r] = await Promise.all([tripAPI.pendingFinance(), financeAPI.report()]);
       setPending(p.data.data || []);
       setReport(r.data.data);
+      window.dispatchEvent(new CustomEvent('ctm_approvals_updated'));
     } finally { setDeciding(null); }
   };
 

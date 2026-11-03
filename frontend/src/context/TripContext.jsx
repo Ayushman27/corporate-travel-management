@@ -28,6 +28,7 @@ export const TripProvider = ({ children }) => {
       setCurrentTrip(data.data.trip);
       setCurrentPlans(data.data.plans || []);
       await fetchMyTrips();
+      window.dispatchEvent(new CustomEvent('ctm_approvals_updated'));
       return data.data;
     } finally {
       setLoading(false);
