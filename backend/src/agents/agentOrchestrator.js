@@ -12,6 +12,7 @@ const bookingAgent       = require('./bookingAgent');
 const financeAgent       = require('./financeAgent');
 const hrmsAgent          = require('./hrmsAgent');
 const notificationAgent  = require('./notificationAgent');
+const emailService       = require('../services/emailService');
 
 const Trip     = require('../models/Trip');
 const Approval = require('../models/Approval');
@@ -183,6 +184,20 @@ const financeApprove = async (tripId, decision, financeUser, budgetApproved, com
     { new: true }
   );
 
+  // Retrieve requesting employee record to guarantee email delivery
+  let employee = null;
+  try {
+    employee = await User.findOne({ employeeId: trip.employeeId });
+    if (!employee && trip.companyId) {
+      employee = await User.findOne({ id: trip.employeeId, companyId: trip.companyId });
+    }
+  } catch (findErr) {
+    logger.warn(`[Orchestrator] Error retrieving employee for email dispatch: ${findErr.message}`);
+  }
+
+  const employeeEmail = employee?.email || trip.employeeEmail || '';
+  const employeeName  = employee?.name  || trip.employeeName  || 'Employee';
+
   if (decision === 'approved') {
     const approvedAmount = (budgetApproved !== undefined && budgetApproved !== null && !isNaN(Number(budgetApproved))) ? Number(budgetApproved) : trip.estimatedBudget;
     trip.status         = 'approved';
@@ -191,12 +206,57 @@ const financeApprove = async (tripId, decision, financeUser, budgetApproved, com
 
     // Apply Excel budget deduction after approval
     await financeAgent.applyApprovedBudget(companyId, tripId, trip.employeeId, approvedAmount);
-    await notificationAgent.notifyFinanceApproved({ name: trip.employeeName, email: '' }, trip, approvedAmount);
+
+    // ── Email notification to trip requested person ───────────────────────────
+    if (employeeEmail) {
+      try {
+        await emailService.sendTripDecisionEmail({
+          trip,
+          decision: 'approved',
+          approvedBudget: approvedAmount,
+          comments,
+          employeeEmail,
+          employeeName,
+          approverName: financeUser.name
+        });
+        logger.info(`[Orchestrator] Finance approval email dispatched to ${employeeEmail} for trip ${tripId}`);
+      } catch (mailErr) {
+        logger.error(`[Orchestrator] Failed to dispatch finance approval email to ${employeeEmail}: ${mailErr.message}`);
+      }
+    } else {
+      logger.warn(`[Orchestrator] Unable to send approval email: No email registered for employee ${trip.employeeId}`);
+    }
+
+    await notificationAgent.notifyFinanceApproved({ name: employeeName, email: employeeEmail, phone: employee?.phone }, trip, approvedAmount);
     await audit('FINANCE_APPROVED', { tripId, actor: financeUser, details: { budgetApproved: approvedAmount, budgetCheck }, req });
     await audit('BUDGET_UPDATED', { tripId, actor: financeUser, details: { amount: approvedAmount }, req });
   } else {
     trip.status = 'rejected';
     await trip.save();
+
+    // ── Email notification to trip requested person ───────────────────────────
+    if (employeeEmail) {
+      try {
+        await emailService.sendTripDecisionEmail({
+          trip,
+          decision: 'rejected',
+          approvedBudget: 0,
+          comments,
+          employeeEmail,
+          employeeName,
+          approverName: financeUser.name
+        });
+        logger.info(`[Orchestrator] Finance rejection email dispatched to ${employeeEmail} for trip ${tripId}`);
+      } catch (mailErr) {
+        logger.error(`[Orchestrator] Failed to dispatch finance rejection email to ${employeeEmail}: ${mailErr.message}`);
+      }
+    } else {
+      logger.warn(`[Orchestrator] Unable to send rejection email: No email registered for employee ${trip.employeeId}`);
+    }
+
+    if (notificationAgent.notifyFinanceRejected) {
+      await notificationAgent.notifyFinanceRejected({ name: employeeName, email: employeeEmail, phone: employee?.phone }, trip, comments);
+    }
     await audit('FINANCE_REJECTED', { tripId, actor: financeUser, details: { comments, budgetCheck }, req });
   }
 

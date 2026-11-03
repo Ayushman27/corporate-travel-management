@@ -230,8 +230,229 @@ Never share this code with anyone. Travello representatives will never ask you f
 `;
 }
 
+/**
+ * Generates an executive, responsive HTML email template for Trip Decision (Approved or Rejected by Finance).
+ */
+function getTripDecisionEmailHTML({ trip, decision, approvedBudget, comments, employeeName, approverName, portalUrl }) {
+  const isApproved = decision === 'approved';
+  const statusColor = isApproved ? '#10B981' : '#EF4444';
+  const statusBg    = isApproved ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)';
+  const statusBorder= isApproved ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)';
+  const badgeLabel  = isApproved ? '✓ APPROVED BY FINANCE' : '✕ REJECTED BY FINANCE';
+  const headline    = isApproved ? 'Trip Request Approved' : 'Trip Request Declined';
+
+  const travelDateStr = trip.travelDate
+    ? new Date(trip.travelDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+    : 'Not specified';
+
+  const returnDateStr = trip.returnDate
+    ? new Date(trip.returnDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+    : 'One-way';
+
+  const targetUrl = `${portalUrl || 'https://corporate-travel-management-one.vercel.app'}/trip/${trip.tripId}`;
+
+  const budgetDisplay = isApproved
+    ? `<div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
+         <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #10B981; margin-bottom: 6px;">Approved Travel Budget</div>
+         <div style="font-size: 32px; font-weight: 700; color: #f0fdf4; letter-spacing: -0.5px;">₹${Number(approvedBudget || trip.approvedBudget || trip.estimatedBudget || 0).toLocaleString('en-IN')}</div>
+         ${trip.estimatedBudget && Number(trip.estimatedBudget) !== Number(approvedBudget) ? `<div style="font-size: 12px; color: #9ca3af; margin-top: 4px;">Requested: ₹${Number(trip.estimatedBudget).toLocaleString('en-IN')}</div>` : ''}
+       </div>`
+    : `<div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
+         <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #ef4444; margin-bottom: 6px;">Requested Travel Budget</div>
+         <div style="font-size: 28px; font-weight: 700; color: #fef2f2; letter-spacing: -0.5px;">₹${Number(trip.estimatedBudget || 0).toLocaleString('en-IN')}</div>
+       </div>`;
+
+  const commentsBox = comments ? `
+    <div style="background: ${isApproved ? 'rgba(196, 162, 93, 0.08)' : 'rgba(239, 68, 68, 0.08)'}; border-left: 3px solid ${isApproved ? '#C4A25D' : '#ef4444'}; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 24px;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: ${isApproved ? '#C4A25D' : '#ef4444'}; margin-bottom: 4px;">Finance Department Remarks</div>
+      <div style="font-size: 13px; color: #e5e7eb; line-height: 1.5; font-style: italic;">"${comments}"</div>
+    </div>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${headline}</title>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      background-color: #0b0e14;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #e6e8eb;
+      -webkit-font-smoothing: antialiased;
+    }
+    table { border-collapse: collapse; }
+    .wrapper { width: 100%; background-color: #0b0e14; padding: 36px 12px; }
+    .card {
+      max-width: 540px; margin: 0 auto;
+      background: #141a24;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    }
+    .header-bar {
+      background: #10151d;
+      padding: 28px 36px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+    .brand-title {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+      color: #ffffff; margin: 0;
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #94a3b8; margin-top: 4px;
+    }
+    .content-body { padding: 32px 36px; }
+    .badge-pill {
+      display: inline-block; padding: 5px 14px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+    .main-heading {
+      font-size: 20px; font-weight: 700; color: #ffffff;
+      margin: 0 0 8px; letter-spacing: -0.3px;
+    }
+    .intro-msg {
+      font-size: 14px; line-height: 1.6; color: #94a3b8;
+      margin: 0 0 20px;
+    }
+    .details-table {
+      width: 100%; background: #18202d;
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .details-row td { padding: 7px 0; font-size: 13px; }
+    .details-key { color: #64748b; width: 42%; font-weight: 500; }
+    .details-val { color: #f1f5f9; font-weight: 600; text-align: right; }
+    .btn-action {
+      display: inline-block; width: 100%; box-sizing: border-box;
+      padding: 14px 20px; border-radius: 10px;
+      background: ${isApproved ? 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)' : '#27272a'};
+      color: #ffffff !important; text-align: center; font-size: 14px;
+      font-weight: 700; text-decoration: none; letter-spacing: 0.5px;
+      box-shadow: ${isApproved ? '0 4px 16px rgba(37, 99, 235, 0.35)' : 'none'};
+    }
+    .footer-bar {
+      background: #0d1117; padding: 20px 36px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
+    }
+    .footer-text { font-size: 11px; line-height: 1.5; color: #64748b; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <div class="header-bar">
+        <h1 class="brand-title">✈ Travello</h1>
+        <div class="brand-sub">Corporate Travel Management</div>
+      </div>
+
+      <div class="content-body">
+        <div class="badge-pill" style="background: ${statusBg}; border: 1px solid ${statusBorder}; color: ${statusColor};">
+          ${badgeLabel}
+        </div>
+
+        <h2 class="main-heading">${headline}</h2>
+        <p class="intro-msg">
+          Hello <strong>${employeeName || 'Colleague'}</strong>,<br>
+          ${isApproved
+            ? `Your travel request has been reviewed and <strong style="color: #10B981;">approved</strong> by the Finance Department. You can now proceed to review the booking options on the Travello portal.`
+            : `Your travel request has been reviewed and <strong style="color: #ef4444;">declined</strong> by the Finance Department. Please see the remarks below for details.`}
+        </p>
+
+        ${budgetDisplay}
+
+        ${commentsBox}
+
+        <table class="details-table" role="presentation">
+          <tr class="details-row">
+            <td class="details-key">Trip Reference ID:</td>
+            <td class="details-val" style="font-family: monospace; color: #38bdf8;">${trip.tripId}</td>
+          </tr>
+          <tr class="details-row">
+            <td class="details-key">Itinerary Route:</td>
+            <td class="details-val">${trip.fromCity} ➔ ${trip.toCity}</td>
+          </tr>
+          <tr class="details-row">
+            <td class="details-key">Departure Date:</td>
+            <td class="details-val">${travelDateStr}</td>
+          </tr>
+          ${trip.returnDate ? `
+          <tr class="details-row">
+            <td class="details-key">Return Date:</td>
+            <td class="details-val">${returnDateStr}</td>
+          </tr>` : ''}
+          <tr class="details-row">
+            <td class="details-key">Travel Mode:</td>
+            <td class="details-val" style="text-transform: capitalize;">${trip.travelMode || 'Mixed - AI Planned'}</td>
+          </tr>
+          ${trip.purpose ? `
+          <tr class="details-row">
+            <td class="details-key">Purpose of Travel:</td>
+            <td class="details-val">${trip.purpose}</td>
+          </tr>` : ''}
+          ${approverName ? `
+          <tr class="details-row">
+            <td class="details-key">Reviewed By:</td>
+            <td class="details-val">${approverName} (Finance)</td>
+          </tr>` : ''}
+        </table>
+
+        <div style="text-align: center; margin-top: 28px;">
+          <a href="${targetUrl}" class="btn-action" target="_blank">
+            ${isApproved ? 'Open Trip & Complete Booking' : 'Review Trip Details on Portal'}
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <p class="footer-text">
+          © 2026 Travello Corporate Travel Management System.<br>
+          Automated travel notification dispatch — please do not reply directly to this email.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function getTripDecisionEmailText({ trip, decision, approvedBudget, comments, employeeName, approverName, portalUrl }) {
+  const isApproved = decision === 'approved';
+  const targetUrl = `${portalUrl || 'https://corporate-travel-management-one.vercel.app'}/trip/${trip.tripId}`;
+  return `✈ TRAVELLO CORPORATE TRAVEL MANAGEMENT
+==========================================
+
+Trip Decision: ${isApproved ? 'APPROVED' : 'REJECTED'} BY FINANCE
+
+Hello ${employeeName || 'Colleague'},
+
+${isApproved
+  ? `Your travel request (${trip.tripId}) has been APPROVED by the Finance Department.`
+  : `Your travel request (${trip.tripId}) has been REJECTED by the Finance Department.`}
+
+Trip Details:
+-------------
+• Trip ID: ${trip.tripId}
+• Route: ${trip.fromCity} -> ${trip.toCity}
+• Departure: ${trip.travelDate ? new Date(trip.travelDate).toDateString() : 'N/A'}
+${trip.returnDate ? `• Return: ${new Date(trip.returnDate).toDateString()}\n` : ''}• Requested Budget: Rs. ${(Number(trip.estimatedBudget) || 0).toLocaleString('en-IN')}
+${isApproved ? `• Approved Budget: Rs. ${(Number(approvedBudget || trip.approvedBudget || trip.estimatedBudget) || 0).toLocaleString('en-IN')}\n` : ''}${comments ? `• Finance Remarks: "${comments}"\n` : ''}${approverName ? `• Reviewed By: ${approverName} (Finance)\n` : ''}
+View trip details online:
+${targetUrl}
+
+--
+© 2026 Travello Inc. All rights reserved.
+`;
+}
+
 module.exports = {
   getOTPEmailHTML,
-  getOTPEmailText
+  getOTPEmailText,
+  getTripDecisionEmailHTML,
+  getTripDecisionEmailText
 };
 

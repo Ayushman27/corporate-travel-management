@@ -26,7 +26,10 @@ const templates = {
     `❌ *Trip Rejected*\n\nHello ${emp.name},\nYour trip request *${trip.tripId}* (${trip.fromCity} → ${trip.toCity}) was rejected by your manager.\n\nReason: ${reason || 'Not specified'}\n\n_CTM System_`,
 
   financeApproved: (emp, trip, budget) =>
-    `💰 *Finance Approved*\n\nHello ${emp.name},\nYour trip *${trip.tripId}* has been approved with a budget of ₹${budget?.toLocaleString('en-IN')}.\n\nBooking will proceed shortly.\n\n_CTM Finance_`,
+    `💰 *Finance Approved*\n\nHello ${emp.name},\nYour trip *${trip.tripId}* has been approved with a budget of ₹${budget?.toLocaleString('en-IN')}.\n\nBooking will proceed shortly.\n\n_Travello Finance_`,
+
+  financeRejected: (emp, trip, reason) =>
+    `❌ *Finance Rejected*\n\nHello ${emp.name},\nYour trip request *${trip.tripId}* (${trip.fromCity} → ${trip.toCity}) was rejected by the Finance department.\n\nReason: ${reason || 'Not specified'}\n\n_Travello Finance_`,
 
   bookingConfirmed: (emp, booking, tickets) => {
     const ticketLines = tickets.map(t =>
@@ -99,6 +102,9 @@ const notifyManagerRejected = (emp, trip, reason) =>
 const notifyFinanceApproved = (emp, trip, budget) =>
   notify({ to: emp.phone || emp.email, message: templates.financeApproved(emp, trip, budget), tripId: trip.tripId, event: 'FINANCE_APPROVED' });
 
+const notifyFinanceRejected = (emp, trip, reason) =>
+  notify({ to: emp.phone || emp.email, message: templates.financeRejected(emp, trip, reason), tripId: trip.tripId, event: 'FINANCE_REJECTED' });
+
 const notifyBookingConfirmed = (emp, booking, tickets) =>
   notify({ to: emp.phone || emp.email, message: templates.bookingConfirmed(emp, booking, tickets), tripId: booking.tripId, event: 'BOOKING_CONFIRMED' });
 
@@ -122,5 +128,5 @@ const notifyBudgetExceededWarning = async (recipients, employee, trip, billDetai
 module.exports = {
   notifyBudgetExceededWarning,
   notifyTripSubmitted, notifyManagerApprovalNeeded, notifyManagerApproved,
-  notifyManagerRejected, notifyFinanceApproved, notifyBookingConfirmed, notifyTripCancelled
+  notifyManagerRejected, notifyFinanceApproved, notifyFinanceRejected, notifyBookingConfirmed, notifyTripCancelled
 };
