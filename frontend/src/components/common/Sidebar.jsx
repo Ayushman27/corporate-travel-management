@@ -21,7 +21,7 @@ const SECTION_LABEL = {
   marginBottom: '0.4rem',
 };
 
-function SideNavItem({ to, icon: Icon, label, delay = 0 }) {
+function SideNavItem({ to, icon: Icon, label, delay = 0, badge = null }) {
   return (
     <NavLink to={to} style={{ textDecoration: 'none' }}>
       {({ isActive }) => (
@@ -57,9 +57,21 @@ function SideNavItem({ to, icon: Icon, label, delay = 0 }) {
             color: isActive ? 'var(--atmos-dark)' : 'var(--atmos-mid)',
             letterSpacing: '0.03em',
             transition: 'color 0.2s ease',
+            flex: 1
           }}>
             {label}
           </span>
+          {badge ? (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              minWidth: '16px', height: '16px', borderRadius: '999px',
+              backgroundColor: '#EF4444', color: '#fff',
+              fontSize: '0.58rem', fontWeight: 700, padding: '0 4px',
+              lineHeight: 1
+            }}>
+              {badge}
+            </span>
+          ) : null}
         </motion.div>
       )}
     </NavLink>
@@ -70,6 +82,24 @@ export default function Sidebar() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const pct = Math.min(100, ((user?.travelBudgetUsed || 0) / (user?.travelBudgetLimit || 50000)) * 100);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchUnread = async () => {
+      try {
+        const res = await tripAPI.getMessages();
+        const msgs = res.data?.data || [];
+        const readIds = JSON.parse(localStorage.getItem('ctm_read_messages') || '[]');
+        const unread = msgs.filter(m => !readIds.includes(m.id)).length;
+        if (mounted) setUnreadMsgCount(unread);
+      } catch {
+        // non-fatal
+      }
+    };
+    fetchUnread();
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <motion.aside
