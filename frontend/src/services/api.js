@@ -93,7 +93,9 @@ export const financeAPI = {
   tripsSummary:      ()           => api.get('/finance/trips-summary'),
   checkBudget:       (params)     => api.get('/finance/budget/check', { params }),
   employeeHistory:   (empId)      => api.get(`/finance/employee-history/${empId}`),
-  setBudget:         (data)       => api.post('/finance/budget/set', data)
+  setBudget:         (data)       => api.post('/finance/budget/set', data),
+  getDistribution:   (params)     => api.get('/finance/distribution', { params }),
+  setEmployeeBudget: (id, budgetLimit) => api.patch(`/finance/employee-budget/${id}`, { budgetLimit })
 };
 
 // ── Admin ─────────────────────────────────────────────────────────────────────

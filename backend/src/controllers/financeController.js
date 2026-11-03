@@ -1,6 +1,7 @@
 const financeAgent = require('../agents/financeAgent');
 const hrmsAgent    = require('../agents/hrmsAgent');
 const Trip         = require('../models/Trip');
+const User         = require('../models/User');
 const Booking      = require('../models/Booking');
 const { getFinanceData, syncCompanyDataToDB } = require('../services/excelService');
 
@@ -181,7 +182,143 @@ const setMonthlyBudget = async (req, res, next) => {
   }
 };
 
+
+// GET /api/finance/distribution
+const getBudgetDistribution = async (req, res, next) => {
+  try {
+    const companyId = req.user.companyId;
+    const now = new Date();
+    const currentMonth = req.query.month || now.toLocaleString('en-US', { month: 'long' });
+    const year = Number(req.query.year) || 2026;
+
+    // 1. Get total company monthly budget pool
+    const Budget = require('../models/Budget');
+    let budgetDoc = await Budget.findOne({ companyId, month: currentMonth, year, department: 'All' });
+    if (!budgetDoc) {
+      budgetDoc = await Budget.findOne({ companyId, month: 'all', year, department: 'All' });
+    }
+    const totalMonthlyBudget = budgetDoc ? Number(budgetDoc.allocatedBudget || 0) : 500000;
+
+    // 2. Get all users for this company
+    const users = await User.find({ companyId }).select('-password').sort({ name: 1 });
+
+    // 3. Get all approved/booked trips to ensure user spend is completely up to date
+    const trips = await Trip.find({
+      companyId,
+      status: { $in: ['approved', 'booked', 'completed'] }
+    });
+
+    const spendByEmp = {};
+    trips.forEach(t => {
+      const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
+        ? Number(t.actualCost)
+        : (t.approvedBudget !== undefined && t.approvedBudget !== null
+          ? Number(t.approvedBudget)
+          : (Number(t.estimatedBudget) || 0));
+      spendByEmp[t.employeeId] = (spendByEmp[t.employeeId] || 0) + cost;
+    });
+
+    // 4. Group by department
+    const departments = {};
+    let totalAssigned = 0;
+    let totalSpent = 0;
+
+    users.forEach(u => {
+      const dept = u.department || 'General';
+      if (!departments[dept]) {
+        departments[dept] = {
+          name: dept,
+          totalAllocated: 0,
+          totalSpent: 0,
+          employees: []
+        };
+      }
+
+      const limit = Number(u.travelBudgetLimit) || 0;
+      const spent = spendByEmp[u.employeeId] !== undefined ? spendByEmp[u.employeeId] : (Number(u.travelBudgetUsed) || 0);
+
+      departments[dept].totalAllocated += limit;
+      departments[dept].totalSpent += spent;
+      totalAssigned += limit;
+      totalSpent += spent;
+
+      departments[dept].employees.push({
+        _id: u._id,
+        employeeId: u.employeeId,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        department: dept,
+        travelBudgetLimit: limit,
+        travelBudgetUsed: spent
+      });
+    });
+
+    const unallocatedPool = totalMonthlyBudget - totalAssigned;
+
+    res.json({
+      success: true,
+      data: {
+        month: currentMonth,
+        year,
+        totalMonthlyBudget,
+        totalAssigned,
+        totalSpent,
+        unallocatedPool,
+        departments: Object.values(departments)
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PATCH /api/finance/employee-budget/:id
+const setEmployeeBudget = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { budgetLimit } = req.body;
+    const limit = Number(budgetLimit);
+
+    if (isNaN(limit) || limit < 0) {
+      return res.status(400).json({ success: false, message: 'Budget limit must be a valid non-negative number' });
+    }
+
+    const user = await User.findOne({ _id: id, companyId: req.user.companyId });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Employee not found' });
+    }
+
+    const oldLimit = user.travelBudgetLimit || 0;
+    user.travelBudgetLimit = limit;
+    await user.save({ validateBeforeSave: false });
+
+    try {
+      const { audit } = require('../services/auditService');
+      await audit('EMPLOYEE_BUDGET_SET', {
+        actor: req.user,
+        details: { employeeId: user.employeeId, employeeName: user.name, oldLimit, newLimit: limit },
+        req
+      });
+    } catch (_) {}
+
+    res.json({
+      success: true,
+      message: `Budget of ₹${limit.toLocaleString('en-IN')} assigned to ${user.name}`,
+      data: {
+        _id: user._id,
+        employeeId: user.employeeId,
+        name: user.name,
+        travelBudgetLimit: user.travelBudgetLimit
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getReport, syncSheets, checkBudget, getDepartmentSummary,
-  getMonthlySpend, getTripsSummary, getEmployeeHistory, setMonthlyBudget
+  getMonthlySpend, getTripsSummary, getEmployeeHistory, setMonthlyBudget,
+  getBudgetDistribution, setEmployeeBudget
 };

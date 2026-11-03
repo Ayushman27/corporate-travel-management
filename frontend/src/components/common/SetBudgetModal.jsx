@@ -211,35 +211,7 @@ isOpen,
               </div>
             </div>
 
-            {/* Department Option */}
-            <div>
-              <label style={{
-                display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem',
-                fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-                color: '#C4A25D', marginBottom: '0.4rem'
-              }}>
-                Department Scope
-              </label>
-              <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                style={{
-                  width: '100%', padding: '0.65rem 0.85rem',
-                  borderRadius: '0.65rem',
-                  border: '1px solid rgba(196,162,93,0.25)',
-                  background: 'rgba(255,255,255,0.05)',
-                  color: '#FFFFFF', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem',
-                  outline: 'none', cursor: 'pointer', boxSizing: 'border-box'
-                }}
-              >
-                <option value="All" style={{ background: '#1c1916', color: '#fff' }}>Company-Wide (All Departments)</option>
-                <option value="Engineering" style={{ background: '#1c1916', color: '#fff' }}>Engineering</option>
-                <option value="Sales" style={{ background: '#1c1916', color: '#fff' }}>Sales</option>
-                <option value="Finance" style={{ background: '#1c1916', color: '#fff' }}>Finance</option>
-                <option value="HR" style={{ background: '#1c1916', color: '#fff' }}>HR</option>
-                <option value="Management" style={{ background: '#1c1916', color: '#fff' }}>Management / CEO</option>
-              </select>
-            </div>
+
 
             {/* Info note */}
             <div style={{
@@ -247,7 +219,7 @@ isOpen,
               background: 'rgba(196,162,93,0.07)', border: '1px solid rgba(196,162,93,0.2)',
               fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.64rem', color: '#E8C97A', lineHeight: 1.4
             }}>
-              ✨ <strong>Note:</strong> Saving will update the monthly budget in Neon DB. The remaining balance will automatically adjust against recorded expenditures.
+              ✨ <strong>Note:</strong> Setting this fixes the total monthly company budget pool. Finance leads can then distribute this amount person-wise across all departments in the <strong>Budget Distribution</strong> tab.
             </div>
 
             {/* Action Buttons */}
