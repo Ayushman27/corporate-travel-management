@@ -433,11 +433,6 @@ const updateEmployeeBudgetUsed = (companyId, employeeId, additionalAmount) => {
     const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
     const idx  = rows.findIndex(r => r.EmployeeID === employeeId);
     if (idx !== -1) {
-      const limit = Number(rows[idx].TravelBudget) || 50000;
-      if (additionalAmount > limit || ((rows[idx].TravelBudgetUsed || 0) + additionalAmount) > limit) {
-        logger.info(`[Excel] Amount ${additionalAmount} exceeds budget ${limit} for ${employeeId} — not cutting from personal budget`);
-        return rows[idx];
-      }
       rows[idx].TravelBudgetUsed = (rows[idx].TravelBudgetUsed || 0) + additionalAmount;
       rows[idx].LastUpdated = new Date().toISOString();
       writeSheet(filePath, rows, sheetName);

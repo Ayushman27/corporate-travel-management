@@ -81,8 +81,33 @@ function SideNavItem({ to, icon: Icon, label, delay = 0, badge = null }) {
 export default function Sidebar() {
   const { user } = useAuth();
   const { isDark } = useTheme();
-  const pct = Math.min(100, ((user?.travelBudgetUsed || 0) / (user?.travelBudgetLimit || 50000)) * 100);
   const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+  const [tripsSpend, setTripsSpend] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchSpend = async () => {
+      try {
+        const res = await tripAPI.myTrips();
+        const trips = res.data?.data || [];
+        const spent = trips
+          .filter(t => ['approved', 'booked', 'completed'].includes(t.status))
+          .reduce((s, t) => s + (t.actualCost || t.approvedBudget || t.estimatedBudget || 0), 0);
+        if (mounted) setTripsSpend(spent);
+      } catch {
+        // non-fatal
+      }
+    };
+    fetchSpend();
+    return () => { mounted = false; };
+  }, []);
+
+  const spentAmount = tripsSpend !== null ? tripsSpend : (user?.travelBudgetUsed || 0);
+  const budgetLimit = user?.travelBudgetLimit || 20000;
+  const pct = budgetLimit > 0 ? (spentAmount / budgetLimit) * 100 : 0;
+  const isOverBudget = spentAmount > budgetLimit;
+  const excess = Math.max(0, spentAmount - budgetLimit);
+  const remaining = Math.max(0, budgetLimit - spentAmount);
 
   useEffect(() => {
     let mounted = true;
@@ -164,46 +189,86 @@ export default function Sidebar() {
             borderTop: '1px solid rgba(196,162,93,0.12)',
           }}
         >
-          <p style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', fontWeight: 700,
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            color: isDark ? 'rgba(196,162,93,0.7)' : 'rgba(37,99,235,0.85)', marginBottom: '0.6rem',
-          }}>
-            Travel Budget
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
-              ₹{(user.travelBudgetUsed || 0).toLocaleString('en-IN')}
-            </span>
-            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', color: 'var(--atmos-muted)' }}>
-              ₹{(user.travelBudgetLimit || 50000).toLocaleString('en-IN')}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+            <p style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: isDark ? 'rgba(196,162,93,0.9)' : 'rgba(37,99,235,0.95)', margin: 0,
+            }}>
+              Monthly Travel Budget
+            </p>
+            <span style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.52rem', fontWeight: 700,
+              letterSpacing: '0.04em', textTransform: 'uppercase',
+              padding: '0.12rem 0.35rem', borderRadius: '4px',
+              backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+              color: 'var(--atmos-muted)',
+            }}>
+              Per Month
             </span>
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.35rem' }}>
+            <div>
+              <span style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700,
+                color: isOverBudget ? '#EF4444' : 'var(--atmos-dark)'
+              }}>
+                ₹{spentAmount.toLocaleString('en-IN')}
+              </span>
+              <span style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem',
+                color: 'var(--atmos-muted)', marginLeft: '0.25rem'
+              }}>
+                spent
+              </span>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)', fontWeight: 500 }}>
+                ₹{budgetLimit.toLocaleString('en-IN')}
+              </span>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', color: 'var(--atmos-muted)', marginLeft: '0.2rem' }}>
+                / mo
+              </span>
+            </div>
+          </div>
+
           {/* Track */}
           <div style={{
-            height: '5px', borderRadius: '999px',
-            background: 'rgba(196,162,93,0.12)',
+            height: '6px', borderRadius: '999px',
+            background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
             overflow: 'hidden',
           }}>
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 1, ease: [0.25, 1, 0.5, 1], delay: 0.5 }}
+              animate={{ width: `${Math.min(100, pct)}%` }}
+              transition={{ duration: 1, ease: [0.25, 1, 0.5, 1], delay: 0.3 }}
               style={{
                 height: '100%',
                 borderRadius: '999px',
-                background: pct > 85
-                  ? 'linear-gradient(90deg, #C0392B, #E74C3C)'
-                  : (isDark ? 'linear-gradient(90deg, #C4A25D, #E8C97A)' : 'linear-gradient(90deg, #2563EB, #60A5FA)'),
+                background: isOverBudget
+                  ? 'linear-gradient(90deg, #DC2626, #EF4444)'
+                  : pct > 80
+                    ? 'linear-gradient(90deg, #D97706, #F59E0B)'
+                    : (isDark ? 'linear-gradient(90deg, #C4A25D, #E8C97A)' : 'linear-gradient(90deg, #2563EB, #60A5FA)'),
               }}
             />
           </div>
-          <p style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.6rem', color: 'var(--atmos-muted)',
-            marginTop: '0.35rem', textAlign: 'right',
-          }}>
-            {pct.toFixed(0)}% used
-          </p>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem', flexWrap: 'wrap', gap: '0.2rem' }}>
+            <span style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600,
+              color: isOverBudget ? '#EF4444' : 'var(--atmos-muted)'
+            }}>
+              {pct.toFixed(0)}% used
+            </span>
+            <span style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 600,
+              color: isOverBudget ? '#EF4444' : '#16A34A'
+            }}>
+              {isOverBudget ? `Over limit by ₹${excess.toLocaleString('en-IN')}` : `₹${remaining.toLocaleString('en-IN')} available`}
+            </span>
+          </div>
         </motion.div>
       )}
     </motion.aside>

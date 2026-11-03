@@ -253,9 +253,6 @@ const getDepartmentSummary = async (companyId) => {
           : (t.approvedBudget !== undefined && t.approvedBudget !== null
             ? Number(t.approvedBudget)
             : (Number(t.estimatedBudget) || 0));
-        if (cost > userLimit || (s + cost) > userLimit) {
-          return s;
-        }
         return s + cost;
       }, 0);
       if (dbUser.travelBudgetUsed !== trueSpend) {

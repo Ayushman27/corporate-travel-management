@@ -180,11 +180,7 @@ const applyApprovedBudget = async (companyId, tripId, employeeId, amount) => {
             ? Number(t.approvedBudget)
             : (Number(t.estimatedBudget) || 0));
 
-        // Rule: If trip cost exceeds employee budget, do not cut it from personal budget
-        if (cost > userLimit || (sum + cost) > userLimit) {
-          logger.info(`[FinanceAgent] Trip ${t.tripId} cost ₹${cost} exceeds employee ${employeeId} budget ₹${userLimit} — not cutting from personal budget`);
-          return sum;
-        }
+        // All approved, booked, and completed trips count toward true spend
         return sum + cost;
       }, 0);
 

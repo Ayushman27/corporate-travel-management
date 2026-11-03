@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const User = require('../models/User');
 const Company = require('../models/Company');
+const Trip = require('../models/Trip');
 const { syncCompanySheets, getEmployeeByEmail, getAllEmployees } = require('../services/excelService');
 const { audit } = require('../services/auditService');
 const logger = require('../utils/logger');
@@ -474,9 +475,42 @@ const syncSheets = async (req, res, next) => {
 
 // ── GET /api/auth/me ─────────────────────────────────────────────────────────
 const getMe = async (req, res) => {
-  const company = await Company.findOne({ companyId: req.user.companyId }).select('companyId companyName');
-  const user = await User.findById(req.user._id).select('-password');
-  res.json({ success: true, user: user || req.user, company });
+  try {
+    const company = await Company.findOne({ companyId: req.user.companyId }).select('companyId companyName');
+    let user = await User.findById(req.user._id).select('-password');
+    if (!user) user = req.user;
+
+    // Dynamically calculate the employee's travel budget spend from their approved/booked trips
+    if (user.employeeId && user.companyId) {
+      try {
+        const trips = await Trip.find({
+          companyId: user.companyId,
+          employeeId: user.employeeId,
+          status: { $in: ['approved', 'booked', 'completed'] }
+        });
+
+        const totalSpend = trips.reduce((sum, t) => {
+          const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
+            ? Number(t.actualCost)
+            : (t.approvedBudget !== undefined && t.approvedBudget !== null
+              ? Number(t.approvedBudget)
+              : (Number(t.estimatedBudget) || 0));
+          return sum + cost;
+        }, 0);
+
+        if (user.travelBudgetUsed !== totalSpend) {
+          user.travelBudgetUsed = totalSpend;
+          await User.findByIdAndUpdate(user._id, { travelBudgetUsed: totalSpend });
+        }
+      } catch (err) {
+        logger.warn(`[Auth] getMe spend recalculation warning: ${err.message}`);
+      }
+    }
+
+    res.json({ success: true, user, company });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 // ── PUT /api/auth/me ─────────────────────────────────────────────────────────
