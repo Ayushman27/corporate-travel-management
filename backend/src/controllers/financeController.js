@@ -210,11 +210,9 @@ const getBudgetDistribution = async (req, res, next) => {
 
     const spendByEmp = {};
     trips.forEach(t => {
-      const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
-        ? Number(t.actualCost)
-        : (t.approvedBudget !== undefined && t.approvedBudget !== null
-          ? Number(t.approvedBudget)
-          : (Number(t.estimatedBudget) || 0));
+      const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+        ? Number(t.approvedBudget)
+        : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
       spendByEmp[t.employeeId] = (spendByEmp[t.employeeId] || 0) + cost;
     });
 

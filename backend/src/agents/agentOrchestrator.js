@@ -296,6 +296,24 @@ const bookTrip = async (tripId, planId, user, req) => {
     req
   });
 
+  // Recalculate and update true spend in Neon DB immediately upon booking
+  try {
+    const allUserTrips = await Trip.find({ employeeId: trip.employeeId, companyId: trip.companyId });
+    const trueSpend = (allUserTrips || []).reduce((sum, t) => {
+      if (!['approved', 'booked', 'completed'].includes(t.status)) return sum;
+      const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+        ? Number(t.approvedBudget)
+        : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
+      return sum + cost;
+    }, 0);
+    await User.findOneAndUpdate(
+      { employeeId: trip.employeeId, ...(trip.companyId ? { companyId: trip.companyId } : {}) },
+      { travelBudgetUsed: trueSpend }
+    );
+  } catch (spendErr) {
+    logger.warn(`[Orchestrator] Failed updating travelBudgetUsed after booking: ${spendErr.message}`);
+  }
+
   return booking;
 };
 

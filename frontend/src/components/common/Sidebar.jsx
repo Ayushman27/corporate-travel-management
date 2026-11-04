@@ -87,23 +87,7 @@ export default function Sidebar() {
   const [pendingFinanceCount, setPendingFinanceCount] = useState(0);
   const [tripsSpend, setTripsSpend] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
-    const fetchSpend = async () => {
-      try {
-        const res = await tripAPI.myTrips();
-        const trips = res.data?.data || [];
-        const spent = trips
-          .filter(t => ['approved', 'booked', 'completed'].includes(t.status))
-          .reduce((s, t) => s + (t.actualCost || t.approvedBudget || t.estimatedBudget || 0), 0);
-        if (mounted) setTripsSpend(spent);
-      } catch {
-        // non-fatal
-      }
-    };
-    fetchSpend();
-    return () => { mounted = false; };
-  }, []);
+
 
   const spentAmount = tripsSpend !== null ? tripsSpend : (user?.travelBudgetUsed || 0);
   const budgetLimit = user?.travelBudgetLimit || 20000;
@@ -116,6 +100,21 @@ export default function Sidebar() {
     let mounted = true;
 
     const fetchAllCounts = async () => {
+      // Spend calculation
+      try {
+        const res = await tripAPI.myTrips();
+        const trips = res.data?.data || [];
+        const spent = trips
+          .filter(t => ['approved', 'booked', 'completed'].includes(t.status))
+          .reduce((s, t) => {
+            const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+              ? Number(t.approvedBudget)
+              : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
+            return s + cost;
+          }, 0);
+        if (mounted) setTripsSpend(spent);
+      } catch {}
+
       // 1. Messages count
       if (location.pathname === '/messages') {
         if (mounted) setUnreadMsgCount(0);
@@ -159,6 +158,7 @@ export default function Sidebar() {
     const onMessagesRead = () => fetchAllCounts();
 
     window.addEventListener('ctm_approvals_updated', onApprovalsUpdated);
+    window.addEventListener('ctm_trip_booked', onApprovalsUpdated);
     window.addEventListener('ctm_messages_read', onMessagesRead);
     window.addEventListener('storage', onMessagesRead);
 
@@ -166,6 +166,7 @@ export default function Sidebar() {
       mounted = false;
       clearInterval(interval);
       window.removeEventListener('ctm_approvals_updated', onApprovalsUpdated);
+      window.removeEventListener('ctm_trip_booked', onApprovalsUpdated);
       window.removeEventListener('ctm_messages_read', onMessagesRead);
       window.removeEventListener('storage', onMessagesRead);
     };

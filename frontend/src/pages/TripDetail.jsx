@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTrip } from '../context/TripContext';
+import { useTheme } from '../context/ThemeContext';
 import { motion } from 'framer-motion';
 import Navbar  from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
@@ -9,7 +10,10 @@ import LoadingSpinner from '../components/common/ShimmerLoader';
 import ChatInterface  from '../components/employee/ChatInterface';
 import TripPlans      from '../components/employee/TripPlans';
 import { format } from 'date-fns';
-import { ArrowLeft, MapPin, Calendar, FileText, CheckCircle, XCircle, Clock, Ticket } from 'lucide-react';
+import {
+  ArrowLeft, MapPin, Calendar, FileText, CheckCircle, XCircle,
+  Clock, Ticket, Building2, Coffee, ShieldCheck
+} from 'lucide-react';
 
 const ease = [0.25, 1, 0.5, 1];
 
@@ -76,8 +80,162 @@ function Timeline({ approvals }) {
   );
 }
 
+function HotelCard({ hotel, tripStatus, isDark }) {
+  if (!hotel) return null;
+  const isBooked = tripStatus === 'booked' || tripStatus === 'completed';
+  const isApproved = tripStatus === 'approved';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease, delay: 0.2 }}
+      style={{
+        ...glassCard,
+        background: isBooked ? 'rgba(39, 174, 96, 0.04)' : 'var(--atmos-glass)',
+        border: isBooked ? '1.5px solid rgba(39, 174, 96, 0.35)' : '1px solid rgba(196,162,93,0.3)',
+        borderRadius: '1.2rem',
+        padding: '1.4rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: isBooked
+          ? '0 16px 40px rgba(39, 174, 96, 0.12), 0 4px 16px rgba(44,43,41,0.06)'
+          : '0 16px 40px rgba(196, 162, 93, 0.12), 0 4px 16px rgba(44,43,41,0.06)',
+      }}
+    >
+      <div>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{
+              width: '38px', height: '38px', borderRadius: '10px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'linear-gradient(135deg, #8B6914, #C4A25D)',
+              boxShadow: '0 4px 14px rgba(196,162,93,0.3)',
+              flexShrink: 0,
+            }}>
+              <Building2 style={{ width: '18px', height: '18px', color: '#fff' }} />
+            </div>
+            <div>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 700, color: 'var(--atmos-dark)', margin: 0 }}>
+                Selected Accommodation
+              </h3>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)', margin: 0 }}>
+                Hotel & Fooding Package
+              </p>
+            </div>
+          </div>
+          <span style={{
+            padding: '0.2rem 0.65rem', borderRadius: '999px',
+            background: isBooked ? 'rgba(39,174,96,0.15)' : 'rgba(196,162,93,0.15)',
+            color: isBooked ? '#1A7F45' : '#8B6914',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', fontWeight: 700,
+            letterSpacing: '0.08em', textTransform: 'uppercase',
+          }}>
+            {isBooked ? 'Confirmed Stay' : isApproved ? 'Approved Stay' : 'Selected Hotel'}
+          </span>
+        </div>
+
+        {/* Total Cost */}
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '1.1rem', paddingBottom: '0.9rem', borderBottom: '1px solid rgba(196,162,93,0.12)' }}>
+          <div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--atmos-dark)', letterSpacing: '-0.02em' }}>
+              ₹{(hotel.totalCost || 0).toLocaleString('en-IN')}
+            </div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-muted)' }}>
+              Total accommodation ({hotel.nights || 1} nights)
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 600, color: 'var(--atmos-dark)' }}>
+              ₹{(hotel.pricePerNight || hotel.costPerNight || 0).toLocaleString('en-IN')}
+            </div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.58rem', color: 'var(--atmos-muted)' }}>
+              per night
+            </div>
+          </div>
+        </div>
+
+        {/* Hotel Details Card */}
+        <div style={{
+          padding: '0.85rem 1rem', borderRadius: '0.85rem',
+          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+          border: '1px solid rgba(196,162,93,0.15)',
+          marginBottom: '1rem',
+        }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--atmos-muted)', marginBottom: '0.2rem' }}>
+            Hotel Property
+          </p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.92rem', fontWeight: 700, color: 'var(--atmos-dark)', margin: 0 }}>
+            {hotel.name}
+          </p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: 'var(--atmos-muted)', marginTop: '0.2rem' }}>
+            ⭐ 4.5/5.0 Corporate Partner · Deluxe Room ({hotel.nights || 1} Nights)
+          </p>
+        </div>
+
+        {/* Perks / Inclusions */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <CheckCircle style={{ width: '14px', height: '14px', color: '#16A34A', flexShrink: 0 }} />
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)', fontWeight: 500 }}>
+              {hotel.nights || 1} Nights Stay Included
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {hotel.foodingIncluded ? (
+              <>
+                <CheckCircle style={{ width: '14px', height: '14px', color: '#16A34A', flexShrink: 0 }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#16A34A', fontWeight: 600 }}>
+                  Fooding Included (Breakfast & Dinner covered)
+                </span>
+              </>
+            ) : (
+              <>
+                <Coffee style={{ width: '14px', height: '14px', color: 'var(--atmos-muted)', flexShrink: 0 }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-muted)', fontWeight: 500 }}>
+                  Room Only (Meals separate / claimable)
+                </span>
+              </>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ShieldCheck style={{ width: '14px', height: '14px', color: '#16A34A', flexShrink: 0 }} />
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: 'var(--atmos-dark)', fontWeight: 500 }}>
+              Authorized & budgeted under approved company allowance
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Status Badge */}
+      <div style={{
+        padding: '0.65rem', borderRadius: '0.75rem',
+        background: isBooked ? 'rgba(39, 174, 96, 0.12)' : 'rgba(196,162,93,0.12)',
+        border: isBooked ? '1px solid rgba(39, 174, 96, 0.35)' : '1px solid rgba(196,162,93,0.3)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
+        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 700,
+        letterSpacing: '0.06em', textTransform: 'uppercase',
+        color: isBooked ? '#16A34A' : '#8B6914',
+      }}>
+        {isBooked ? (
+          <><CheckCircle style={{ width: '14px', height: '14px' }} /> Hotel Reserved & Confirmed</>
+        ) : isApproved ? (
+          <><CheckCircle style={{ width: '14px', height: '14px' }} /> Approved with Travel Plan</>
+        ) : (
+          <>Selected Hotel</>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function TripDetail() {
-  const { tripId }  = useParams();
+  const { isDark } = useTheme();
+  const { tripId } = useParams();
   const { loadTripDetail, loading } = useTrip();
   const [detail, setDetail] = useState(null);
 
@@ -96,6 +254,10 @@ export default function TripDetail() {
 
   const { trip, plans, approvals, booking } = detail || {};
   const badge = trip ? STATUS_BADGE(trip.status) : {};
+  const hotel = trip?.selectedHotel || trip?.billDetails?.hotel;
+  const isApprovedOrBooked = ['approved', 'booked', 'completed'].includes(trip?.status);
+  const selectedPlan = plans?.find(p => p.isSelected || (p._id || p.id) === trip?.selectedPlanId) || plans?.[0];
+  const displayedPlans = isApprovedOrBooked && selectedPlan ? [selectedPlan] : (plans || []);
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -250,21 +412,70 @@ export default function TripDetail() {
 
                 {/* Right column */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  {plans?.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, ease, delay: 0.15 }}
-                    >
-                      <TripPlans
-                        trip={trip}
-                        plans={plans}
-                        onPlanSelected={() => {}}
-                        onBooked={() => loadTripDetail(tripId).then(setDetail)}
-                        compact
-                      />
-                    </motion.div>
+                  {/* Status header banner for approved or booked trips */}
+                  {isApprovedOrBooked && (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '0.85rem 1.25rem', borderRadius: '0.9rem',
+                      background: trip.status === 'booked' ? 'rgba(39, 174, 96, 0.08)' : 'rgba(196,162,93,0.08)',
+                      border: trip.status === 'booked' ? '1px solid rgba(39, 174, 96, 0.25)' : '1px solid rgba(196,162,93,0.25)',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <CheckCircle style={{ width: '18px', height: '18px', color: trip.status === 'booked' ? '#16A34A' : '#8B6914' }} />
+                        <div>
+                          <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.85rem', fontWeight: 700, color: 'var(--atmos-dark)', margin: 0 }}>
+                            {trip.status === 'booked' ? 'Confirmed Travel Plan & Accommodation' : 'Approved Travel Plan & Accommodation'}
+                          </h3>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.66rem', color: 'var(--atmos-muted)', margin: 0 }}>
+                            {trip.status === 'booked' ? 'All travel tickets and hotel accommodations are confirmed' : 'Approved by manager & finance — click Confirm & Book to proceed'}
+                          </p>
+                        </div>
+                      </div>
+                      <span style={{
+                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', fontWeight: 700,
+                        letterSpacing: '0.08em', textTransform: 'uppercase',
+                        padding: '0.2rem 0.6rem', borderRadius: '999px',
+                        background: trip.status === 'booked' ? 'rgba(39, 174, 96, 0.15)' : 'rgba(196,162,93,0.15)',
+                        color: trip.status === 'booked' ? '#16A34A' : '#8B6914',
+                      }}>
+                        {trip.status?.toUpperCase()}
+                      </span>
+                    </div>
                   )}
+
+                  {/* Plans & Hotel Cards Grid */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: (isApprovedOrBooked && hotel) ? 'repeat(auto-fit, minmax(320px, 1fr))' : '1fr',
+                    gap: '1.25rem',
+                    alignItems: 'start'
+                  }}>
+                    {displayedPlans?.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, ease, delay: 0.15 }}
+                      >
+                        <TripPlans
+                          trip={trip}
+                          plans={displayedPlans}
+                          onPlanSelected={() => {}}
+                          onBooked={() => loadTripDetail(tripId).then(setDetail)}
+                          compact
+                        />
+                      </motion.div>
+                    )}
+
+                    {isApprovedOrBooked && hotel && (
+                      <HotelCard
+                        hotel={hotel}
+                        tripStatus={trip.status}
+                        isDark={isDark}
+                      />
+                    )}
+                  </div>
+
+                  {/* Interactive Chat */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

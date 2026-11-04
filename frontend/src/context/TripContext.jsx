@@ -52,11 +52,14 @@ export const TripProvider = ({ children }) => {
     try {
       const { data } = await tripAPI.book(tripId, planId);
       toast.success('🎫 Booking confirmed!');
+      window.dispatchEvent(new CustomEvent('ctm_trip_booked'));
+      window.dispatchEvent(new CustomEvent('ctm_approvals_updated'));
+      await fetchMyTrips();
       return data.data;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchMyTrips]);
 
   return (
     <TripContext.Provider value={{

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTrip } from '../../context/TripContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Zap, DollarSign, Smile, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Loader2, Zap, DollarSign, Smile, ChevronDown, ChevronUp, Check, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { tripAPI } from '../../services/api';
 import TripMap from './TripMap';
@@ -196,7 +196,35 @@ function PlanCard({ plan, selected, onSelect, onBook, booking, tripStatus, index
 
       {/* Actions */}
       <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid rgba(196,162,93,0.1)', display: 'flex', gap: '0.65rem' }}>
-        {!selected ? (
+        {tripStatus === 'booked' ? (
+          selected ? (
+            <div
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
+                padding: '0.6rem', borderRadius: '0.7rem',
+                background: 'rgba(34, 197, 94, 0.15)',
+                border: '1px solid rgba(34, 197, 94, 0.4)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 700,
+                letterSpacing: '0.06em', textTransform: 'uppercase', color: '#16A34A',
+              }}
+            >
+              <CheckCircle style={{ width: '14px', height: '14px' }} /> Plan Booked & Confirmed
+            </div>
+          ) : (
+            <div
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '0.6rem', borderRadius: '0.7rem',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 500,
+                color: 'var(--atmos-muted)',
+              }}
+            >
+              Alternative Option
+            </div>
+          )
+        ) : !selected ? (
           <motion.button
             onClick={() => onSelect(plan._id || plan.id)}
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
@@ -259,7 +287,7 @@ trip, plans, onPlanSelected, onBooked, onBack, compact }) {
   const { isDark } = useTheme();
   const { bookSelectedPlan } = useTrip();
   const navigate = useNavigate();
-  const [selectedPlanId, setSelectedPlanId] = useState(trip?.selectedPlanId || null);
+  const [selectedPlanId, setSelectedPlanId] = useState(trip?.selectedPlanId || (plans?.length === 1 ? (plans[0]._id || plans[0].id) : null));
   const [booking, setBooking] = useState(false);
 
   const handleSelect = async (planId) => {
@@ -343,7 +371,21 @@ trip, plans, onPlanSelected, onBooked, onBack, compact }) {
       )}
 
       {/* Status notices */}
-      {trip?.status !== 'approved' && trip?.status !== 'draft' && (
+      {trip?.status === 'booked' && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginBottom: '1rem', padding: '0.75rem 1rem', borderRadius: '0.75rem',
+            background: 'rgba(39,174,96,0.08)', border: '1px solid rgba(39,174,96,0.3)',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#1A7F45',
+            display: 'flex', alignItems: 'center', gap: '0.5rem'
+          }}
+        >
+          ✅ Booking Confirmed — Travel tickets and itinerary are reserved.
+        </motion.div>
+      )}
+
+      {trip?.status !== 'approved' && trip?.status !== 'draft' && trip?.status !== 'booked' && (
         <motion.div
           initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           style={{
@@ -374,12 +416,12 @@ trip, plans, onPlanSelected, onBooked, onBack, compact }) {
         <TripMap startCity={trip?.fromCity} endCity={trip?.toCity} />
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: plans.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
         {plans.map((plan, i) => (
           <PlanCard
             key={plan._id || plan.id || i}
             plan={plan}
-            selected={selectedPlanId === (plan._id || plan.id)}
+            selected={plans.length === 1 || selectedPlanId === (plan._id || plan.id) || plan.isSelected}
             onSelect={handleSelect}
             onBook={handleBook}
             booking={booking}

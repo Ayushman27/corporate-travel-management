@@ -111,8 +111,13 @@ export default function Dashboard() {
     total:    myTrips.length,
     pending:  myTrips.filter(t => t.status.startsWith('pending')).length,
     approved: myTrips.filter(t => ['approved', 'booked'].includes(t.status)).length,
-    spent:    myTrips.filter(t => ['approved', 'booked'].includes(t.status))
-                     .reduce((s, t) => s + (t.actualCost || t.estimatedBudget || 0), 0),
+    spent: myTrips.filter(t => ['approved', 'booked', 'completed'].includes(t.status))
+                    .reduce((s, t) => {
+                      const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+                        ? Number(t.approvedBudget)
+                        : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
+                      return s + cost;
+                    }, 0),
   };
 
   return (

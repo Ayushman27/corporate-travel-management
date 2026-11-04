@@ -490,11 +490,9 @@ const getMe = async (req, res) => {
         });
 
         const totalSpend = trips.reduce((sum, t) => {
-          const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
-            ? Number(t.actualCost)
-            : (t.approvedBudget !== undefined && t.approvedBudget !== null
-              ? Number(t.approvedBudget)
-              : (Number(t.estimatedBudget) || 0));
+          const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+            ? Number(t.approvedBudget)
+            : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
           return sum + cost;
         }, 0);
 

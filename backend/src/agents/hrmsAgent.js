@@ -235,11 +235,9 @@ const getDepartmentSummary = async (companyId) => {
       if (!summary[dept]) {
         summary[dept] = { count: 0, totalBudgetAllocated: 0, totalBudgetUsed: 0, employees: [] };
       }
-      const cost = (trip.status === 'booked' && Number(trip.actualCost) > 0)
-        ? Number(trip.actualCost)
-        : (trip.approvedBudget !== undefined && trip.approvedBudget !== null
-          ? Number(trip.approvedBudget)
-          : (Number(trip.estimatedBudget) || 0));
+      const cost = (trip.approvedBudget !== undefined && trip.approvedBudget !== null && Number(trip.approvedBudget) > 0)
+        ? Number(trip.approvedBudget)
+        : (Number(trip.actualCost) || Number(trip.estimatedBudget) || 0);
       summary[dept].totalBudgetUsed += cost;
     }
 
@@ -248,11 +246,9 @@ const getDepartmentSummary = async (companyId) => {
       const userTrips = allTrips.filter(t => t.employeeId === dbUser.employeeId);
       const userLimit = Number(dbUser.travelBudgetLimit) || 50000;
       const trueSpend = userTrips.reduce((s, t) => {
-        const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
-          ? Number(t.actualCost)
-          : (t.approvedBudget !== undefined && t.approvedBudget !== null
-            ? Number(t.approvedBudget)
-            : (Number(t.estimatedBudget) || 0));
+        const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+          ? Number(t.approvedBudget)
+          : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
         return s + cost;
       }, 0);
       if (dbUser.travelBudgetUsed !== trueSpend) {

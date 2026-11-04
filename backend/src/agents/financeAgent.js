@@ -174,11 +174,9 @@ const applyApprovedBudget = async (companyId, tripId, employeeId, amount) => {
       });
       const userLimit = Number(user.travelBudgetLimit) || 50000;
       const trueSpend = allUserTrips.reduce((sum, t) => {
-        const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
-          ? Number(t.actualCost)
-          : (t.approvedBudget !== undefined && t.approvedBudget !== null
-            ? Number(t.approvedBudget)
-            : (Number(t.estimatedBudget) || 0));
+        const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+          ? Number(t.approvedBudget)
+          : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
 
         // All approved, booked, and completed trips count toward true spend
         return sum + cost;
@@ -238,11 +236,9 @@ const generateReport = async (companyId) => {
     const d = new Date(dateVal);
     if (isNaN(d.getTime())) continue;
     const mName = d.toLocaleString('en-US', { month: 'long' });
-    const cost = (t.status === 'booked' && Number(t.actualCost) > 0)
-      ? Number(t.actualCost)
-      : (t.approvedBudget !== undefined && t.approvedBudget !== null
-        ? Number(t.approvedBudget)
-        : (Number(t.estimatedBudget) || 0));
+    const cost = (t.approvedBudget !== undefined && t.approvedBudget !== null && Number(t.approvedBudget) > 0)
+      ? Number(t.approvedBudget)
+      : (Number(t.actualCost) || Number(t.estimatedBudget) || 0);
     const updated = new Date(t.updatedAt || t.submittedAt || t.createdAt);
 
     if (!tripSpendByMonth[mName]) {
