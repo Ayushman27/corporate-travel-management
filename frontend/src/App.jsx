@@ -15,6 +15,7 @@ import EmployeeReimbursements from './pages/EmployeeReimbursements';
 import FinanceReimbursements from './pages/FinanceReimbursements';
 import AdminTelemetry from './pages/AdminTelemetry';
 import Messages from './pages/Messages';
+import MagicLogin from './pages/MagicLogin';
 import LoadingSpinner     from './components/common/ShimmerLoader';
 import AnimatedBackground from './components/common/AnimatedBackground';
 import ErrorBoundary      from './components/common/ErrorBoundary';
@@ -35,6 +36,7 @@ const AppRoutes = () => {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/login" element={<Login />} />
+          <Route path="/magic-login" element={<MagicLogin />} />
 
           <Route path="/dashboard" element={
             <ProtectedRoute><Dashboard /></ProtectedRoute>

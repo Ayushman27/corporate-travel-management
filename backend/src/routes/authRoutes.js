@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const {
-  registerCompany, employeeLogin, adminLogin,
+  registerCompany, employeeLogin, adminLogin, magicLogin,
   listCompanies, syncSheets,
   getMe, updateMe, reactivateAdmin, requestReactivation,
   emailDiagnostic,
@@ -13,6 +13,7 @@ const { authorize }  = require('../middleware/rbac');
 router.post('/register-company', registerCompany);
 router.post('/employee-login',   employeeLogin);
 router.post('/admin-login',      adminLogin);
+router.post('/magic-login',      magicLogin);
 router.post('/reactivate-admin', reactivateAdmin);
 router.post('/request-reactivation', requestReactivation);
 router.get ('/companies',        listCompanies);

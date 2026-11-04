@@ -600,10 +600,114 @@ const emailDiagnostic = async (req, res) => {
   });
 };
 
+
+// ── POST /api/auth/magic-login ──────────────────────────────────────────────
+// Validates a cryptographically signed one-click magic token and signs in the user
+const magicLogin = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Magic login token is required' });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret');
+    } catch (err) {
+      logger.warn(`[MagicLogin] Token verification failed: ${err.message}`);
+      return res.status(401).json({
+        success: false,
+        message: 'This secure access link has expired or is invalid. Please log in with your email.'
+      });
+    }
+
+    if (decoded.purpose !== 'magic_trip_login') {
+      return res.status(401).json({ success: false, message: 'Invalid token purpose' });
+    }
+
+    const { employeeId, email, companyId, tripId } = decoded;
+
+    // Retrieve user from DB
+    let user = null;
+    if (employeeId && companyId) {
+      user = await User.findOne({ employeeId, companyId });
+    }
+    if (!user && employeeId) {
+      user = await User.findOne({ employeeId });
+    }
+    if (!user && email) {
+      user = await User.findOne({ email: email.toLowerCase().trim() });
+    }
+
+    // Fallback: If user not yet in DB, check HRMS sheet and create record
+    if (!user && email && companyId) {
+      try {
+        const hrmsEmp = await getEmployeeByEmail(companyId, email);
+        if (hrmsEmp) {
+          user = await User.findOneAndUpdate(
+            { companyId, employeeId: hrmsEmp.EmployeeID },
+            {
+              employeeId: hrmsEmp.EmployeeID,
+              companyId,
+              name: hrmsEmp.Name || 'Employee',
+              email: email.toLowerCase().trim(),
+              department: hrmsEmp.Department || 'General',
+              role: (hrmsEmp.Role || 'employee').toLowerCase(),
+              loginType: 'email_only',
+              managerId: hrmsEmp.ManagerID || null,
+              travelBudgetLimit: hrmsEmp.TravelBudget || 50000,
+              travelBudgetUsed: hrmsEmp.TravelBudgetUsed || 0
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+          );
+        }
+      } catch (e) {
+        logger.warn(`[MagicLogin] HRMS fallback check error: ${e.message}`);
+      }
+    }
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User account not found' });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({ success: false, message: 'Account is deactivated' });
+    }
+
+    // Retrieve company
+    let company = null;
+    if (user.companyId) {
+      company = await Company.findOne({ companyId: user.companyId });
+    }
+
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    const sessionToken = signToken(user._id);
+    await audit('LOGIN', {
+      actor: user,
+      details: { email: user.email, loginType: 'magic_token', tripId },
+      req
+    });
+
+    logger.info(`[MagicLogin] Successful passwordless login for ${user.email} (Employee: ${user.employeeId}) via trip ${tripId || 'N/A'}`);
+
+    return res.json({
+      success: true,
+      token: sessionToken,
+      user,
+      company: company ? { companyId: company.companyId, companyName: company.companyName } : null,
+      tripId
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   emailDiagnostic,
   emailEnv,
-  registerCompany, employeeLogin, adminLogin,
+  registerCompany, employeeLogin, adminLogin, magicLogin,
   listCompanies, syncSheets,
   getMe, updateMe, reactivateAdmin, requestReactivation
 };

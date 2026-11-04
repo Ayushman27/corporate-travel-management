@@ -217,7 +217,9 @@ const financeApprove = async (tripId, decision, financeUser, budgetApproved, com
           comments,
           employeeEmail,
           employeeName,
-          approverName: financeUser.name
+          approverName: financeUser.name,
+          employeeId: trip.employeeId,
+          companyId: trip.companyId || financeUser.companyId
         });
         logger.info(`[Orchestrator] Finance approval email dispatched to ${employeeEmail} for trip ${tripId}`);
       } catch (mailErr) {
@@ -244,7 +246,9 @@ const financeApprove = async (tripId, decision, financeUser, budgetApproved, com
           comments,
           employeeEmail,
           employeeName,
-          approverName: financeUser.name
+          approverName: financeUser.name,
+          employeeId: trip.employeeId,
+          companyId: trip.companyId || financeUser.companyId
         });
         logger.info(`[Orchestrator] Finance rejection email dispatched to ${employeeEmail} for trip ${tripId}`);
       } catch (mailErr) {

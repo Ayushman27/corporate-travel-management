@@ -54,6 +54,7 @@ export const authAPI = {
   registerCompany: (data) => api.post('/auth/register-company', data),
   employeeLogin:   (data) => api.post('/auth/employee-login', data),
   adminLogin:      (data) => api.post('/auth/admin-login', data),
+  magicLogin:      (data) => api.post('/auth/magic-login', data),
   listCompanies:   ()     => api.get('/auth/companies'),
   syncSheets:      ()     => api.post('/auth/sync-sheets'),
   me:              ()     => api.get('/auth/me'),

@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
@@ -90,16 +91,65 @@ const sendEmail = async ({ to, subject, html, text }) => {
   return { sent: false, reason: 'No external email provider succeeded' };
 };
 
+const cleanBaseUrl = (url) => {
+  if (!url) return 'https://corporate-travel-management-one.vercel.app';
+  let base = url.split(',')[0].trim().replace(/\/+$/, '');
+  base = base.replace(/\/(dashboard|login|trip|manager|finance).*$/, '');
+  if (base.includes('localhost') || base.includes('127.0.0.1')) {
+    return 'https://corporate-travel-management-one.vercel.app';
+  }
+  return base || 'https://corporate-travel-management-one.vercel.app';
+};
+
 /**
- * Send Trip Decision Email (Finance Approval or Rejection)
+ * Send Trip Decision Email (Finance Approval or Rejection) with secure passwordless magic link
  */
-const sendTripDecisionEmail = async ({ trip, decision, approvedBudget, comments, employeeEmail, employeeName, approverName }) => {
+const sendTripDecisionEmail = async ({
+  trip,
+  decision,
+  approvedBudget,
+  comments,
+  employeeEmail,
+  employeeName,
+  approverName,
+  employeeId,
+  companyId
+}) => {
   const isApproved = decision === 'approved';
   const subject = isApproved
     ? `✈️ Trip Approved: ${trip.tripId} (${trip.fromCity} → ${trip.toCity})`
     : `❌ Trip Request Update: ${trip.tripId} (${trip.fromCity} → ${trip.toCity})`;
 
-  const portalUrl = process.env.FRONTEND_URL || 'https://corporate-travel-management-one.vercel.app';
+  const portalUrl = cleanBaseUrl(process.env.FRONTEND_URL);
+
+  const empId = employeeId || trip.employeeId;
+  const compId = companyId || trip.companyId;
+
+  // Sign a secure, unique 14-day magic token for direct passwordless access
+  let magicToken = '';
+  try {
+    magicToken = jwt.sign(
+      {
+        purpose: 'magic_trip_login',
+        employeeId: empId,
+        email: employeeEmail?.toLowerCase()?.trim(),
+        companyId: compId,
+        tripId: trip.tripId
+      },
+      process.env.JWT_SECRET || 'dev_secret',
+      { expiresIn: '14d' }
+    );
+  } catch (signErr) {
+    logger.warn(`[EmailService] Failed to sign magic token: ${signErr.message}`);
+  }
+
+  const bookingUrl = magicToken
+    ? `${portalUrl}/magic-login?token=${encodeURIComponent(magicToken)}&redirect=${encodeURIComponent(`/trip/${trip.tripId}`)}`
+    : `${portalUrl}/trip/${trip.tripId}`;
+
+  const dashboardUrl = magicToken
+    ? `${portalUrl}/magic-login?token=${encodeURIComponent(magicToken)}&redirect=${encodeURIComponent('/dashboard')}`
+    : `${portalUrl}/dashboard`;
 
   const html = getTripDecisionEmailHTML({
     trip,
@@ -108,7 +158,10 @@ const sendTripDecisionEmail = async ({ trip, decision, approvedBudget, comments,
     comments,
     employeeName,
     approverName,
-    portalUrl
+    portalUrl,
+    magicToken,
+    bookingUrl,
+    dashboardUrl
   });
 
   const text = getTripDecisionEmailText({
@@ -118,7 +171,10 @@ const sendTripDecisionEmail = async ({ trip, decision, approvedBudget, comments,
     comments,
     employeeName,
     approverName,
-    portalUrl
+    portalUrl,
+    magicToken,
+    bookingUrl,
+    dashboardUrl
   });
 
   return sendEmail({
@@ -147,7 +203,6 @@ const sendOTPEmail = async (otp, actualUserEmail) => {
 
 module.exports = {
   sendEmail,
+  sendOTPEmail,
   sendTripDecisionEmail,
-  sendOTPEmail
 };
-

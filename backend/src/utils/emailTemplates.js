@@ -233,7 +233,7 @@ Never share this code with anyone. Travello representatives will never ask you f
 /**
  * Generates an executive, responsive HTML email template for Trip Decision (Approved or Rejected by Finance).
  */
-function getTripDecisionEmailHTML({ trip, decision, approvedBudget, comments, employeeName, approverName, portalUrl }) {
+function getTripDecisionEmailHTML({ trip, decision, approvedBudget, comments, employeeName, approverName, portalUrl, magicToken, bookingUrl, dashboardUrl }) {
   const isApproved = decision === 'approved';
   const statusColor = isApproved ? '#10B981' : '#EF4444';
   const statusBg    = isApproved ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)';
@@ -249,7 +249,9 @@ function getTripDecisionEmailHTML({ trip, decision, approvedBudget, comments, em
     ? new Date(trip.returnDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
     : 'One-way';
 
-  const targetUrl = `${portalUrl || 'https://corporate-travel-management-one.vercel.app'}/trip/${trip.tripId}`;
+  const defaultPortal = 'https://corporate-travel-management-one.vercel.app';
+  const finalBookingUrl = bookingUrl || (portalUrl ? `${portalUrl}/trip/${trip.tripId}` : `${defaultPortal}/trip/${trip.tripId}`);
+  const finalDashboardUrl = dashboardUrl || (portalUrl ? `${portalUrl}/dashboard` : `${defaultPortal}/dashboard`);
 
   const budgetDisplay = isApproved
     ? `<div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
@@ -402,9 +404,21 @@ function getTripDecisionEmailHTML({ trip, decision, approvedBudget, comments, em
         </table>
 
         <div style="text-align: center; margin-top: 28px;">
-          <a href="${targetUrl}" class="btn-action" target="_blank">
+          <a href="${finalBookingUrl}" class="btn-action" target="_blank">
             ${isApproved ? 'Open Trip & Complete Booking' : 'Review Trip Details on Portal'}
           </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 14px;">
+          <a href="${finalDashboardUrl}" style="color: #94a3b8; font-size: 13px; font-weight: 600; text-decoration: underline;" target="_blank">
+            Or open your Employee Dashboard directly →
+          </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 14px;">
+          <span style="display: inline-block; padding: 6px 14px; border-radius: 999px; background: rgba(37, 99, 235, 0.12); border: 1px solid rgba(37, 99, 235, 0.25); font-size: 11px; font-weight: 600; color: #60a5fa;">
+            🔒 1-Click Secure Access — No OTP Login Required
+          </span>
         </div>
       </div>
 
@@ -420,9 +434,11 @@ function getTripDecisionEmailHTML({ trip, decision, approvedBudget, comments, em
 </html>`;
 }
 
-function getTripDecisionEmailText({ trip, decision, approvedBudget, comments, employeeName, approverName, portalUrl }) {
+function getTripDecisionEmailText({ trip, decision, approvedBudget, comments, employeeName, approverName, portalUrl, bookingUrl, dashboardUrl }) {
   const isApproved = decision === 'approved';
-  const targetUrl = `${portalUrl || 'https://corporate-travel-management-one.vercel.app'}/trip/${trip.tripId}`;
+  const defaultPortal = 'https://corporate-travel-management-one.vercel.app';
+  const finalBookingUrl = bookingUrl || (portalUrl ? `${portalUrl}/trip/${trip.tripId}` : `${defaultPortal}/trip/${trip.tripId}`);
+  const finalDashboardUrl = dashboardUrl || (portalUrl ? `${portalUrl}/dashboard` : `${defaultPortal}/dashboard`);
   return `✈ TRAVELLO CORPORATE TRAVEL MANAGEMENT
 ==========================================
 
@@ -441,11 +457,15 @@ Trip Details:
 • Departure: ${trip.travelDate ? new Date(trip.travelDate).toDateString() : 'N/A'}
 ${trip.returnDate ? `• Return: ${new Date(trip.returnDate).toDateString()}\n` : ''}• Requested Budget: Rs. ${(Number(trip.estimatedBudget) || 0).toLocaleString('en-IN')}
 ${isApproved ? `• Approved Budget: Rs. ${(Number(approvedBudget || trip.approvedBudget || trip.estimatedBudget) || 0).toLocaleString('en-IN')}\n` : ''}${comments ? `• Finance Remarks: "${comments}"\n` : ''}${approverName ? `• Reviewed By: ${approverName} (Finance)\n` : ''}
-View trip details online:
-${targetUrl}
+
+>> Open Trip & Complete Booking (Direct Access - No OTP Login):
+${finalBookingUrl}
+
+>> Or Open Your Dashboard Directly:
+${finalDashboardUrl}
 
 --
-© 2026 Travello Inc. All rights reserved.
+© 2026 Travello Corporate Travel Management System.
 `;
 }
 

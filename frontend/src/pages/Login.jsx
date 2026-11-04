@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../services/api';
@@ -22,6 +22,14 @@ export default function Login() {
   const { isDark, toggleTheme } = useTheme();
   const { employeeLogin, adminLogin, registerCompany, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const magicToken = searchParams.get('token');
+    if (magicToken) {
+      navigate(`/magic-login?${searchParams.toString()}`, { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => { if (user) navigate('/dashboard'); }, [user, navigate]);
 

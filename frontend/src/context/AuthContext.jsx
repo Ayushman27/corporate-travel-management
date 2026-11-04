@@ -77,6 +77,16 @@ export const AuthProvider = ({ children }) => {
     return data;
   }, []);
 
+  const loginWithSession = useCallback((data) => {
+    localStorage.setItem('ctm_token', data.token);
+    localStorage.setItem('ctm_user',  JSON.stringify(data.user));
+    if (data.company) localStorage.setItem('ctm_company', JSON.stringify(data.company));
+    setUser(data.user);
+    setCompany(data.company || null);
+    toast.success(`Welcome, ${data.user.name}!`);
+    return data;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('ctm_token');
     localStorage.removeItem('ctm_user');
@@ -99,7 +109,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{
       user, company, loading,
-      employeeLogin, adminLogin, registerCompany,
+      employeeLogin, adminLogin, registerCompany, loginWithSession,
       logout, refreshUser
     }}>
       {children}
