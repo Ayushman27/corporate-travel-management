@@ -238,7 +238,7 @@ export default function TripDetail() {
                             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 600, color: '#1A7F45' }}>
                               {t.mode?.toUpperCase()} · {t.from} → {t.to}
                             </p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.62rem', color: 'var(--atmos-mid)', marginTop: '0.2rem' }}>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.66rem', color: '#000000', fontWeight: 600, marginTop: '0.2rem' }}>
                               Ref: {t.refNo} · Seat: {t.seat} · ₹{t.cost?.toLocaleString('en-IN')}
                             </p>
                           </div>
